@@ -5,6 +5,7 @@ open import Definitions.Setoid
 open import Definitions.Relation
 open import Definitions.Relation.Properties
 open import Definitions.Function.Binary.Properties
+open import Definitions.Relation.Order.Pre
 
 open Setoid {{...}}
 
@@ -17,8 +18,7 @@ record IsAntisymmetric  { ℓ : Level } { A : Set ℓ } {{AS : Setoid A}} (_≤_
 
 record PartialOrder {ℓ : Level} {A : Set ℓ} {{AS : Setoid A}} (_≤_ : Relation A) : Set ℓ where
     field
-        {{is-reflexive}} : IsReflexive _≤_
-        {{is-transitive}} : IsTransitive _≤_
+        {{is-preorder}} : PreOrder _≤_
         {{is-antisymmetric}} : IsAntisymmetric _≤_
         left-congruent-law : {a1 a2 b : A} → a1 ≈ a2 → a1 ≤ b → a2 ≤ b
         right-congruent-law : {a b1 b2 : A} → b1 ≈ b2 → a ≤ b1 → a ≤ b2

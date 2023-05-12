@@ -13,6 +13,7 @@ open import Definitions.Relation
 open import Definitions.Relation.Equivalence.Structural
 open import Definitions.Relation.Equivalence.Structural.Properties(ℕ)
 open import Definitions.Relation.Order.Partial
+open import Definitions.Relation.Order.Pre
 open import Definitions.Relation.Order.Total
 open import Definitions.Relation.Properties
 open import Definitions.Either
@@ -56,18 +57,21 @@ private
     ≤-left-congruent : {a1 a2 b : ℕ} → a1 ≈ a2 → a1 ≤ b → a2 ≤ b
     ≤-left-congruent refl le = le
 
-    ≤-right-congruent : {a b1 b2 : ℕ} → a ≤ b1 → b1 ≈ b2 → a ≤ b2
-    ≤-right-congruent le refl = le
+    ≤-right-congruent : {a b1 b2 : ℕ} → b1 ≈ b2 → a ≤ b1 → a ≤ b2
+    ≤-right-congruent refl le = le
 
 instance
     ≤-IsReflexive : IsReflexive _≤_
     ≤-IsReflexive = record { reflexive = ≤-reflexive }
 
-    ≤-IsAntisymmetric : IsAntisymmetric _≤_
-    ≤-IsAntisymmetric = record { antisymmetric = ≤-antisymmetric }
-
     ≤-IsTransitive : IsTransitive _≤_
     ≤-IsTransitive = record { transitive = ≤-transitive }
+
+    ≤-IsPreorder : PreOrder _≤_
+    ≤-IsPreorder = record {}
+
+    ≤-IsAntisymmetric : IsAntisymmetric _≤_
+    ≤-IsAntisymmetric = record { antisymmetric = ≤-antisymmetric }
 
     ≤-PartialOrder : PartialOrder _≤_
     ≤-PartialOrder = record {left-congruent-law = ≤-left-congruent; right-congruent-law = ≤-right-congruent}

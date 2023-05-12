@@ -6,6 +6,7 @@ open import Definitions.Relation.Equivalence.Structural
 open import Definitions.Relation.Equivalence
 open import Definitions.Relation
 open import Definitions.Relation.Properties 
+open import Definitions.Relation.Order.Pre
 open import Definitions.Function.Unary.Properties
 open import Definitions.Function.Binary.Properties
 open import Definitions.Setoid
@@ -26,6 +27,9 @@ instance
 
     ≡-is-transitive : IsTransitive {ℓ} {A} _≡_
     ≡-is-transitive = record { transitive = ≡-transitive }
+
+    ≡-is-preorder : PreOrder {ℓ} {A} _≡_
+    ≡-is-preorder = record {}
 
     ≡-is-symmetric : IsSymmetric {ℓ} {A} _≡_
     ≡-is-symmetric = record { symmetric = ≡-symmetric }

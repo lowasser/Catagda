@@ -12,6 +12,7 @@ open import Definitions.Nat.Addition.Properties
 open import Definitions.Setoid
 open import Definitions.Function.Binary.Properties
 open import Definitions.Setoid.Equation
+open import Definitions.Relation.Order.Pre
 open import Definitions.Relation.Order.Partial
 
 open Setoid {{ ... }}
@@ -75,11 +76,14 @@ instance
     ℤ≈-IsReflexive : IsReflexive _ℤ≈_
     ℤ≈-IsReflexive = record { reflexive = ℤ≈-reflexive }
 
-    ℤ≈-IsSymmetric : IsSymmetric _ℤ≈_
-    ℤ≈-IsSymmetric = record { symmetric = ℤ≈-symmetric }
-
     ℤ≈-IsTransitive : IsTransitive _ℤ≈_
     ℤ≈-IsTransitive = record { transitive = ℤ≈-transitive }
+
+    ℤ≈-PreOrder : PreOrder _ℤ≈_
+    ℤ≈-PreOrder = record {}
+
+    ℤ≈-IsSymmetric : IsSymmetric _ℤ≈_
+    ℤ≈-IsSymmetric = record { symmetric = ℤ≈-symmetric }
 
     ℤ≈-Equivalence : Equivalence _ℤ≈_
     ℤ≈-Equivalence = record {}
