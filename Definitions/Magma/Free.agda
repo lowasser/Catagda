@@ -18,7 +18,7 @@ data FreeMagma : Set ℓ → Set ℓ where
 
 private    
     data _=fm=_ : Relation (FreeMagma A) where
-        free-magma-leaf-= : {x y : A} → x ≈ y → free-magma-leaf x =fm= free-magma-leaf y
+        free-magma-leaf-= : {x y : A} → x ≅ y → free-magma-leaf x =fm= free-magma-leaf y
         free-magma-bin-= : {x y z w : FreeMagma A} → x =fm= y → z =fm= w → (x <magma> z) =fm= (y <magma> w)
 
     =fm-reflexive : Reflexive _=fm=_
@@ -26,13 +26,13 @@ private
     =fm-reflexive (a <magma> b) = free-magma-bin-= (=fm-reflexive a) (=fm-reflexive b)
 
     =fm-symmetric : Symmetric _=fm=_
-    =fm-symmetric (free-magma-leaf-= x≈y) = free-magma-leaf-= (symmetric-on A x≈y)
-    =fm-symmetric (free-magma-bin-= x≈y z≈w) = free-magma-bin-= (=fm-symmetric x≈y) (=fm-symmetric z≈w)
+    =fm-symmetric (free-magma-leaf-= x≅y) = free-magma-leaf-= (symmetric-on A x≅y)
+    =fm-symmetric (free-magma-bin-= x≅y z≅w) = free-magma-bin-= (=fm-symmetric x≅y) (=fm-symmetric z≅w)
 
     =fm-transitive : Transitive _=fm=_
-    =fm-transitive (free-magma-leaf-= x≈y) (free-magma-leaf-= y≈z) = free-magma-leaf-= (transitive-on A x≈y y≈z)
-    =fm-transitive (free-magma-bin-= ax≈ay bx≈by) (free-magma-bin-= ay≈az by≈bz) =
-        free-magma-bin-= (=fm-transitive ax≈ay ay≈az) (=fm-transitive bx≈by by≈bz)
+    =fm-transitive (free-magma-leaf-= x≅y) (free-magma-leaf-= y≅z) = free-magma-leaf-= (transitive-on A x≅y y≅z)
+    =fm-transitive (free-magma-bin-= ax≅ay bx≅by) (free-magma-bin-= ay≅az by≅bz) =
+        free-magma-bin-= (=fm-transitive ax≅ay ay≅az) (=fm-transitive bx≅by by≅bz)
 
 instance
     =fm-IsReflexive : IsReflexive _=fm=_
@@ -52,7 +52,7 @@ instance
 
 private
     magma-bicongruent : BiCongruent _<magma>_
-    magma-bicongruent {a} {b} {c} {d} a≈b c≈d = free-magma-bin-= a≈b c≈d
+    magma-bicongruent {a} {b} {c} {d} a≅b c≅d = free-magma-bin-= a≅b c≅d
 
 instance
     free-magma-is-bicongruent : IsBiCongruent _<magma>_

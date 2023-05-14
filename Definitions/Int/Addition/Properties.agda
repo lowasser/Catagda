@@ -32,39 +32,39 @@ open IsSymmetric {{...}}
 
 private
     +-commute : Commute _+_
-    +-commute ℤ< a , b > ℤ< c , d > = zeq (begin≈
-        (a +ℕ c) +ℕ (d +ℕ b)    ≈< ≡-congruent (_+ℕ (d +ℕ b)) _≡_ (commute-on _+ℕ_ a c) >
-        (c +ℕ a) +ℕ (d +ℕ b)    ≈< ≡-congruent ((c +ℕ a) +ℕ_) _≡_ (commute-on _+ℕ_ d b) >
+    +-commute ℤ< a , b > ℤ< c , d > = zeq (begin≅
+        (a +ℕ c) +ℕ (d +ℕ b)    ≅< ≡-congruent (_+ℕ (d +ℕ b)) _≡_ (commute-on _+ℕ_ a c) >
+        (c +ℕ a) +ℕ (d +ℕ b)    ≅< ≡-congruent ((c +ℕ a) +ℕ_) _≡_ (commute-on _+ℕ_ d b) >
         (c +ℕ a) +ℕ (b +ℕ d)    ∎)
  
     +-cong2 : Congruent2 _+_
-    +-cong2 {ℤ< ay , by >} (zeq {ax1} {bx1} {ax2} {bx2} ax1bx2≡ax2bx1) = zeq (begin≈
-        (ay +ℕ ax1) +ℕ (by +ℕ bx2)  ≈< ≡-congruent ((ay +ℕ ax1) +ℕ_) _≡_ (commute-on _+ℕ_ by bx2) >
-        (ay +ℕ ax1) +ℕ (bx2 +ℕ by)  ≈< symmetric-on ℕ (associate-on _+ℕ_ ay ax1 (bx2 +ℕ by)) >
-        ay +ℕ (ax1 +ℕ (bx2 +ℕ by))  ≈< ≡-congruent (ay +ℕ_) _≡_ (associate-on _+ℕ_ ax1 bx2 by) >
-        ay +ℕ ((ax1 +ℕ bx2) +ℕ by)  ≈< ≡-congruent (ay +ℕ_) _≡_ (≡-congruent (_+ℕ by) _≡_ ax1bx2≡ax2bx1) >
-        ay +ℕ ((ax2 +ℕ bx1) +ℕ by)  ≈< ≡-congruent (ay +ℕ_) _≡_ (symmetric-on ℕ (associate-on _+ℕ_ ax2 bx1 by)) >
-        ay +ℕ (ax2 +ℕ (bx1 +ℕ by))  ≈< associate-on _+ℕ_ ay ax2 (bx1 +ℕ by) >
-        (ay +ℕ ax2) +ℕ (bx1 +ℕ by)  ≈< ≡-congruent ((ay +ℕ ax2) +ℕ_) _≡_ (commute-on _+ℕ_ bx1 by) >
+    +-cong2 {ℤ< ay , by >} (zeq {ax1} {bx1} {ax2} {bx2} ax1bx2≡ax2bx1) = zeq (begin≅
+        (ay +ℕ ax1) +ℕ (by +ℕ bx2)  ≅< ≡-congruent ((ay +ℕ ax1) +ℕ_) _≡_ (commute-on _+ℕ_ by bx2) >
+        (ay +ℕ ax1) +ℕ (bx2 +ℕ by)  ≅< symmetric-on ℕ (associate-on _+ℕ_ ay ax1 (bx2 +ℕ by)) >
+        ay +ℕ (ax1 +ℕ (bx2 +ℕ by))  ≅< ≡-congruent (ay +ℕ_) _≡_ (associate-on _+ℕ_ ax1 bx2 by) >
+        ay +ℕ ((ax1 +ℕ bx2) +ℕ by)  ≅< ≡-congruent (ay +ℕ_) _≡_ (≡-congruent (_+ℕ by) _≡_ ax1bx2≡ax2bx1) >
+        ay +ℕ ((ax2 +ℕ bx1) +ℕ by)  ≅< ≡-congruent (ay +ℕ_) _≡_ (symmetric-on ℕ (associate-on _+ℕ_ ax2 bx1 by)) >
+        ay +ℕ (ax2 +ℕ (bx1 +ℕ by))  ≅< associate-on _+ℕ_ ay ax2 (bx1 +ℕ by) >
+        (ay +ℕ ax2) +ℕ (bx1 +ℕ by)  ≅< ≡-congruent ((ay +ℕ ax2) +ℕ_) _≡_ (commute-on _+ℕ_ bx1 by) >
         (ay +ℕ ax2) +ℕ (by +ℕ bx1)  ∎)
 
     +-cong1 : Congruent1 _+_
-    +-cong1 {y} {x1} {x2} x1≈x2 = begin≈
-        x1 + y      ≈< +-commute x1 y >
-        y + x1      ≈< +-cong2 x1≈x2 >
-        y + x2      ≈< +-commute y x2 >
+    +-cong1 {y} {x1} {x2} x1≅x2 = begin≅
+        x1 + y      ≅< +-commute x1 y >
+        y + x1      ≅< +-cong2 x1≅x2 >
+        y + x2      ≅< +-commute y x2 >
         x2 + y      ∎
 
     +-assoc : Associate _+_
-    +-assoc (ℤ< ax , bx >) (ℤ< ay , by >) (ℤ< az , bz >) = zeq (begin≈
-        (ax +ℕ (ay +ℕ az)) +ℕ ((bx +ℕ by) +ℕ bz)    ≈< ≡-congruent (_+ℕ ((bx +ℕ by) +ℕ bz)) _≡_ (associate-on _+ℕ_ ax ay az) >
-        ((ax +ℕ ay) +ℕ az) +ℕ ((bx +ℕ by) +ℕ bz)    ≈< ≡-congruent (((ax +ℕ ay) +ℕ az) +ℕ_) _≡_ (symmetric-on ℕ (associate-on _+ℕ_ bx by bz)) >
+    +-assoc (ℤ< ax , bx >) (ℤ< ay , by >) (ℤ< az , bz >) = zeq (begin≅
+        (ax +ℕ (ay +ℕ az)) +ℕ ((bx +ℕ by) +ℕ bz)    ≅< ≡-congruent (_+ℕ ((bx +ℕ by) +ℕ bz)) _≡_ (associate-on _+ℕ_ ax ay az) >
+        ((ax +ℕ ay) +ℕ az) +ℕ ((bx +ℕ by) +ℕ bz)    ≅< ≡-congruent (((ax +ℕ ay) +ℕ az) +ℕ_) _≡_ (symmetric-on ℕ (associate-on _+ℕ_ bx by bz)) >
         ((ax +ℕ ay) +ℕ az) +ℕ (bx +ℕ (by +ℕ bz))    ∎)
 
     +-leftId : LeftIdentity _+_ 0ℤ
-    +-leftId (ℤ< a , b >) = zeq (begin≈
-        (0 +ℕ a) +ℕ b       ≈< ≡-congruent (_+ℕ b) _≡_ (left-id-on _+ℕ_ a) >
-        a +ℕ b              ≈< ≡-congruent (a +ℕ_) _≡_ (symmetric-on ℕ (left-id-on _+ℕ_ b)) >
+    +-leftId (ℤ< a , b >) = zeq (begin≅
+        (0 +ℕ a) +ℕ b       ≅< ≡-congruent (_+ℕ b) _≡_ (left-id-on _+ℕ_ a) >
+        a +ℕ b              ≅< ≡-congruent (a +ℕ_) _≡_ (symmetric-on ℕ (left-id-on _+ℕ_ b)) >
         a +ℕ (0 +ℕ b)       ∎)
 
 instance
@@ -100,9 +100,9 @@ instance
 
 private
     +-left-inv : LeftInverse _+_ 0ℤ -_
-    +-left-inv (ℤ< a , b >) = zeq (begin≈
-            (b +ℕ a) +ℕ 0   ≈< commute-on _+ℕ_ (b +ℕ a) 0 >
-            0 +ℕ (b +ℕ a)   ≈< ≡-congruent (0 +ℕ_) _≡_ (commute-on _+ℕ_ b a) >
+    +-left-inv (ℤ< a , b >) = zeq (begin≅
+            (b +ℕ a) +ℕ 0   ≅< commute-on _+ℕ_ (b +ℕ a) 0 >
+            0 +ℕ (b +ℕ a)   ≅< ≡-congruent (0 +ℕ_) _≡_ (commute-on _+ℕ_ b a) >
             0 +ℕ (a +ℕ b)   ∎)
 
 instance

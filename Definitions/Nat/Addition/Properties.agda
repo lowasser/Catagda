@@ -31,15 +31,15 @@ instance
     +ℕ-Magma = record {}
 
 private
-    +-commute-lemma : (m n : ℕ) → m + suc n ≈ suc (m + n)
-    +-commute-lemma zero n = begin≈
-        zero + suc n        ≈<>
-        suc n               ≈<>
+    +-commute-lemma : (m n : ℕ) → m + suc n ≅ suc (m + n)
+    +-commute-lemma zero n = begin≅
+        zero + suc n        ≅<>
+        suc n               ≅<>
         suc (zero + n)      ∎
-    +-commute-lemma (suc m) n = begin≈
-        suc m + suc n       ≈<>
-        suc (m + suc n)     ≈< congruent-on suc (+-commute-lemma m n) >
-        suc (suc (m + n))   ≈<>
+    +-commute-lemma (suc m) n = begin≅
+        suc m + suc n       ≅<>
+        suc (m + suc n)     ≅< congruent-on suc (+-commute-lemma m n) >
+        suc (suc (m + n))   ≅<>
         suc (suc m + n)     ∎
 
     +-left-id : LeftIdentity _+_ 0
@@ -47,9 +47,9 @@ private
 
     +-right-id : RightIdentity _+_ 0
     +-right-id zero     = refl
-    +-right-id (suc n)  = begin≈
-        suc n + 0       ≈<>
-        suc (n + 0)     ≈< congruent-on suc (+-right-id n) >
+    +-right-id (suc n)  = begin≅
+        suc n + 0       ≅<>
+        suc (n + 0)     ≅< congruent-on suc (+-right-id n) >
         suc n           ∎
 
 instance
@@ -58,14 +58,14 @@ instance
 
 private
     +-commute : Commute _+_
-    +-commute 0 n = begin≈
-        0 + n       ≈<>
-        n           ≈< symmetric (+-right-id n) >
+    +-commute 0 n = begin≅
+        0 + n       ≅<>
+        n           ≅< symmetric (+-right-id n) >
         n + 0       ∎
-    +-commute (suc m) n = begin≈
-        suc m + n   ≈<>
-        suc (m + n) ≈< congruent-on suc (+-commute m n) >
-        suc (n + m) ≈< symmetric (+-commute-lemma n m) >
+    +-commute (suc m) n = begin≅
+        suc m + n   ≅<>
+        suc (m + n) ≅< congruent-on suc (+-commute m n) >
+        suc (n + m) ≅< symmetric (+-commute-lemma n m) >
         n + suc m   ∎
 
 instance
@@ -77,15 +77,15 @@ instance
 
 private
     +-assoc : Associate _+_
-    +-assoc 0 y z = begin≈
-        0 + (y + z)     ≈<>
-        y + z           ≈< right-congruent-on _+_ (symmetric (+-left-id y)) >
+    +-assoc 0 y z = begin≅
+        0 + (y + z)     ≅<>
+        y + z           ≅< right-congruent-on _+_ (symmetric (+-left-id y)) >
         (0 + y) + z     ∎  
-    +-assoc (suc x) y z = begin≈
-        suc x + (y + z)     ≈<>
-        suc (x + (y + z))   ≈< congruent-on suc (+-assoc x y z) >
-        suc ((x + y) + z)   ≈<>
-        suc (x + y) + z     ≈<>
+    +-assoc (suc x) y z = begin≅
+        suc x + (y + z)     ≅<>
+        suc (x + (y + z))   ≅< congruent-on suc (+-assoc x y z) >
+        suc ((x + y) + z)   ≅<>
+        suc (x + y) + z     ≅<>
         (suc x + y) + z     ∎
 
 instance
@@ -109,24 +109,24 @@ private
     unsuc≡ refl = refl
 
 +ℕ-left-injective : (a : ℕ) → Injective (a +_)
-+ℕ-left-injective 0 {b} {c} 0b≡0c = begin≈
-    b       ≈<>
-    0 + b   ≈< 0b≡0c >
-    0 + c   ≈<>
++ℕ-left-injective 0 {b} {c} 0b≡0c = begin≅
+    b       ≅<>
+    0 + b   ≅< 0b≡0c >
+    0 + c   ≅<>
     c       ∎
-+ℕ-left-injective (suc a) {b} {c} sucab≡sucac = unsuc≡ (+ℕ-left-injective a (begin≈
-    a + suc b       ≈< +-commute-lemma a b >
-    suc (a + b)     ≈<>
-    suc a + b       ≈< sucab≡sucac >
-    suc a + c       ≈<>
-    suc (a + c)     ≈< symmetric (+-commute-lemma a c) >
++ℕ-left-injective (suc a) {b} {c} sucab≡sucac = unsuc≡ (+ℕ-left-injective a (begin≅
+    a + suc b       ≅< +-commute-lemma a b >
+    suc (a + b)     ≅<>
+    suc a + b       ≅< sucab≡sucac >
+    suc a + c       ≅<>
+    suc (a + c)     ≅< symmetric (+-commute-lemma a c) >
     a + suc c       ∎))
 
 +ℕ-right-injective : (a : ℕ) → Injective (_+ a)
-+ℕ-right-injective a {b} {c} ba≡ca = +ℕ-left-injective a (begin≈
-    a + b       ≈< +-commute a b >
-    b + a       ≈< ba≡ca >
-    c + a       ≈< +-commute c a >
++ℕ-right-injective a {b} {c} ba≡ca = +ℕ-left-injective a (begin≅
+    a + b       ≅< +-commute a b >
+    b + a       ≅< ba≡ca >
+    c + a       ≅< +-commute c a >
     a + c       ∎) 
 
 ≤ℕ-left-cancel-+ : { a b c : ℕ } → (a + b) ≤ (a + c) → b ≤ c

@@ -24,4 +24,4 @@ instance
     alleq-equivalence = record {}
 
     alleq-setoid : Setoid A
-    alleq-setoid = record {_≈_ = _==_}
+    alleq-setoid = record {_≅_ = _==_}

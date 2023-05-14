@@ -5,7 +5,7 @@ open import Definitions.Monoid
 open import Definitions.Function.Binary
 open import Definitions.Function.Binary.Properties
 
-record Group {ℓ : Level} {S : Set ℓ} (_∙_ : BinOp S) (i : S) (_⁻¹ : S → S) : Set (lsuc ℓ) where
+record Group {ℓA ℓ=A : Level} {A : Set ℓA} (_∙_ : BinOp A) (i : A) (_⁻¹ : A → A) : Set (ℓA ⊔ lsuc ℓ=A) where
     field
-        overlap {{base-monoid}} : Monoid _∙_ i
-        overlap {{has-inverse}} : HasInverse _∙_ i _⁻¹
+        overlap {{base-monoid}} : Monoid {ℓA} {ℓ=A} _∙_ i
+        overlap {{has-inverse}} : HasInverse _∙_ i _⁻¹ 

@@ -20,7 +20,7 @@ open import Definitions.Either
 
 instance
     ℕ-Setoid : Setoid ℕ
-    ℕ-Setoid = record { _≈_ = _≡_ }
+    ℕ-Setoid = record { _≅_ = _≡_ }
 
     ℕ-suc-congruent : IsCongruent suc
     ℕ-suc-congruent = record {congruent = ≡-congruent suc}
@@ -32,8 +32,8 @@ data _≤_ : Relation ℕ where
     s≤s : { a b : ℕ } → a ≤ b → suc a ≤ suc b
 
 private
-    s≈s : {a b : ℕ} → a ≈ b → suc a ≈ suc b
-    s≈s refl = refl
+    s≅s : {a b : ℕ} → a ≅ b → suc a ≅ suc b
+    s≅s refl = refl
 
     ≤-reflexive : Reflexive _≤_
     ≤-reflexive 0 = z≤
@@ -45,7 +45,7 @@ private
 
     ≤-antisymmetric : Antisymmetric _≤_
     ≤-antisymmetric z≤ z≤ = refl
-    ≤-antisymmetric (s≤s xy) (s≤s yx) = s≈s (≤-antisymmetric xy yx)
+    ≤-antisymmetric (s≤s xy) (s≤s yx) = s≅s (≤-antisymmetric xy yx)
 
     ≤-compare : (x y : ℕ) → Either (x ≤ y) (y ≤ x)
     ≤-compare 0 _ = left z≤
@@ -54,10 +54,10 @@ private
     ... | right y≤x = right (s≤s y≤x)
     ≤-compare _ 0 = right z≤
 
-    ≤-left-congruent : {a1 a2 b : ℕ} → a1 ≈ a2 → a1 ≤ b → a2 ≤ b
+    ≤-left-congruent : {a1 a2 b : ℕ} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
     ≤-left-congruent refl le = le
 
-    ≤-right-congruent : {a b1 b2 : ℕ} → b1 ≈ b2 → a ≤ b1 → a ≤ b2
+    ≤-right-congruent : {a b1 b2 : ℕ} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
     ≤-right-congruent refl le = le
 
 instance

@@ -41,54 +41,54 @@ infix 10 ℤ<_,_>
 -1ℤ : ℤ
 -1ℤ = - 1ℤ
 
-data _ℤ≈_ : Relation ℤ where
-    zeq : {a1 b1 a2 b2 : ℕ} → (a1 +ℕ b2) ≈ (a2 +ℕ b1) → ℤ< a1 , b1 > ℤ≈ ℤ< a2 , b2 >
-infix 4 _ℤ≈_
+data _ℤ≅_ : Relation ℤ where
+    zeq : {a1 b1 a2 b2 : ℕ} → (a1 +ℕ b2) ≅ (a2 +ℕ b1) → ℤ< a1 , b1 > ℤ≅ ℤ< a2 , b2 >
+infix 4 _ℤ≅_
 
 data _≤_ : Relation ℤ where
     z≤ : {a1 b1 a2 b2 : ℕ} → (a1 +ℕ b2) ≤ℕ (a2 +ℕ b1) → ℤ< a1 , b1 > ≤ ℤ< a2 , b2 >
 
 private
-    ℤ≈-reflexive : Reflexive _ℤ≈_
-    ℤ≈-reflexive ℤ< x , y > = zeq refl
+    ℤ≅-reflexive : Reflexive _ℤ≅_
+    ℤ≅-reflexive ℤ< x , y > = zeq refl
 
-    ℤ≈-symmetric : Symmetric _ℤ≈_
-    ℤ≈-symmetric (zeq a1b2≈a2b1) = zeq (symmetric-on ℕ a1b2≈a2b1)
+    ℤ≅-symmetric : Symmetric _ℤ≅_
+    ℤ≅-symmetric (zeq a1b2≅a2b1) = zeq (symmetric-on ℕ a1b2≅a2b1)
 
-    ℤ≈-transitive : Transitive _ℤ≈_
-    ℤ≈-transitive (zeq {ax} {bx} {ay} {by} axby≡aybx) (zeq {ay} {by} {az} {bz} aybz≡azby) = zeq (
-        +ℕ-right-injective by (begin≈
-            (ax +ℕ bz) +ℕ by    ≈< symmetric-on ℕ (associate-on _+ℕ_ ax bz by) >
-            ax +ℕ (bz +ℕ by)    ≈< left-congruent-on _+ℕ_ {ax} (commute-on _+ℕ_ bz by) >
-            ax +ℕ (by +ℕ bz)    ≈< associate-on _+ℕ_ ax by bz >
-            (ax +ℕ by) +ℕ bz    ≈< right-congruent-on _+ℕ_ axby≡aybx >
-            (ay +ℕ bx) +ℕ bz    ≈< right-congruent-on _+ℕ_ (commute-on _+ℕ_ ay bx) >
-            (bx +ℕ ay) +ℕ bz    ≈< symmetric-on ℕ (associate-on _+ℕ_ bx ay bz) >
-            bx +ℕ (ay +ℕ bz)    ≈< left-congruent-on _+ℕ_ {bx} aybz≡azby >
-            bx +ℕ (az +ℕ by)    ≈< associate-on _+ℕ_ bx az by >
-            (bx +ℕ az) +ℕ by    ≈< right-congruent-on _+ℕ_ (commute-on _+ℕ_ bx az) >
+    ℤ≅-transitive : Transitive _ℤ≅_
+    ℤ≅-transitive (zeq {ax} {bx} {ay} {by} axby≡aybx) (zeq {ay} {by} {az} {bz} aybz≡azby) = zeq (
+        +ℕ-right-injective by (begin≅
+            (ax +ℕ bz) +ℕ by    ≅< symmetric-on ℕ (associate-on _+ℕ_ ax bz by) >
+            ax +ℕ (bz +ℕ by)    ≅< left-congruent-on _+ℕ_ {ax} (commute-on _+ℕ_ bz by) >
+            ax +ℕ (by +ℕ bz)    ≅< associate-on _+ℕ_ ax by bz >
+            (ax +ℕ by) +ℕ bz    ≅< right-congruent-on _+ℕ_ axby≡aybx >
+            (ay +ℕ bx) +ℕ bz    ≅< right-congruent-on _+ℕ_ (commute-on _+ℕ_ ay bx) >
+            (bx +ℕ ay) +ℕ bz    ≅< symmetric-on ℕ (associate-on _+ℕ_ bx ay bz) >
+            bx +ℕ (ay +ℕ bz)    ≅< left-congruent-on _+ℕ_ {bx} aybz≡azby >
+            bx +ℕ (az +ℕ by)    ≅< associate-on _+ℕ_ bx az by >
+            (bx +ℕ az) +ℕ by    ≅< right-congruent-on _+ℕ_ (commute-on _+ℕ_ bx az) >
             (az +ℕ bx) +ℕ by    ∎))
 
     ≤-reflexive : Reflexive _≤_
     ≤-reflexive (ℤ< a , b >) = z≤ (reflexive-order-on _≤ℕ_ (a +ℕ b))
 
 instance
-    ℤ≈-IsReflexive : IsReflexive _ℤ≈_
-    ℤ≈-IsReflexive = record { reflexive = ℤ≈-reflexive }
+    ℤ≅-IsReflexive : IsReflexive _ℤ≅_
+    ℤ≅-IsReflexive = record { reflexive = ℤ≅-reflexive }
 
-    ℤ≈-IsTransitive : IsTransitive _ℤ≈_
-    ℤ≈-IsTransitive = record { transitive = ℤ≈-transitive }
+    ℤ≅-IsTransitive : IsTransitive _ℤ≅_
+    ℤ≅-IsTransitive = record { transitive = ℤ≅-transitive }
 
-    ℤ≈-PreOrder : PreOrder _ℤ≈_
-    ℤ≈-PreOrder = record {}
+    ℤ≅-PreOrder : PreOrder _ℤ≅_
+    ℤ≅-PreOrder = record {}
 
-    ℤ≈-IsSymmetric : IsSymmetric _ℤ≈_
-    ℤ≈-IsSymmetric = record { symmetric = ℤ≈-symmetric }
+    ℤ≅-IsSymmetric : IsSymmetric _ℤ≅_
+    ℤ≅-IsSymmetric = record { symmetric = ℤ≅-symmetric }
 
-    ℤ≈-Equivalence : Equivalence _ℤ≈_
-    ℤ≈-Equivalence = record {}
+    ℤ≅-Equivalence : Equivalence _ℤ≅_
+    ℤ≅-Equivalence = record {}
 
     ℤ-Setoid : Setoid ℤ
-    ℤ-Setoid = record { _≈_ = _ℤ≈_ }
+    ℤ-Setoid = record { _≅_ = _ℤ≅_ }
 
     -- TODO : ≤ is a total order

@@ -25,17 +25,17 @@ free-semi1 : A → FreeSemigroup A
 free-semi1 x = free-semi x []
 
 data _=fsg=_ : Relation (FreeSemigroup A) where
-    =fsg : {x y : A} → x ≈ y → {xs ys : [ A ]} → xs ≈ ys → free-semi x xs =fsg= free-semi y ys
+    =fsg : {x y : A} → x ≅ y → {xs ys : [ A ]} → xs ≅ ys → free-semi x xs =fsg= free-semi y ys
 
 private
     =fsg-reflexive : Reflexive _=fsg=_
     =fsg-reflexive (free-semi x xs) = =fsg (reflexive-on A x) (reflexive-on [ A ] xs)
 
     =fsg-symmetric : Symmetric _=fsg=_
-    =fsg-symmetric (=fsg x≈y xs≈ys) = =fsg (symmetric-on A x≈y) (symmetric-on [ A ] xs≈ys)
+    =fsg-symmetric (=fsg x≅y xs≅ys) = =fsg (symmetric-on A x≅y) (symmetric-on [ A ] xs≅ys)
 
     =fsg-transitive : Transitive _=fsg=_
-    =fsg-transitive (=fsg x≈y xs≈ys) (=fsg y≈z ys≈zs) = =fsg (transitive-on A x≈y y≈z) (transitive-on [ A ] xs≈ys ys≈zs)
+    =fsg-transitive (=fsg x≅y xs≅ys) (=fsg y≅z ys≅zs) = =fsg (transitive-on A x≅y y≅z) (transitive-on [ A ] xs≅ys ys≅zs)
 
 instance
     =fsg-IsReflexive : IsReflexive _=fsg=_
@@ -51,20 +51,20 @@ instance
     =fsg-IsEquivalence = record {}
 
     fsg-Setoid : Setoid (FreeSemigroup A)
-    fsg-Setoid = record { _≈_ = _=fsg=_ }
+    fsg-Setoid = record { _≅_ = _=fsg=_ }
 
 _<sg>_ : BinOp (FreeSemigroup A)
 free-semi x xs <sg> free-semi y ys = free-semi x (xs ++ (y :: ys))
 
 private
     sg-bicongruent : BiCongruent _<sg>_
-    sg-bicongruent {free-semi x xs} {free-semi y ys} {free-semi z zs} {free-semi w ws} (=fsg x≈y xs≈ys) (=fsg z≈w zs≈ws) =
-        =fsg x≈y (begin≈
-            xs ++ (z :: zs)     ≈< cong2-on _++_ xs≈ys (cong2-on _::_ z≈w zs≈ws) >
+    sg-bicongruent {free-semi x xs} {free-semi y ys} {free-semi z zs} {free-semi w ws} (=fsg x≅y xs≅ys) (=fsg z≅w zs≅ws) =
+        =fsg x≅y (begin≅
+            xs ++ (z :: zs)     ≅< cong2-on _++_ xs≅ys (cong2-on _::_ z≅w zs≅ws) >
             ys ++ (w :: ws)     ∎)
 
     free-semi-bicongruent : BiCongruent free-semi
-    free-semi-bicongruent x≈y = =fsg x≈y
+    free-semi-bicongruent x≅y = =fsg x≅y
 
 instance
     sg-IsBiCongruent : IsBiCongruent _<sg>_
@@ -78,9 +78,9 @@ instance
 
 private
     sg-associate : Associate _<sg>_
-    sg-associate (free-semi x xs) (free-semi y ys) (free-semi z zs) = begin≈
-        free-semi x (xs ++ (y :: (ys ++ (z :: zs))))    ≈<>
-        free-semi x (xs ++ ((y :: ys) ++ (z :: zs)))    ≈< cong-left-on free-semi (associate-on _++_ xs (y :: ys) (z :: zs)) >
+    sg-associate (free-semi x xs) (free-semi y ys) (free-semi z zs) = begin≅
+        free-semi x (xs ++ (y :: (ys ++ (z :: zs))))    ≅<>
+        free-semi x (xs ++ ((y :: ys) ++ (z :: zs)))    ≅< cong-left-on free-semi (associate-on _++_ xs (y :: ys) (z :: zs)) >
         free-semi x ((xs ++ (y :: ys)) ++ (z :: zs))    ∎
 
 instance

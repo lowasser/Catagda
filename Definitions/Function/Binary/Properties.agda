@@ -5,160 +5,165 @@ open import Definitions.Function.Unary.Properties
 open import Definitions.Function.Binary
 open import Definitions.Setoid
 open import Definitions.Setoid.Equation
-open import Definitions.Relation.Equivalence
+open import Definitions.Relation
+open import Definitions.Relation.Properties
+
+private
+    variable
+        ℓZ ℓA ℓB ℓC ℓ=Z ℓ=A ℓ=B ℓ=C : Level
 
 open Setoid {{...}}
 open Equivalence {{...}}
 
-LeftCongruent : { ℓA ℓB ℓC : Level } {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{Setoid A}} → {{Setoid B}} → {{Setoid C}} → (A → B → C) → Set (ℓA ⊔ ℓB ⊔ ℓC)
+LeftCongruent : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{Setoid ℓ=A A}} → {{Setoid ℓ=B B}} → {{Setoid ℓ=C C}} → (A → B → C) → Set (ℓA ⊔ ℓB ⊔ ℓ=B ⊔ ℓ=C)
 LeftCongruent _∙_ = ∀ {a} → Congruent (a ∙_)
 
-RightCongruent : { ℓA ℓB ℓC : Level } {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{Setoid A}} → {{Setoid B}} → {{Setoid C}} → (A → B → C) → Set (ℓA ⊔ ℓB ⊔ ℓC)
+RightCongruent : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{Setoid ℓ=A A}} → {{Setoid ℓ=B B}} → {{Setoid ℓ=C C}} → (A → B → C) → Set (ℓA ⊔ ℓB ⊔ ℓ=A ⊔ ℓ=C)
 RightCongruent _∙_ = ∀ {b} → Congruent (_∙ b)
 
-record BiCongruent { ℓA ℓB ℓC : Level } {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} {{SA : Setoid A}} {{SB : Setoid B}} {{SC : Setoid C}} (_∙_ : A → B → C) : Set (ℓA ⊔ ℓB ⊔ ℓC) where
+record BiCongruent  {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} {{SA : Setoid ℓ=A A}} {{SB : Setoid ℓ=B B}} {{SC : Setoid ℓ=C C}} (_∙_ : A → B → C) : Set (ℓA ⊔ ℓB ⊔ ℓC ⊔ ℓ=A ⊔ ℓ=B ⊔ ℓ=C) where
     field
         left-congruent : LeftCongruent _∙_
         right-congruent : RightCongruent _∙_
 
 open BiCongruent{{...}}
 
-bi-congruent : { ℓA ℓB ℓC : Level } {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{SA : Setoid A}} → {{SB : Setoid B}} → {{SC : Setoid C}} → (_∙_ : A → B → C) → {{BiCongruent _∙_}} → 
-    {a1 a2 : A} → a1 ≈ a2 → {b1 b2 : B} → b1 ≈ b2 → (a1 ∙ b1) ≈ (a2 ∙ b2)
-bi-congruent _∙_ {a1} {a2} a1≈a2 {b1} {b2} b1≈b2 = begin≈
-    a1 ∙ b1     ≈< left-congruent b1≈b2 >
-    a1 ∙ b2     ≈< right-congruent a1≈a2 >
+bi-congruent : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{SA : Setoid ℓ=A A}} → {{SB : Setoid ℓ=B B}} → {{SC : Setoid ℓ=C C}} → (_∙_ : A → B → C) → {{BiCongruent _∙_}} → 
+    {a1 a2 : A} → a1 ≅ a2 → {b1 b2 : B} → b1 ≅ b2 → (a1 ∙ b1) ≅ (a2 ∙ b2)
+bi-congruent _∙_ {a1} {a2} a1≅a2 {b1} {b2} b1≅b2 = begin≅
+    a1 ∙ b1     ≅< left-congruent b1≅b2 >
+    a1 ∙ b2     ≅< right-congruent a1≅a2 >
     a2 ∙ b2     ∎ 
 
-left-congruent-on : { ℓA ℓB ℓC : Level } {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{SA : Setoid A}} → {{SB : Setoid B}} → {{SC : Setoid C}} → 
+left-congruent-on : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{SA : Setoid ℓ=A A}} → {{SB : Setoid ℓ=B B}} → {{SC : Setoid ℓ=C C}} → 
     (_∙_ : A → B → C) → {{BiCongruent _∙_}} → LeftCongruent _∙_
 left-congruent-on _ = left-congruent
 
-right-congruent-on : { ℓA ℓB ℓC : Level } {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{SA : Setoid A}} → {{SB : Setoid B}} → {{SC : Setoid C}} → 
+right-congruent-on : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{SA : Setoid ℓ=A A}} → {{SB : Setoid ℓ=B B}} → {{SC : Setoid ℓ=C C}} → 
     (_∙_ : A → B → C) → {{BiCongruent _∙_}} → RightCongruent _∙_
 right-congruent-on _ = right-congruent
 
 
-Commute : { ℓA ℓB : Level } {A : Set ℓA} {B : Set ℓB} → {{Setoid B}} → (A → A → B) → Set (ℓA ⊔ ℓB)
-Commute _∙_ = ∀ x y → (x ∙ y) ≈ (y ∙ x) 
+Commute : {A : Set ℓA} {B : Set ℓB} → {{Setoid ℓ=B B}} → (A → A → B) → Set (ℓA ⊔ ℓ=B)
+Commute _∙_ = ∀ x y → (x ∙ y) ≅ (y ∙ x) 
 
-record IsCommutative { ℓA ℓB : Level } { A : Set ℓA } {B : Set ℓB} {{ SB : Setoid B }} (_∙_ : A → A → B) : Set (ℓA ⊔ ℓB) where
+record IsCommutative { A : Set ℓA } {B : Set ℓB} {{ SB : Setoid ℓ=B B }} (_∙_ : A → A → B) : Set (ℓA ⊔ ℓ=B) where
     field
         commute : Commute _∙_
 
 open IsCommutative {{...}}
 
-commute-on : {ℓA ℓB : Level} {A : Set ℓA} {B : Set ℓB} → {{SB : Setoid B}} → (_∙_ : A → A → B) → {{IC : IsCommutative _∙_}} → Commute _∙_
+commute-on : {A : Set ℓA} {B : Set ℓB} → {{SB : Setoid ℓ=B B}} → (_∙_ : A → A → B) → {{IC : IsCommutative _∙_}} → Commute _∙_
 commute-on _ = commute
 
 private
-    commute-congruent : {ℓA ℓB : Level} {A : Set ℓA} {B : Set ℓB} → {{SA : Setoid A}} → {{SC : Setoid B}} → {_∙_ : A → A → B} → {{IsCommutative _∙_}} → LeftCongruent _∙_ → RightCongruent _∙_
-    commute-congruent {_} {_} {_} {_} {_∙_} left-cong {b} {a1} {a2} a1≈a2 = begin≈
-        a1 ∙ b      ≈< commute-on _∙_ a1 b >
-        b ∙ a1      ≈< left-cong a1≈a2 >
-        b ∙ a2      ≈< commute-on _∙_ b a2 >
+    commute-congruent : {A : Set ℓA} {B : Set ℓB} → {{SA : Setoid ℓ=A A}} → {{SB : Setoid ℓ=B B}} → {_∙_ : A → A → B} → {{IsCommutative _∙_}} → LeftCongruent _∙_ → RightCongruent _∙_
+    commute-congruent {_} {_} {_} {_} {_} {_} {_∙_} left-cong {b} {a1} {a2} a1≅a2 = begin≅
+        a1 ∙ b      ≅< commute-on _∙_ a1 b >
+        b ∙ a1      ≅< left-cong a1≅a2 >
+        b ∙ a2      ≅< commute-on _∙_ b a2 >
         a2 ∙ b      ∎
 
-bi-congruent-commutative : {ℓA ℓB : Level} {A : Set ℓA} {B : Set ℓB} → {{SA : Setoid A}} → {{SC : Setoid B}} → (_∙_ : A → A → B) → {{IsCommutative _∙_}} → LeftCongruent _∙_ → BiCongruent _∙_
+bi-congruent-commutative : {A : Set ℓA} {B : Set ℓB} → {{SA : Setoid ℓ=A A}} → {{SC : Setoid ℓ=B B}} → (_∙_ : A → A → B) → {{IsCommutative _∙_}} → LeftCongruent _∙_ → BiCongruent _∙_
 bi-congruent-commutative _∙_ left-cong = record {left-congruent = left-cong; right-congruent = commute-congruent left-cong}
 
-Associate : { ℓ : Level } { A : Set ℓ } → {{Setoid A}} → BinOp A → Set ℓ
-Associate _∙_ = ∀ x y z → (x ∙ (y ∙ z)) ≈ ((x ∙ y) ∙ z)
+Associate : { A : Set ℓA } → {{Setoid ℓ=A A}} → BinOp A → Set (ℓA ⊔ ℓ=A)
+Associate _∙_ = ∀ x y z → (x ∙ (y ∙ z)) ≅ ((x ∙ y) ∙ z)
 
-record IsAssociative {ℓ : Level} {A : Set ℓ} {{SA : Setoid A}} (_∙_ : BinOp A) : Set ℓ where
+record IsAssociative {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_∙_ : BinOp A) : Set (ℓA ⊔ ℓ=A) where
     field
         associate : Associate _∙_
 
 open IsAssociative {{...}}
 
-associate-on : {ℓ : Level} → {A : Set ℓ} → {{SA : Setoid A}} → (_∙_ : BinOp A) → {{IsAssociative _∙_}} → Associate _∙_
+associate-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → {{IsAssociative _∙_}} → Associate _∙_
 associate-on _ = associate
 
-LeftIdentity : {ℓ : Level} {A : Set ℓ} → {{Setoid A}} → BinOp A → A → Set ℓ
-LeftIdentity _∙_ i = ∀ x → i ∙ x ≈ x
+LeftIdentity : {A : Set ℓA} → {{Setoid ℓ=A A}} → BinOp A → A → Set (ℓA ⊔ ℓ=A)
+LeftIdentity _∙_ i = ∀ x → i ∙ x ≅ x
 
-RightIdentity : {ℓ : Level} {A : Set ℓ} → {{Setoid A}} → BinOp A → A → Set ℓ
-RightIdentity _∙_ i = ∀ x → x ∙ i ≈ x
+RightIdentity : {A : Set ℓA} → {{Setoid ℓ=A A}} → BinOp A → A → Set (ℓA ⊔ ℓ=A)
+RightIdentity _∙_ i = ∀ x → x ∙ i ≅ x
 
-record HasIdentity {ℓ : Level} {A : Set ℓ} {{SA : Setoid A}} (_∙_ : BinOp A) (i : A) : Set ℓ where
+record HasIdentity {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_∙_ : BinOp A) (i : A) : Set (ℓA ⊔ ℓ=A) where
     field
         left-identity : LeftIdentity _∙_ i
         right-identity : RightIdentity _∙_ i
 
 open HasIdentity {{...}}
 
-left-identity-on : {ℓ : Level} → {A : Set ℓ} → {{SA : Setoid A}} → (_∙_ : BinOp A) → {i : A} → {{HasIdentity _∙_ i}} → LeftIdentity _∙_ i
+left-identity-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → {i : A} → {{HasIdentity _∙_ i}} → LeftIdentity _∙_ i
 left-identity-on _ = left-identity
 
-right-identity-on : {ℓ : Level} → {A : Set ℓ} → {{SA : Setoid A}} → (_∙_ : BinOp A) → {i : A} → {{HasIdentity _∙_ i}} → RightIdentity _∙_ i
+right-identity-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → {i : A} → {{HasIdentity _∙_ i}} → RightIdentity _∙_ i
 right-identity-on _ = right-identity
 
 private
-    commute-identity : {ℓ : Level} {A : Set ℓ} → {{SA : Setoid A}} → {_∙_ : BinOp A} {i : A} → {{C : IsCommutative _∙_}} → LeftIdentity _∙_ i → RightIdentity _∙_ i
-    commute-identity {_} {_} {{_}} {_∙_} {i} left-id x = begin≈
-        x ∙ i   ≈< commute-on _∙_ x i >
-        i ∙ x   ≈< left-id x >
+    commute-identity : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → {_∙_ : BinOp A} {i : A} → {{C : IsCommutative _∙_}} → LeftIdentity _∙_ i → RightIdentity _∙_ i
+    commute-identity {_} {_} {{_}} {_∙_} {i} left-id x = begin≅
+        x ∙ i   ≅< commute-on _∙_ x i >
+        i ∙ x   ≅< left-id x >
         x       ∎
 
-has-identity-commute : {ℓ : Level} {A : Set ℓ} → {{SA : Setoid A}} → {_∙_ : BinOp A} → {i : A} → {{C : IsCommutative _∙_}} → LeftIdentity _∙_ i → HasIdentity _∙_ i
+has-identity-commute : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → {_∙_ : BinOp A} → {i : A} → {{C : IsCommutative _∙_}} → LeftIdentity _∙_ i → HasIdentity _∙_ i
 has-identity-commute left-id = record {left-identity = left-id; right-identity = commute-identity left-id }
 
-left-id-on : {ℓ : Level} {A : Set ℓ} → {{SA : Setoid A}} → (_∙_ : BinOp A) → {i : A} → {{HasIdentity _∙_ i}} → LeftIdentity _∙_ i
+left-id-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → {i : A} → {{HasIdentity _∙_ i}} → LeftIdentity _∙_ i
 left-id-on _ = left-identity
 
-right-id-on : {ℓ : Level} {A : Set ℓ} → {{SA : Setoid A}} → (_∙_ : BinOp A) → {i : A} → {{HasIdentity _∙_ i}} → RightIdentity _∙_ i
+right-id-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → {i : A} → {{HasIdentity _∙_ i}} → RightIdentity _∙_ i
 right-id-on _ = right-identity
 
-LeftZero : {ℓZ ℓA : Level} {Z : Set ℓZ} {A : Set ℓA} → {{Setoid Z}} → (Z → A → Z) → Z → Set (ℓZ ⊔ ℓA)
-LeftZero _∙_ z = ∀ x → z ∙ x ≈ z
+LeftZero : {Z : Set ℓZ} {A : Set ℓA} → {{Setoid ℓ=Z Z}} → (Z → A → Z) → Z → Set (ℓ=Z ⊔ ℓA)
+LeftZero _∙_ z = ∀ x → z ∙ x ≅ z
 
-RightZero : {ℓA ℓZ : Level} {A : Set ℓA} {Z : Set ℓZ} → {{Setoid Z}} → (A → Z → Z) → Z → Set (ℓZ ⊔ ℓA)
-RightZero _∙_ z = ∀ x → x ∙ z ≈ z
+RightZero : {Z : Set ℓZ} {A : Set ℓA} → {{Setoid ℓ=Z Z}} → (A → Z → Z) → Z → Set (ℓ=Z ⊔ ℓA)
+RightZero _∙_ z = ∀ x → x ∙ z ≅ z
 
-record HasZero {ℓ : Level} {A : Set ℓ} {{SA : Setoid A}} (_∙_ : BinOp A) (z : A) : Set ℓ where
+record HasZero {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_∙_ : BinOp A) (z : A) : Set (ℓA ⊔ ℓ=A) where
     field
         left-zero : LeftZero _∙_ z
         right-zero : RightZero _∙_ z
 
-LeftInverse : {ℓ : Level} {A : Set ℓ} → {{SA : Setoid A}} → (_∙_ : BinOp A) → (id : A) → {{HasIdentity _∙_ id}} → (A → A) → Set ℓ
-LeftInverse _∙_ i inv = ∀ x → inv x ∙ x ≈ i
+LeftInverse : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (id : A) → {{HasIdentity _∙_ id}} → (A → A) → Set (ℓA ⊔ ℓ=A)
+LeftInverse _∙_ i inv = ∀ x → inv x ∙ x ≅ i
 
-RightInverse : {ℓ : Level} {A : Set ℓ} → {{SA : Setoid A}} → (_∙_ : BinOp A) → (id : A) → {{HasIdentity _∙_ id}} → (A → A) → Set ℓ
-RightInverse _∙_ i inv = ∀ x → x ∙ inv x ≈ i
+RightInverse : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (id : A) → {{HasIdentity _∙_ id}} → (A → A) → Set (ℓA ⊔ ℓ=A)
+RightInverse _∙_ i inv = ∀ x → x ∙ inv x ≅ i
 
-record HasInverse {ℓ : Level} {A : Set ℓ} {{SA : Setoid A}} (_∙_ : BinOp A) (i : A) (_⁻¹ : A → A) : Set ℓ where
+record HasInverse {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_∙_ : BinOp A) (i : A) (_⁻¹ : A → A) : Set (ℓA ⊔ ℓ=A) where
     field
         overlap {{has-identity}} : HasIdentity _∙_ i
         left-inverse : LeftInverse _∙_ i _⁻¹
         right-inverse : RightInverse _∙_ i _⁻¹
 
 private
-    commute-inverse : {ℓ : Level} {A : Set ℓ} → {{SA : Setoid A}} → {_∙_ : BinOp A} {i : A} {_⁻¹ : A → A} → {{C : IsCommutative _∙_}} → {{HI : HasIdentity _∙_ i}} → 
+    commute-inverse : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → {_∙_ : BinOp A} {i : A} {_⁻¹ : A → A} → {{C : IsCommutative _∙_}} → {{HI : HasIdentity _∙_ i}} → 
         LeftInverse _∙_ i _⁻¹ → RightInverse _∙_ i _⁻¹
-    commute-inverse {_} {_} {{_}} {_∙_} {i} {inv} left-inv x = begin≈
-        x ∙ inv x   ≈< commute-on _∙_ x (inv x) >
-        inv x ∙ x   ≈< left-inv x >
+    commute-inverse {_} {_} {{_}} {_∙_} {i} {inv} left-inv x = begin≅
+        x ∙ inv x   ≅< commute-on _∙_ x (inv x) >
+        inv x ∙ x   ≅< left-inv x >
         i           ∎
 
-has-inverse-commute : {ℓ : Level} {A : Set ℓ} → {{SA : Setoid A}} → {_∙_ : BinOp A} {i : A} {_⁻¹ : A → A} → {{C : IsCommutative _∙_}} → {{HI : HasIdentity _∙_ i}} → 
+has-inverse-commute : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → {_∙_ : BinOp A} {i : A} {_⁻¹ : A → A} → {{C : IsCommutative _∙_}} → {{HI : HasIdentity _∙_ i}} → 
         LeftInverse _∙_ i _⁻¹ → HasInverse _∙_ i _⁻¹
 has-inverse-commute left-inv = record { left-inverse = left-inv; right-inverse = commute-inverse left-inv }
 
-record BiInjective {ℓA ℓB ℓC : Level} {A : Set ℓA} {B : Set ℓB} {C : Set ℓC}
-    {{SA : Setoid A}} {{SB : Setoid B}} {{SC : Setoid C}}
-    (_∙_ : A → B → C) : Set (ℓA ⊔ ℓB ⊔ ℓC) where
+record BiInjective {A : Set ℓA} {B : Set ℓB} {C : Set ℓC}
+    {{SA : Setoid ℓ=A A}} {{SB : Setoid ℓ=B B}} {{SC : Setoid ℓ=C C}}
+    (_∙_ : A → B → C) : Set (ℓA ⊔ ℓB ⊔ ℓC ⊔ ℓ=A ⊔ ℓ=B ⊔ ℓ=C) where
     field
         left-injective : (a : A) → Injective (a ∙_)
         right-injective : (b : B) → Injective (_∙ b)
 
 open BiInjective {{...}}
 
-left-injective-on : {ℓA ℓB ℓC : Level} {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} →
-     {{SA : Setoid A}} → {{SB : Setoid B}} → {{SC : Setoid C}} →
+left-injective-on : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} →
+     {{SA : Setoid ℓ=A A}} → {{SB : Setoid ℓ=B B}} → {{SC : Setoid ℓ=C C}} →
      (_∙_ : A → B → C) → {{BI : BiInjective _∙_}} → (a : A) → Injective (a ∙_)
 left-injective-on _ = left-injective
 
-right-injective-on : {ℓA ℓB ℓC : Level} {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} →
-     {{SA : Setoid A}} → {{SB : Setoid B}} → {{SC : Setoid C}} →
+right-injective-on : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} →
+     {{SA : Setoid ℓ=A A}} → {{SB : Setoid ℓ=B B}} → {{SC : Setoid ℓ=C C}} →
      (_∙_ : A → B → C) → {{BI : BiInjective _∙_}} → (b : B) → Injective (_∙ b)
 right-injective-on _ = right-injective

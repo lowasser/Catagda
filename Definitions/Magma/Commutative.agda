@@ -5,7 +5,7 @@ open import Definitions.Magma
 open import Definitions.Function.Binary
 open import Definitions.Function.Binary.Properties
 
-record CommutativeMagma {ℓ : Level} {S : Set ℓ} (_∙_ : BinOp S) : Set (lsuc ℓ) where
+record CommutativeMagma {ℓS ℓ=S : Level} {S : Set ℓS} (_∙_ : BinOp S) : Set (ℓS ⊔ lsuc ℓ=S) where
     field
-        overlap {{base-magma}} : Magma _∙_
+        overlap {{base-magma}} : Magma {ℓS} {ℓ=S} _∙_
         {{is-commutative}} : IsCommutative _∙_

@@ -12,6 +12,8 @@ data [_] { ℓ : Level } (A : Set ℓ) : Set ℓ where
     nil : [ A ]
     _::_ : A → [ A ] → [ A ]
 
+infixr 7 _::_
+
 pattern [] = nil
 
 _++_ : {ℓ : Level} {A : Set ℓ} → BinOp [ A ]
@@ -24,3 +26,7 @@ infixr 6 _++_
 [ x :] = x :: []
 
 infix 9 [_:]
+
+map : {ℓA ℓB : Level} {A : Set ℓA} {B : Set ℓB} → (A → B) → [ A ] → [ B ]
+map f [] = []
+map f (x :: xs) = f x :: map f xs

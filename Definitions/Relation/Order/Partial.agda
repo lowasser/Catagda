@@ -10,7 +10,7 @@ open import Definitions.Relation.Order.Pre
 open Setoid {{...}}
 
 Antisymmetric : { ℓ : Level } { A : Set ℓ } → {{AS : Setoid A}} → Relation A → Set ℓ
-Antisymmetric _∼_ = ∀ {x y} → x ∼ y → y ∼ x → x ≈ y
+Antisymmetric _∼_ = ∀ {x y} → x ∼ y → y ∼ x → x ≅ y
 
 record IsAntisymmetric  { ℓ : Level } { A : Set ℓ } {{AS : Setoid A}} (_≤_ : Relation A) : Set ℓ where
     field
@@ -20,8 +20,8 @@ record PartialOrder {ℓ : Level} {A : Set ℓ} {{AS : Setoid A}} (_≤_ : Relat
     field
         {{is-preorder}} : PreOrder _≤_
         {{is-antisymmetric}} : IsAntisymmetric _≤_
-        left-congruent-law : {a1 a2 b : A} → a1 ≈ a2 → a1 ≤ b → a2 ≤ b
-        right-congruent-law : {a b1 b2 : A} → b1 ≈ b2 → a ≤ b1 → a ≤ b2
+        left-congruent-law : {a1 a2 b : A} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
+        right-congruent-law : {a b1 b2 : A} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
 
 open IsReflexive {{...}}
 open IsTransitive {{...}}

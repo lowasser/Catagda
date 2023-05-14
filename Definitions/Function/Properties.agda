@@ -18,19 +18,19 @@ _cong$_ : A Congruent→ B → A → B
 (cong→ f _) cong$ a = f a
 
 data _≡→_ : Relation (A Congruent→ B) where
-    fequiv : { f g : A Congruent→ B } → (∀ {a1 a2 : A} → a1 ≈ a2 → f cong$ a1 ≈ g cong$ a2) → f ≡→ g
+    fequiv : { f g : A Congruent→ B } → (∀ {a1 a2 : A} → a1 ≅ a2 → f cong$ a1 ≅ g cong$ a2) → f ≡→ g
 
 private
     ≡→-reflexive : Reflexive _≡→_
-    ≡→-reflexive (cong→ f cong) = fequiv (λ a1≈a2 → cong a1≈a2)
+    ≡→-reflexive (cong→ f cong) = fequiv (λ a1≅a2 → cong a1≅a2)
 
     ≡→-symmetric : Symmetric _≡→_
-    ≡→-symmetric (fequiv eq) = fequiv (λ a1≈a2 → symmetric-on B (eq (symmetric-on A a1≈a2)))
+    ≡→-symmetric (fequiv eq) = fequiv (λ a1≅a2 → symmetric-on B (eq (symmetric-on A a1≅a2)))
 
     ≡→-transitive : Transitive _≡→_
-    ≡→-transitive (fequiv {f} {g} feqg) (fequiv {g} {h} geqh) = fequiv (λ {a1} {a2} a1≈a2 → begin≈
-        f cong$ a1      ≈< feqg a1≈a2 >
-        g cong$ a2      ≈< geqh (reflexive-on A a2) >
+    ≡→-transitive (fequiv {f} {g} feqg) (fequiv {g} {h} geqh) = fequiv (λ {a1} {a2} a1≅a2 → begin≅
+        f cong$ a1      ≅< feqg a1≅a2 >
+        g cong$ a2      ≅< geqh (reflexive-on A a2) >
         h cong$ a2      ∎)
 
 instance 

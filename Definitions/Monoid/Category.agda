@@ -20,7 +20,7 @@ data Morphism : Object → Object → Set ℓ where
     morph : (a : A) → Morphism ob ob
 
 data _=m=_ : {m n : Object} → Relation (Morphism m n) where
-    meq : {a b : A} → a ≈ b → morph a =m= morph b
+    meq : {a b : A} → a ≅ b → morph a =m= morph b
 
 private
     _∘_ : {a b c : Object} → Morphism b c → Morphism a b → Morphism a c
