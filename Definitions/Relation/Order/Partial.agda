@@ -5,18 +5,21 @@ open import Definitions.Setoid
 open import Definitions.Relation
 open import Definitions.Relation.Properties
 open import Definitions.Function.Binary.Properties
-open import Definitions.Relation.Order.Pre
 
 open Setoid {{...}}
 
-Antisymmetric : { ℓ : Level } { A : Set ℓ } → {{AS : Setoid A}} → Relation A → Set ℓ
+private
+    variable
+        ℓA ℓ=A ℓ≤A : Level
+
+Antisymmetric : { A : Set ℓA } → {{AS : Setoid ℓ=A A}} → Rel ℓ≤A A → Set (ℓA ⊔ ℓ=A ⊔ ℓ≤A)
 Antisymmetric _∼_ = ∀ {x y} → x ∼ y → y ∼ x → x ≅ y
 
-record IsAntisymmetric  { ℓ : Level } { A : Set ℓ } {{AS : Setoid A}} (_≤_ : Relation A) : Set ℓ where
+record IsAntisymmetric { A : Set ℓA } {{AS : Setoid ℓ=A A}} (_≤_ : Rel ℓ≤A A) : Set (ℓA ⊔ ℓ=A ⊔ ℓ≤A) where
     field
         antisymmetric : Antisymmetric _≤_
 
-record PartialOrder {ℓ : Level} {A : Set ℓ} {{AS : Setoid A}} (_≤_ : Relation A) : Set ℓ where
+record PartialOrder {A : Set ℓA} {{AS : Setoid ℓ=A A}} (_≤_ : Rel ℓ≤A A) : Set (ℓA ⊔ ℓ=A ⊔ ℓ≤A) where
     field
         {{is-preorder}} : PreOrder _≤_
         {{is-antisymmetric}} : IsAntisymmetric _≤_
@@ -27,11 +30,11 @@ open IsReflexive {{...}}
 open IsTransitive {{...}}
 open IsAntisymmetric {{...}}
 
-reflexive-order-on : {ℓ : Level} {A : Set ℓ} → {{AS : Setoid A}} → (_≤_ : Relation A) → {{PO : PartialOrder _≤_}} → Reflexive _≤_
+reflexive-order-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → Reflexive _≤_
 reflexive-order-on _ = reflexive
 
-transitive-order-on : {ℓ : Level} {A : Set ℓ} → {{AS : Setoid A}} → (_≤_ : Relation A) → {{PO : PartialOrder _≤_}} → Transitive _≤_
+transitive-order-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → Transitive _≤_
 transitive-order-on _ = transitive
 
-antisymmetric-order-on : {ℓ : Level} {A : Set ℓ} → {{AS : Setoid A}} → (_≤_ : Relation A) → {{PO : PartialOrder _≤_}} → Antisymmetric _≤_
+antisymmetric-order-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → Antisymmetric _≤_
 antisymmetric-order-on _ = antisymmetric
