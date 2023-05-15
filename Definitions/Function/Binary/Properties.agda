@@ -137,6 +137,8 @@ record HasInverse {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_∙_ : BinOp A) (i : 
         left-inverse : LeftInverse _∙_ i _⁻¹
         right-inverse : RightInverse _∙_ i _⁻¹
 
+open HasInverse {{...}}
+
 private
     commute-inverse : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → {_∙_ : BinOp A} {i : A} {_⁻¹ : A → A} → {{C : IsCommutative _∙_}} → {{HI : HasIdentity _∙_ i}} → 
         LeftInverse _∙_ i _⁻¹ → RightInverse _∙_ i _⁻¹
@@ -148,6 +150,12 @@ private
 has-inverse-commute : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → {_∙_ : BinOp A} {i : A} {_⁻¹ : A → A} → {{C : IsCommutative _∙_}} → {{HI : HasIdentity _∙_ i}} → 
         LeftInverse _∙_ i _⁻¹ → HasInverse _∙_ i _⁻¹
 has-inverse-commute left-inv = record { left-inverse = left-inv; right-inverse = commute-inverse left-inv }
+
+left-inverse-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (id : A) → (inv : A → A) → {{HasInverse _∙_ id inv}} → (a : A) → inv a ∙ a ≅ id
+left-inverse-on _ _ _ = left-inverse
+
+right-inverse-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (id : A) → (inv : A → A) → {{HasInverse _∙_ id inv}} → (a : A) → a ∙ inv a ≅ id
+right-inverse-on _ _ _ = right-inverse
 
 record BiInjective {A : Set ℓA} {B : Set ℓB} {C : Set ℓC}
     {{SA : Setoid ℓ=A A}} {{SB : Setoid ℓ=B B}} {{SC : Setoid ℓ=C C}}

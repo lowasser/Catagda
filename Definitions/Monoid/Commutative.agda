@@ -6,7 +6,7 @@ open import Definitions.Monoid
 open import Definitions.Function.Binary
 open import Definitions.Function.Binary.Properties
 
-record CommutativeMonoid {ℓ : Level} {S : Set ℓ} (_∙_ : BinOp S) (i : S) : Set (lsuc ℓ) where
+record CommutativeMonoid {ℓS ℓ=S : Level} {S : Set ℓS} (_∙_ : BinOp S) (i : S) : Set (ℓS ⊔ lsuc ℓ=S) where
     field
-        {{commutative-semigroup}} : CommutativeSemigroup _∙_
-        overlap {{base-monoid}} : Monoid _∙_ i
+        {{commutative-semigroup}} : CommutativeSemigroup {ℓS} {ℓ=S} _∙_
+        overlap {{base-monoid}} : Monoid {ℓS} {ℓ=S} _∙_ i

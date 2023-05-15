@@ -7,7 +7,7 @@ open import Definitions.Semigroup
 open import Definitions.Function.Binary
 open import Definitions.Function.Binary.Properties
 
-record CommutativeSemigroup {ℓ : Level} {S : Set ℓ} (_∙_ : BinOp S) : Set (lsuc ℓ) where
+record CommutativeSemigroup {ℓS ℓ=S : Level} {S : Set ℓS} (_∙_ : BinOp S) : Set (ℓS ⊔ lsuc ℓ=S) where
     field
-        {{commutative-magma}} : CommutativeMagma _∙_
-        overlap {{base-semigroup}} : Semigroup _∙_
+        {{commutative-magma}} : CommutativeMagma {ℓS} {ℓ=S} _∙_
+        overlap {{base-semigroup}} : Semigroup {ℓS} {ℓ=S} _∙_

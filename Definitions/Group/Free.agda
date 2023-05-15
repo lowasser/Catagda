@@ -46,21 +46,24 @@ open Magma {{...}}
 open Equivalence {{...}}
 open IsReflexive {{...}}
 
-private
-    data ReducesTo : Rel (ℓA ⊔ ℓ=A) Word where
-        reduces : (xs : Word) → (x : Letter) → (ys : Word) → ReducesTo (xs ++ invLetter x :: x :: ys) (xs ++ ys)
+data ReducesTo : Rel (ℓA ⊔ ℓ=A) Word where
+    reduces : (xs : Word) → (x : Letter) → (ys : Word) → ReducesTo (xs ++ invLetter x :: x :: ys) (xs ++ ys)
 
-    data EqClosure : Rel (ℓA ⊔ ℓ=A) Word where
-        imp : {xs ys : Word} → ReducesTo xs ys → EqClosure xs ys
-        refl : (xs ys : Word) → xs ≅ ys → EqClosure xs ys
-        sym : Symmetric EqClosure
-        trans : Transitive EqClosure
+data EqClosure : Rel (ℓA ⊔ ℓ=A) Word where
+    imp : {xs ys : Word} → ReducesTo xs ys → EqClosure xs ys
+    refl : (xs ys : Word) → xs ≅ ys → EqClosure xs ys
+    sym : Symmetric EqClosure
+    trans : Transitive EqClosure
 
-    data EqFg : Rel (ℓA ⊔ ℓ=A) (FreeGroup A) where
-        eqfg : { xs ys : Word } → EqClosure xs ys → EqFg (free xs) (free ys)
+data EqFg : Rel (ℓA ⊔ ℓ=A) (FreeGroup A) where
+    eqfg : { xs ys : Word } → EqClosure xs ys → EqFg (free xs) (free ys)
 
+refl' : {xs ys : Word} → xs ≅ ys → EqClosure xs ys
+refl' {xs} {ys} xs=ys = refl xs ys xs=ys
+
+private 
     eqfg-refl : Reflexive EqFg
-    eqfg-refl (free xs) = eqfg (refl xs xs (reflexive-on Word xs))
+    eqfg-refl (free xs) = eqfg (refl' (reflexive-on Word xs))
 
     eqfg-sym : Symmetric EqFg
     eqfg-sym (eqfg xs=ys) = eqfg (sym xs=ys)
@@ -75,10 +78,7 @@ instance
 _∙_ : BinOp (FreeGroup A)
 free xs ∙ free ys = free (xs ++ ys)
 
-private    
-    refl' : {xs ys : Word} → xs ≅ ys → EqClosure xs ys
-    refl' {xs} {ys} xs=ys = refl xs ys xs=ys
-
+private
     left-cong' : (xs : Word) → {ys zs : Word} → EqClosure ys zs → EqClosure (xs ++ ys) (xs ++ zs)
     left-cong' xs (refl ys zs ys=zs) = refl (xs ++ ys) (xs ++ zs) (left-congruent-on _++_ ys=zs)
     left-cong' xs (sym zs=ys) = sym (left-cong' xs zs=ys)
@@ -125,8 +125,11 @@ private
     ∙-assoc (free xs) (free ys) (free zs) = eqfg (refl' (associate-on _++_ xs ys zs))
 
 instance
+    ∙fg-is-associative : IsAssociative _∙_ 
+    ∙fg-is-associative = record {associate = ∙-assoc}
+
     ∙fg-semigroup : Semigroup _∙_
-    ∙fg-semigroup = make-semigroup _∙_ ∙-assoc
+    ∙fg-semigroup = record {}
 
 1fg : FreeGroup A
 1fg = free []

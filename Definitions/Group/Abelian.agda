@@ -6,7 +6,7 @@ open import Definitions.Group
 open import Definitions.Function.Binary
 open import Definitions.Function.Binary.Properties
 
-record AbelianGroup {ℓ : Level} {S : Set ℓ} (_∙_ : BinOp S) (i : S) (_⁻¹ : S → S) : Set (lsuc ℓ) where
+record AbelianGroup {ℓS ℓ=S : Level} {S : Set ℓS} (_∙_ : BinOp S) (i : S) (_⁻¹ : S → S) : Set (ℓS ⊔ lsuc ℓ=S) where
     field
-        {{commutative-monoid}} : CommutativeMonoid _∙_ i
-        overlap {{base-group}} : Group _∙_ i _⁻¹
+        {{commutative-monoid}} : CommutativeMonoid {ℓS} {ℓ=S} _∙_ i
+        overlap {{base-group}} : Group {ℓS} {ℓ=S} _∙_ i _⁻¹
