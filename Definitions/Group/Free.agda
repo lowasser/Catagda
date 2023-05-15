@@ -30,14 +30,24 @@ private
     invLetter (left a) = right a
     invLetter (right a) = left a
 
-data FreeGroup : Set ℓA → Set ℓA where
-    free : Word → FreeGroup A
-
 open import Definitions.List.Reverse.Properties {ℓA} {ℓ=A} Letter
 open import Definitions.Either.Setoid {ℓA} {ℓ=A} {ℓA} {ℓ=A} A A
 open import Definitions.List.Setoid {ℓA} {ℓ=A} Letter
 open import Definitions.List.Concatenation.Properties {ℓA} {ℓ=A} Letter
 open import Definitions.List.Properties {ℓA} {ℓ=A} Letter
+open import Definitions.List.Map.Properties {ℓA} {ℓ=A} {ℓA} {ℓ=A} Letter Letter
+
+private
+    invLetter-cong : Congruent invLetter
+    invLetter-cong (l= a=b) = r= a=b
+    invLetter-cong (r= a=b) = l= a=b
+
+    instance
+        invLetter-is-congruent : IsCongruent invLetter
+        invLetter-is-congruent = record {congruent = invLetter-cong}
+
+data FreeGroup : Set ℓA → Set ℓA where
+    free : Word → FreeGroup A
 
 open Setoid {{...}}
 open Monoid {{...}}
@@ -158,6 +168,55 @@ private
     invLetter-invLetter (left x) = reflexive-on Letter (left x)
     invLetter-invLetter (right x) = reflexive-on Letter (right x)
     
+    inverse-congruent'-lemma1 : (xs1 : Word) → (x : Letter) → (xs2 : Word) → 
+            map invLetter (reverse (xs1 ++ invLetter x :: x :: xs2)) ≅ map invLetter (reverse xs2) ++ invLetter x :: x :: map invLetter (reverse xs1)
+    inverse-congruent'-lemma1 xs1 x xs2 = begin≅
+            map invLetter (reverse (xs1 ++ invLetter x :: x :: xs2))        ≅< symmetric-on Word (reverse-map-commute invLetter (xs1 ++ invLetter x :: x :: xs2)) >
+            reverse (map invLetter (xs1 ++ invLetter x :: x :: xs2))        ≅< congruent-on reverse (map-distributes-over-++ invLetter xs1 (invLetter x :: x :: xs2)) >
+            reverse (map invLetter xs1 ++ map invLetter (invLetter x :: x :: xs2))
+                                                                            ≅< reverse-++ (map invLetter xs1) (map invLetter (invLetter x :: x :: xs2)) >
+            reverse (map invLetter (invLetter x :: x :: xs2)) ++ reverse (map invLetter xs1)
+                                                                            ≅<>
+            reverse (invLetter (invLetter x) :: invLetter x :: map invLetter xs2) ++ reverse (map invLetter xs1)
+                                                                            ≅< right-congruent-on _++_  {reverse (map invLetter xs1)} (congruent-on reverse (right-congruent-on _::_ {invLetter x :: map invLetter xs2} (invLetter-invLetter x))) >
+            reverse (x :: invLetter x :: map invLetter xs2) ++ reverse (map invLetter xs1)
+                                                                            ≅<>
+            (reverse (invLetter x :: map invLetter xs2) ++ [ x :]) ++ reverse (map invLetter xs1)
+                                                                            ≅<>
+            ((reverse (map invLetter xs2) ++ [ invLetter x :]) ++ [ x :]) ++ reverse (map invLetter xs1)
+                                                                            ≅< right-congruent-on _++_ (symmetric-on Word (associate-on _++_ (reverse (map invLetter xs2)) [ invLetter x :] [ x :])) >
+            (reverse (map invLetter xs2) ++ invLetter x :: x :: []) ++ reverse (map invLetter xs1)
+                                                                            ≅< symmetric-on Word (associate-on _++_ (reverse (map invLetter xs2)) (invLetter x :: x :: []) (reverse (map invLetter xs1))) >
+            reverse (map invLetter xs2) ++ (invLetter x :: x :: [] ++ reverse (map invLetter xs1))
+                                                                            ≅< right-congruent-on _++_ (reverse-map-commute invLetter xs2) >
+            map invLetter (reverse xs2) ++ (invLetter x :: x :: [] ++ reverse (map invLetter xs1))
+                                                                            ≅< left-congruent-on _++_ {map invLetter (reverse xs2)} (left-congruent-on _++_ (reverse-map-commute invLetter xs1)) >
+            map invLetter (reverse xs2) ++ (invLetter x :: x :: [] ++ map invLetter (reverse xs1))
+                                                                            ≅<>
+            map invLetter (reverse xs2) ++ (invLetter x :: x :: map invLetter (reverse xs1))
+                                                                            ∎
+
+    inverse-congruent'-lemma2 : (xs1 xs2 : Word) → map invLetter (reverse xs2) ++ map invLetter (reverse xs1) ≅ map invLetter (reverse (xs1 ++ xs2))
+    inverse-congruent'-lemma2 xs1 xs2 = begin≅
+        map invLetter (reverse xs2) ++ map invLetter (reverse xs1)  ≅< symmetric-on Word (map-distributes-over-++ invLetter (reverse xs2) (reverse xs1)) >
+        map invLetter (reverse xs2 ++ reverse xs1)                  ≅< map-congruent invLetter (symmetric-on Word (reverse-++ xs1 xs2)) >
+        map invLetter (reverse (xs1 ++ xs2))                        ∎
+
+    inverse-congruent' : {x y : Word} → EqClosure x y → EqClosure (map invLetter (reverse x)) (map invLetter (reverse y))
+    inverse-congruent' (refl _ _ x=y) = refl' (map-congruent invLetter (congruent-on reverse x=y))
+    inverse-congruent' (sym y=x) = sym (inverse-congruent' y=x)
+    inverse-congruent' (trans x=y y=z) = trans (inverse-congruent' x=y) (inverse-congruent' y=z)
+    inverse-congruent' (imp (reduces xs1 x xs2)) =
+        trans
+            (refl' (inverse-congruent'-lemma1 xs1 x xs2))
+            (trans
+                (imp
+                    (reduces (map invLetter (reverse xs2)) x (map invLetter (reverse xs1))))
+                (refl' (inverse-congruent'-lemma2 xs1 xs2)))
+
+    inverse-congruent : Congruent inverse
+    inverse-congruent (eqfg x=y) = eqfg (inverse-congruent' x=y)
+
     left-inv : LeftInverse _∙_ 1fg inverse
     left-inv (free []) = reflexive-on (FreeGroup A) 1fg
     left-inv (free (x :: xs)) = begin≅
@@ -195,8 +254,11 @@ private
         1fg                                                             ∎
 
 instance
+    inverse-is-congruent : IsCongruent inverse
+    inverse-is-congruent = record {congruent = inverse-congruent}
+
     fg-has-inverse : HasInverse _∙_ 1fg inverse
     fg-has-inverse = record { left-inverse = left-inv; right-inverse = right-inv }
 
     fg-group : Group _∙_ 1fg inverse
-    fg-group = record {}
+    fg-group = record {}   

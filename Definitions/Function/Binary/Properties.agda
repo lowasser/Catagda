@@ -15,10 +15,10 @@ private
 open Setoid {{...}}
 open Equivalence {{...}}
 
-LeftCongruent : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{Setoid ℓ=A A}} → {{Setoid ℓ=B B}} → {{Setoid ℓ=C C}} → (A → B → C) → Set (ℓA ⊔ ℓB ⊔ ℓ=B ⊔ ℓ=C)
+LeftCongruent : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{Setoid ℓ=B B}} → {{Setoid ℓ=C C}} → (A → B → C) → Set (ℓA ⊔ ℓB ⊔ ℓ=B ⊔ ℓ=C)
 LeftCongruent _∙_ = ∀ {a} → Congruent (a ∙_)
 
-RightCongruent : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{Setoid ℓ=A A}} → {{Setoid ℓ=B B}} → {{Setoid ℓ=C C}} → (A → B → C) → Set (ℓA ⊔ ℓB ⊔ ℓ=A ⊔ ℓ=C)
+RightCongruent : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{Setoid ℓ=A A}} → {{Setoid ℓ=C C}} → (A → B → C) → Set (ℓA ⊔ ℓB ⊔ ℓ=A ⊔ ℓ=C)
 RightCongruent _∙_ = ∀ {b} → Congruent (_∙ b)
 
 record BiCongruent  {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} {{SA : Setoid ℓ=A A}} {{SB : Setoid ℓ=B B}} {{SC : Setoid ℓ=C C}} (_∙_ : A → B → C) : Set (ℓA ⊔ ℓB ⊔ ℓC ⊔ ℓ=A ⊔ ℓ=B ⊔ ℓ=C) where
@@ -134,6 +134,7 @@ RightInverse _∙_ i inv = ∀ x → x ∙ inv x ≅ i
 record HasInverse {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_∙_ : BinOp A) (i : A) (_⁻¹ : A → A) : Set (ℓA ⊔ ℓ=A) where
     field
         overlap {{has-identity}} : HasIdentity _∙_ i
+        overlap {{inverse-is-congruent}} : IsCongruent _⁻¹
         left-inverse : LeftInverse _∙_ i _⁻¹
         right-inverse : RightInverse _∙_ i _⁻¹
 
@@ -147,7 +148,7 @@ private
         inv x ∙ x   ≅< left-inv x >
         i           ∎
 
-has-inverse-commute : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → {_∙_ : BinOp A} {i : A} {_⁻¹ : A → A} → {{C : IsCommutative _∙_}} → {{HI : HasIdentity _∙_ i}} → 
+has-inverse-commute : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → {_∙_ : BinOp A} {i : A} {_⁻¹ : A → A} → {{C : IsCommutative _∙_}} → {{HI : HasIdentity _∙_ i}} → {{IC : IsCongruent _⁻¹}} →
         LeftInverse _∙_ i _⁻¹ → HasInverse _∙_ i _⁻¹
 has-inverse-commute left-inv = record { left-inverse = left-inv; right-inverse = commute-inverse left-inv }
 

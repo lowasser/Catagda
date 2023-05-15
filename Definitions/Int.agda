@@ -30,13 +30,21 @@ open import Definitions.List.Setoid {lzero} {lzero} (Either ⊤ ⊤)
 _+_ : BinOp ℤ
 _+_ = _∙_
 
+infixr 9 _+_
+
 pattern 0ℤ = free []
 
-sucℤ : ℤ → ℤ
-sucℤ (free z) = free (right tt :: z)
+suc : ℤ → ℤ
+suc (free z) = free (right tt :: z)
 
-negsucZ : ℤ → ℤ
-negsucZ (free z) = free (left tt :: z)
+negsuc : ℤ → ℤ
+negsuc (free z) = free (left tt :: z)
+
+neg : ℤ → ℤ
+neg = inverse
+
+pattern 1ℤ = free (right tt :: [])
+pattern -1ℤ = free (left tt :: [])
 
 open Setoid {{...}}
 open Group {{...}}
@@ -100,3 +108,86 @@ instance
 
     +ℤ-commutative-group : AbelianGroup _+_ 0ℤ inverse
     +ℤ-commutative-group = record {}
+
+_*_ : BinOp ℤ
+0ℤ * _ = 0ℤ
+free (right tt :: x) * y = y + (free x * y)
+free (left tt :: x) * y = neg y + (free x * y)
+
+infixr 10 _*_
+
+private
+    *-left-zero : LeftZero _*_ 0ℤ
+    *-left-zero _ = reflexive-on ℤ 0ℤ
+
+    *-right-zero : RightZero _*_ 0ℤ
+    *-right-zero 0ℤ = reflexive-on ℤ 0ℤ
+    *-right-zero (free (right tt :: x)) = begin≅
+        free (right tt :: x) * 0ℤ       ≅<>
+        0ℤ + (free x * 0ℤ)              ≅< left-id-on _+_ (free x * 0ℤ) >
+        free x * 0ℤ                     ≅< *-right-zero (free x) >
+        0ℤ                              ∎
+    *-right-zero (free (left tt :: x)) = begin≅
+        free (left tt :: x) * 0ℤ        ≅<>
+        neg 0ℤ + free x * 0ℤ           ≅<>
+        0ℤ + free x * 0ℤ                ≅< left-id-on _+_ (free x * 0ℤ) >
+        free x * 0ℤ                     ≅< *-right-zero (free x) >
+        0ℤ                              ∎
+
+    *-left-id : LeftIdentity _*_ 1ℤ
+    *-left-id x = begin≅
+        1ℤ * x      ≅<>
+        x + 0ℤ * x  ≅<>
+        x + 0ℤ      ≅< right-id-on _+_ x >
+        x           ∎
+
+    *-right-id : RightIdentity _*_ 1ℤ
+    *-right-id 0ℤ = *-right-zero 1ℤ
+    *-right-id (free (right tt :: x)) = begin≅
+        free (right tt :: x) * 1ℤ       ≅<>
+        1ℤ + (free x * 1ℤ)              ≅< left-congruent-on _+_ (*-right-id (free x)) >
+        1ℤ + free x                     ≅<>
+        free (right tt :: x)            ∎
+    *-right-id (free (left tt :: x)) = begin≅
+        free (left tt :: x) * 1ℤ        ≅<>
+        -1ℤ + (free x * 1ℤ)             ≅< left-congruent-on _+_ (*-right-id (free x)) >
+        -1ℤ + free x                    ≅<>
+        free (left tt :: x)             ∎
+
+    *-distributive-+ : (a b c : ℤ) → a * (b + c) ≅ a * b + a * c
+    *-distributive-+ 0ℤ _ _ = reflexive-on ℤ 0ℤ
+    *-distributive-+ (free (right tt :: a)) b c = begin≅
+        free (right tt :: a) * (b + c)          ≅<>
+        (b + c) + (free a * (b + c))            ≅< left-congruent-on _+_ (*-distributive-+ (free a) b c) >
+        (b + c) + (free a * b + free a * c)     ≅< right-congruent-on _+_ (commute-on _+_ b c) >
+        (c + b) + (free a * b + free a * c)     ≅< associate-on _+_ (c + b) (free a * b) (free a * c) >
+        ((c + b) + free a * b) + free a * c     ≅< right-congruent-on _+_ (symmetric-on ℤ (associate-on _+_ c b (free a * b))) >
+        (c + (b + free a * b)) + free a * c     ≅<>
+        (c + free (right tt :: a) * b) + free a * c
+                                                ≅< right-congruent-on _+_ (commute-on _+_ c (free (right tt :: a) * b)) >
+        (free (right tt :: a) * b + c) + free a * c
+                                                ≅< symmetric-on ℤ (associate-on _+_ (free (right tt :: a) * b) c (free a * c)) >
+        free (right tt :: a) * b + (c + free a * c)
+                                                ≅<>
+        free (right tt :: a) * b + free (right tt :: a) * c
+                                                ∎
+    *-distributive-+ (free (left tt :: a)) b c = begin≅
+        free (left tt :: a) * (b + c)                       ≅<>
+        neg (b + c) + (free a * (b + c))                    ≅< left-congruent-on _+_ (*-distributive-+ (free a) b c) >
+        neg (b + c) + (free a * b + free a * c)             ≅< right-congruent-on _+_ (distribute-inverse-on _+_ 0ℤ neg b c) >
+        (neg c + neg b) + (free a * b + free a * c)         ≅< associate-on _+_ (neg c + neg b) (free a * b) (free a * c) >
+        ((neg c + neg b) + free a * b) + free a * c         ≅< right-congruent-on _+_ (symmetric-on ℤ (associate-on _+_ (neg c) (neg b) (free a * b))) >
+        (neg c + (neg b + free a * b)) + free a * c         ≅<>
+        (neg c + (free (left tt :: a) * b)) + free a * c    ≅< right-congruent-on _+_ (commute-on _+_ (neg c) (free (left tt :: a) * b)) >
+        (free (left tt :: a) * b + neg c) + free a * c      ≅< symmetric-on ℤ (associate-on _+_ (free (left tt :: a) * b) (neg c) (free a * c)) >
+        free (left tt :: a) * b + (neg c + free a * c)      ≅<>
+        free (left tt :: a) * b + free (left tt :: a) * c   ∎
+
+    *-left-congruent : LeftCongruent _*_
+    *-left-congruent {0ℤ} _ = reflexive-on ℤ 0ℤ
+    *-left-congruent {free (right tt :: x)} {b} {c} b=c = begin≅
+        free (right tt :: x) * b        ≅<>
+        b + (free x * b)                ≅< left-congruent-on _+_ (*-left-congruent {free x} {b} {c} b=c) >
+        b + (free x * c)                ≅< right-congruent-on _+_ b=c >
+        c + (free x * c)                ≅<>
+        free (right tt :: x) * c        ∎

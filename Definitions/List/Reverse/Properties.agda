@@ -23,20 +23,6 @@ private
         [] ++ [ x :]            ≅<>
         [ x :]                  ∎
 
-    reverse-++-lemma : (xs ys : [ A ]) → reverse (xs ++ ys) ≅ reverse ys ++ reverse xs
-    reverse-++-lemma [] ys = begin≅
-        reverse ([] ++ ys)          ≅<>
-        reverse ys                  ≅< symmetric-on [ A ] (right-id-on _++_ (reverse ys)) >
-        reverse ys ++ []            ≅<>
-        reverse ys ++ reverse []    ∎
-    reverse-++-lemma (x :: xs) ys = begin≅
-        reverse ((x :: xs) ++ ys)               ≅<>
-        reverse (x :: (xs ++ ys))               ≅<>
-        reverse (xs ++ ys) ++ [ x :]            ≅< right-congruent-on _++_ (reverse-++-lemma xs ys) >
-        (reverse ys ++ reverse xs) ++ [ x :]    ≅< symmetric-on [ A ] (associate-on _++_ (reverse ys) (reverse xs) [ x :]) >
-        reverse ys ++ (reverse xs ++ [ x :])    ≅<>
-        reverse ys ++ reverse (x :: xs)         ∎
-
     reverse-congruent : Congruent reverse
     reverse-congruent nil=[]=nil = nil=[]=nil
     reverse-congruent {x :: xs} {y :: ys} (cons=[]=cons x≅y xs≅ys) = begin≅
@@ -50,11 +36,25 @@ instance
     reverse-IsCongruent : IsCongruent reverse
     reverse-IsCongruent = record { congruent = reverse-congruent }
 
+reverse-++ : (xs ys : [ A ]) → reverse (xs ++ ys) ≅ reverse ys ++ reverse xs
+reverse-++ [] ys = begin≅
+    reverse ([] ++ ys)          ≅<>
+    reverse ys                  ≅< symmetric-on [ A ] (right-id-on _++_ (reverse ys)) >
+    reverse ys ++ []            ≅<>
+    reverse ys ++ reverse []    ∎
+reverse-++ (x :: xs) ys = begin≅
+    reverse ((x :: xs) ++ ys)               ≅<>
+    reverse (x :: (xs ++ ys))               ≅<>
+    reverse (xs ++ ys) ++ [ x :]            ≅< right-congruent-on _++_ (reverse-++ xs ys) >
+    (reverse ys ++ reverse xs) ++ [ x :]    ≅< symmetric-on [ A ] (associate-on _++_ (reverse ys) (reverse xs) [ x :]) >
+    reverse ys ++ (reverse xs ++ [ x :])    ≅<>
+    reverse ys ++ reverse (x :: xs)         ∎
+
 reverse-reverse : (xs : [ A ]) → reverse (reverse xs) ≅ xs
 reverse-reverse [] = reflexive-on [ A ] []
 reverse-reverse (x :: xs) = begin≅
     reverse (reverse (x :: xs))             ≅<>
-    reverse (reverse xs ++ [ x :])          ≅< reverse-++-lemma (reverse xs) [ x :] >
+    reverse (reverse xs ++ [ x :])          ≅< reverse-++ (reverse xs) [ x :] >
     reverse [ x :] ++ reverse (reverse xs)  ≅< right-congruent-on _++_ (reverse-singleton x) >
     [ x :] ++ reverse (reverse xs)          ≅< left-congruent-on _++_ (reverse-reverse xs) >
     [ x :] ++ xs                            ≅<>
