@@ -4,8 +4,9 @@ open import Agda.Primitive
 open import Definitions.Magma
 open import Definitions.Function.Binary
 open import Definitions.Function.Binary.Properties
+open import Definitions.Setoid
 
-record CommutativeMagma {ℓS ℓ=S : Level} {S : Set ℓS} (_∙_ : BinOp S) : Set (ℓS ⊔ lsuc ℓ=S) where
+record CommutativeMagma {ℓS ℓ=S : Level} {S : Set ℓS} {{SS : Setoid ℓ=S S}} (_∙_ : BinOp S) : Set (ℓS ⊔ lsuc ℓ=S) where
     field
-        overlap {{base-magma}} : Magma {ℓS} {ℓ=S} _∙_
+        overlap {{base-magma}} : Magma _∙_
         {{is-commutative}} : IsCommutative _∙_

@@ -26,9 +26,9 @@ private
     Word : Set ℓA
     Word = [ Letter ]
 
-    invLetter : Letter → Letter
-    invLetter (left a) = right a
-    invLetter (right a) = left a
+invLetter : Letter → Letter
+invLetter (left a) = right a
+invLetter (right a) = left a
 
 open import Definitions.List.Reverse.Properties {ℓA} {ℓ=A} Letter
 open import Definitions.Either.Setoid {ℓA} {ℓ=A} {ℓA} {ℓ=A} A A

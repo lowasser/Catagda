@@ -14,7 +14,7 @@ open IsSymmetric {{...}}
 record Setoid {ℓA : Level} (ℓ= : Level) (A : Set ℓA) : Set (ℓA ⊔ lsuc ℓ=) where
     field
         _≅_ : Rel ℓ= A
-        {{equivalence}} : Equivalence _≅_
+        overlap {{equivalence}} : Equivalence _≅_
         
     infix 4 _≅_
 

@@ -4,6 +4,7 @@ open import Agda.Primitive
 open import Definitions.Monoid
 open import Definitions.Function.Binary
 open import Definitions.Function.Binary.Properties
+open import Definitions.Function.Unary.Properties
 open import Definitions.Setoid
 open import Definitions.Setoid.Equation
 open import Definitions.Semigroup
@@ -14,11 +15,10 @@ open Semigroup {{...}}
 open Magma {{...}}
 open Setoid {{...}}
 
-record Group {ℓA ℓ=A : Level} {A : Set ℓA} (_∙_ : BinOp A) (i : A) (_⁻¹ : A → A) : Set (ℓA ⊔ lsuc ℓ=A) where
+record Group {ℓA ℓ=A : Level} {A : Set ℓA} {{SA : Setoid ℓ=A A}}  (_∙_ : BinOp A) (i : A) (_⁻¹ : A → A) : Set (ℓA ⊔ lsuc ℓ=A) where
     field
-        overlap {{base-monoid}} : Monoid {ℓA} {ℓ=A} _∙_ i
+        overlap {{base-monoid}} : Monoid {{SA}} _∙_ i
         overlap {{has-inverse}} : HasInverse _∙_ i _⁻¹
-    
 
     left-inverse-is-unique : (x xi : A) → (xi ∙ x ≅ i) → xi ≅ x ⁻¹
     left-inverse-is-unique x xi xix=i = begin≅
@@ -50,7 +50,37 @@ record Group {ℓA ℓ=A : Level} {A : Set ℓA} (_∙_ : BinOp A) (i : A) (_⁻
         (b ⁻¹) ∙ b                                  ≅< left-inverse-on _∙_ i _⁻¹ b >
         i                                           ∎))
 
+    private
+        left-injective : (a : A) → Injective (a ∙_)
+        left-injective a {b} {c} ab=ac = begin≅
+            b                   ≅< symmetric-on A (left-id-on _∙_ b) >
+            i ∙ b               ≅< right-congruent-on _∙_ (symmetric-on A (left-inverse-on _∙_ i _⁻¹ a)) >
+            ((a ⁻¹) ∙ a) ∙ b    ≅< symmetric-on A (associate-on _∙_ (a ⁻¹) a b) >
+            (a ⁻¹) ∙ (a ∙ b)    ≅< left-congruent-on _∙_ ab=ac >
+            (a ⁻¹) ∙ (a ∙ c)    ≅< associate-on _∙_ (a ⁻¹) a c >
+            ((a ⁻¹) ∙ a) ∙ c    ≅< right-congruent-on _∙_ (left-inverse-on _∙_ i _⁻¹ a) >
+            i ∙ c               ≅< left-id-on _∙_ c >
+            c                   ∎
+
+        right-injective : (c : A) → Injective (_∙ c)
+        right-injective c {a} {b} ac=bc = begin≅
+            a                   ≅< symmetric-on A (right-id-on _∙_ a) >
+            a ∙ i               ≅< left-congruent-on _∙_ (symmetric-on A (right-inverse-on _∙_ i _⁻¹ c)) >
+            a ∙ (c ∙ (c ⁻¹))    ≅< associate-on _∙_ a c (c ⁻¹) >
+            (a ∙ c) ∙ (c ⁻¹)    ≅< right-congruent-on _∙_ ac=bc >
+            (b ∙ c) ∙ (c ⁻¹)    ≅< symmetric-on A (associate-on _∙_ b c (c ⁻¹)) >
+            b ∙ (c ∙ (c ⁻¹))    ≅< left-congruent-on _∙_ (right-inverse-on _∙_ i _⁻¹ c) >
+            b ∙ i               ≅< right-id-on _∙_ b >
+            b                   ∎
+    
+    instance
+        bi-injective : BiInjective _∙_
+        bi-injective = record {left-injective = left-injective; right-injective = right-injective}
+
 open Group {{...}}
 
-distribute-inverse-on : {ℓA ℓ=A : Level} {A : Set ℓA} → (_∙_ : BinOp A) → (i : A) → (_⁻¹ : A → A) → {{G : Group {ℓA} {ℓ=A} _∙_ i _⁻¹}} → (a b : A) → ((a ∙ b) ⁻¹) ≅ (b ⁻¹) ∙ (a ⁻¹)
+right-inverse-is-unique-on : {ℓA ℓ=A : Level} {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (i : A) → (_⁻¹ : A → A) → {{G : Group _∙_ i _⁻¹}} → (x xi : A) → (x ∙ xi ≅ i) → xi ≅ x ⁻¹
+right-inverse-is-unique-on _ _ _ = right-inverse-is-unique
+
+distribute-inverse-on : {ℓA ℓ=A : Level} {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (i : A) → (_⁻¹ : A → A) → {{G : Group _∙_ i _⁻¹}} → (a b : A) → ((a ∙ b) ⁻¹) ≅ (b ⁻¹) ∙ (a ⁻¹)
 distribute-inverse-on _ _ _ = distribute-inverse
