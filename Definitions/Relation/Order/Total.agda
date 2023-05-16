@@ -1,17 +1,40 @@
 module Definitions.Relation.Order.Total where
 
 open import Agda.Primitive
+open import Agda.Builtin.Sigma
 open import Definitions.Either
 open import Definitions.Setoid
 open import Definitions.Relation
+open import Definitions.Relation.Properties
 open import Definitions.Relation.Order.Partial
+open import Definitions.Logic
 
-open Setoid {{...}}
+open IsReflexive {{...}}
 
-record TotalOrder {ℓA ℓ=A ℓ≤A : Level} {A : Set ℓA} {{AS : Setoid ℓ=A A}} (_≤_ : Rel ℓ≤A A) : Set (ℓA ⊔ ℓ=A ⊔ ℓ≤A) where
+private
+    variable
+        ℓA ℓB ℓC ℓ=A ℓ≤A : Level
+
+data Tri {A : Set ℓA} (_~_ : Rel ℓB A) (_≺_ : Rel ℓC A) : A → A → Set (ℓB ⊔ ℓC) where
+    triL : {x y : A} → x ≺ y → ¬ (x ~ y) → ¬ (y ≺ x) → Tri _~_ _≺_ x y
+    triE : {x y : A} → x ~ y → Tri _~_ _≺_ x y
+    triG : {x y : A} → ¬ (x ≺ y) → ¬ (x ~ y) → y ≺ x → Tri _~_ _≺_ x y
+
+record TotalOrder {A : Set ℓA} {{AS : Setoid ℓ=A A}} (_≤_ : Rel ℓ≤A A) : Set (ℓA ⊔ ℓ=A ⊔ ℓ≤A) where
     field
         {{is-partial-order}} : PartialOrder _≤_
-        compare : (a b : A) → Either (a ≤ b) (b ≤ a)
+
+    open Setoid {{...}}
+    open PartialOrder is-partial-order
+    
+    field
+        trichotomy : (a b : A) → Tri _≅_ _≤_ a b
+
+    compare : (a b : A) → Either (a ≤ b) (b ≤ a)
+    compare a b with trichotomy a b
+    ... | triL lt _ _ = left lt
+    ... | triE eq = left (reflexive-equiv eq)
+    ... | triG _ _ gt = right gt
 
 open TotalOrder {{...}}
 

@@ -1,128 +1,30 @@
-module Definitions.Int where
+module Definitions.Int.Multiplication where 
 
 open import Agda.Primitive
-open import Definitions.Setoid
-open import Agda.Builtin.Unit
-open import Agda.Builtin.Sigma
-open import Definitions.Relation.Equivalence.Structural.Properties ⊤
-open import Definitions.List
-open import Definitions.Setoid.Equation
-open import Definitions.List.Setoid {lzero} {lzero} ⊤
-open import Definitions.Group.Free {lzero} {lzero} ⊤
+open import Definitions.Int.Base
+open import Definitions.Int.Addition
 open import Definitions.Function.Binary
+open import Agda.Builtin.Unit
+open import Definitions.List
+open import Definitions.Either
+open import Definitions.Relation.Equivalence.Structural.Properties ⊤
+open import Definitions.Group.Free {lzero} {lzero} ⊤
 open import Definitions.Function.Binary.Properties
-open import Definitions.Monoid
-open import Definitions.List.Properties {lzero} {lzero} ⊤
-open import Definitions.List.Concatenation.Properties {lzero} {lzero} ⊤
+open import Definitions.Setoid
+open import Definitions.Setoid.Equation
+open import Definitions.Function.Unary.Properties
+open import Definitions.Group
 open import Definitions.Magma
 open import Definitions.Magma.Commutative
 open import Definitions.Semigroup
 open import Definitions.Semigroup.Commutative
+open import Definitions.Monoid
 open import Definitions.Monoid.Commutative
-open import Definitions.Group
-open import Definitions.Group.Abelian
-open import Definitions.Either
-open import Definitions.Either.Setoid {lzero} {lzero} {lzero} {lzero} ⊤ ⊤
-open import Definitions.List.Setoid {lzero} {lzero} (Either ⊤ ⊤)
-open import Definitions.Function.Unary.Properties
+open import Definitions.Ringoid
 open import Definitions.Ring
 open import Definitions.Ring.Commutative
-open import Definitions.Ringoid
-open import Definitions.Relation
-open import Definitions.Relation.Properties
-open import Definitions.Relation.Order.Partial
-open import Definitions.Relation.Order.Total
-open import Definitions.Logic
-open import Definitions.Pair
-
-ℤ : Set
-ℤ = FreeGroup ⊤
-
-_+_ : BinOp ℤ
-_+_ = _∙_
-
-infixr 9 _+_
-
-pattern 0ℤ = free []
-
-private
-    pattern p1 = right tt
-    pattern m1 = left tt
-
-suc : ℤ → ℤ
-suc (free z) = free (p1 :: z)
-
-negsuc : ℤ → ℤ
-negsuc (free z) = free (m1 :: z)
-
-neg : ℤ → ℤ
-neg = inverse
-
-pattern 1ℤ = free (p1 :: [])
-pattern -1ℤ = free (m1 :: [])
 
 open Setoid {{...}}
-open Group {{...}}
-open HasInverse {{...}}
-open Monoid {{...}}
-open Semigroup {{...}}
-
-private
-    +-commute-lemma1 : (x : [ Either ⊤ ⊤ ]) → (x1 x2 : Either ⊤ ⊤) → free (x1 :: x2 :: x) ≅ free (x2 :: x1 :: x)
-    +-commute-lemma1 x (m1) (m1) = reflexive-on ℤ (free (m1 :: m1 :: x))
-    +-commute-lemma1 x (p1) (p1) = reflexive-on ℤ (free (p1 :: p1 :: x))
-    +-commute-lemma1 x (m1) (p1) = begin≅
-        free (m1 :: p1 :: x)                     ≅<>
-        free [ m1 :] + free (p1 :: x)            ≅<>
-        free (m1 :: p1 :: []) + free x           ≅<>
-        (free [ m1 :] + free [ p1 :]) + free x   ≅< right-congruent-on _+_ (left-inverse-on _+_ 0ℤ inverse (free [ p1 :])) >
-        0ℤ + free x                                         ≅< right-congruent-on _+_ (symmetric-on ℤ (right-inverse-on _+_ 0ℤ inverse (free [ p1 :]))) >
-        (free [ p1 :] + free [ m1 :]) + free x   ≅<>
-        free (p1 :: m1 :: x)                     ∎ 
-    +-commute-lemma1 x (p1) (m1) = symmetric-on ℤ (+-commute-lemma1 x (m1) (p1))
-
-    +-commute-lemma2 : (x y : [ Either ⊤ ⊤ ]) → (s : Either ⊤ ⊤) → free (s :: x) + free y ≅ free x + free (s :: y)
-    +-commute-lemma2 [] y s = begin≅
-        free [ s :] + free y   ≅<>
-        free (s :: y)           ≅< symmetric-on ℤ (left-identity-on _+_ (free (s :: y))) >
-        0ℤ + free (s :: y)      ∎
-    +-commute-lemma2 (x1 :: x) y s = begin≅
-        free (s :: x1 :: x) + free y            ≅< right-congruent-on _+_ (+-commute-lemma1 x s x1) >
-        free (x1 :: s :: x) + free y            ≅<>
-        (free [ x1 :] + free (s :: x)) + free y ≅< symmetric-on ℤ (associate-on _+_ (free [ x1 :]) (free (s :: x)) (free y)) >
-        free [ x1 :] + (free (s :: x) + free y) ≅< left-congruent-on _+_ {free [ x1 :]} (+-commute-lemma2 x y s) >
-        free [ x1 :] + (free x + free (s :: y)) ≅< associate-on _+_ (free [ x1 :]) (free x) (free (s :: y)) >
-        (free [ x1 :] + free x) + free (s :: y) ≅<>
-        free (x1 :: x) + free (s :: y)          ∎
-
-    +-commute : (x y : ℤ) → (x + y) ≅ (y + x)
-    +-commute 0ℤ y = begin≅
-        0ℤ + y      ≅< left-identity-on _+_ y >
-        y           ≅< symmetric-on ℤ (right-identity-on _+_ y) >
-        y + 0ℤ      ∎
-    +-commute (free (s :: x)) (free y) = begin≅
-        free (s :: x) + free y          ≅<>
-        (free [ s :] + free x) + free y ≅< symmetric-on ℤ (associate-on _+_ (free [ s :]) (free x) (free y)) >
-        free [ s :] + (free x + free y) ≅< left-congruent-on _+_ {free [ s :]} (+-commute (free x) (free y)) >
-        free [ s :] + (free y + free x) ≅< associate-on _+_ (free [ s :]) (free y) (free x) >
-        free (s :: y) + free x          ≅< +-commute-lemma2 y x s >
-        free y + free (s :: x)          ∎
-
-instance
-    +ℤ-commutative : IsCommutative _+_
-    +ℤ-commutative = record { commute = +-commute }
-
-    +ℤ-commutative-magma : CommutativeMagma _+_
-    +ℤ-commutative-magma = record {}
-
-    +ℤ-commutative-semigroup : CommutativeSemigroup _+_
-    +ℤ-commutative-semigroup = record {}
-
-    +ℤ-commutative-monoid : CommutativeMonoid _+_ 0ℤ
-    +ℤ-commutative-monoid = record {}
-
-    +ℤ-commutative-group : AbelianGroup _+_ 0ℤ inverse
-    +ℤ-commutative-group = record {}
 
 _*_ : BinOp ℤ
 0ℤ * _ = 0ℤ
@@ -317,20 +219,3 @@ instance
 
     ℤ-commutative-ring : CommutativeRing _+_ _*_ 0ℤ 1ℤ neg
     ℤ-commutative-ring = record {}
-
-open import Definitions.Nat renaming (_+_ to _+ℕ_; _≤_ to _≤ℕ_; suc to sucℕ)
-
-ℕ-to-ℤ : ℕ → ℤ
-ℕ-to-ℤ 0ℕ = 0ℤ
-ℕ-to-ℤ (sucℕ n) = suc (ℕ-to-ℤ n)
-
-private
-    count-ℤ : ℤ → ℕ × ℕ
-    count-ℤ (free []) = 0ℕ , 0ℕ
-    count-ℤ (free (p1 :: x)) with count-ℤ (free x)
-    ... | pos , neg = sucℕ pos , neg
-    count-ℤ (free (m1 :: x)) with count-ℤ (free x)
-    ... | pos , neg = pos , sucℕ neg
-
-    count-equiv : (x : ℤ) → x ≅ ℕ-to-ℤ (fst (count-ℤ x)) + neg (ℕ-to-ℤ (snd (count-ℤ x)))
-    count-equiv (free []) = reflexive-on ℤ 0ℤ

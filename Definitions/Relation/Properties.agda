@@ -15,6 +15,13 @@ record IsReflexive { A : Set ℓA } (_∼_ : Rel ℓ=A A) : Set (ℓA ⊔ ℓ=A)
     field
         reflexive : Reflexive _∼_
 
+Antireflexive : { A : Set ℓA } → Rel ℓB A → Set (ℓA ⊔ ℓB)
+Antireflexive _≁_ = ∀ x → ¬ (x ≁ x)
+
+record IsAntireflexive { A : Set ℓA } (_≁_ : Rel ℓ=A A) : Set (ℓA ⊔ ℓ=A) where
+    field
+        antireflexive : Antireflexive _≁_
+
 Symmetric : { A : Set ℓA } → Rel ℓB A → Set (ℓA ⊔ ℓB)
 Symmetric _∼_ = ∀ {x y} → x ∼ y → y ∼ x
 

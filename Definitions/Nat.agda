@@ -19,6 +19,13 @@ open import Definitions.Semigroup
 open import Definitions.Semigroup.Commutative
 open import Definitions.Monoid.Commutative
 open import Definitions.Ringoid
+open import Definitions.Relation
+open import Definitions.Relation.Properties
+open import Definitions.Relation.Order.Partial
+open import Definitions.Relation.Order.Total
+open import Definitions.Either
+open import Definitions.Relation.Equivalence.Structural
+open import Definitions.Function.Unary.Properties
 
 open Monoid {{...}}
 
@@ -38,6 +45,9 @@ pattern 1ℕ = suc 0ℕ
 open Setoid {{...}}
 
 private
+    suc-injective : Injective suc
+    suc-injective {x} {y} (cons=[]=cons _ x=y) = x=y
+
     +-commute-lemma : (x y : ℕ) → (suc x + y) ≅ (x + suc y)
     +-commute-lemma zero y = begin≅
         suc zero + y        ≅<>
@@ -195,3 +205,69 @@ instance
 
     *-ringoid : Ringoid _+_ _*_
     *-ringoid = record { left-distribute = *-distributes-over-+ ; right-distribute = *-right-distributes }
+
+data _≤_ : Rel lzero ℕ where
+    z≤ : { x : ℕ } → 0ℕ ≤ x
+    s≤s : { x y : ℕ } → x ≤ y → suc x ≤ suc y
+
+private
+    ≤-reflexive : Reflexive _≤_ 
+    ≤-reflexive 0ℕ = z≤
+    ≤-reflexive (suc n) = s≤s (≤-reflexive n)
+
+    ≤-transitive : Transitive _≤_
+    ≤-transitive z≤ _ = z≤ 
+    ≤-transitive (s≤s x≤y) (s≤s y≤z) = s≤s (≤-transitive x≤y y≤z)
+
+    ≤-antisymmetric : Antisymmetric _≤_
+    ≤-antisymmetric z≤ z≤ = reflexive-on ℕ 0ℕ 
+    ≤-antisymmetric (s≤s x≤y) (s≤s y≤x) = bi-congruent _::_ (reflexive-on ⊤ tt) (≤-antisymmetric x≤y y≤x)
+
+    ≤-left-congruent : {a1 a2 b : ℕ} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
+    ≤-left-congruent nil=[]=nil z≤ = z≤
+    ≤-left-congruent (cons=[]=cons _ a1=a2) (s≤s a1≤b) = s≤s (≤-left-congruent a1=a2 a1≤b)
+
+    ≤-right-congruent : {a b1 b2 : ℕ} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
+    ≤-right-congruent nil=[]=nil a≤b1 = a≤b1
+    ≤-right-congruent (cons=[]=cons _ b1=b2) z≤ = z≤
+    ≤-right-congruent (cons=[]=cons x b1=b2) (s≤s a≤b1) = s≤s (≤-right-congruent b1=b2 a≤b1)
+
+    ≤-compare : (m n : ℕ) → Either (m ≤ n) (n ≤ m)
+    ≤-compare zero _ = left z≤
+    ≤-compare _ zero = right z≤
+    ≤-compare (suc m) (suc n) with ≤-compare m n
+    ... | left m≤n      = left (s≤s m≤n)
+    ... | right n≤m     = right (s≤s n≤m)
+
+    suc-le-injective : { m n : ℕ } → suc m ≤ suc n → m ≤ n
+    suc-le-injective (s≤s m≤n) = m≤n
+
+    ≤-trichotomy : (m n : ℕ) → Tri _≅_ _≤_ m n
+    ≤-trichotomy zero zero = triE (reflexive-on ℕ zero)
+    ≤-trichotomy (suc m) (suc n) with ≤-trichotomy m n
+    ... | triE m=n          = triE (cons=[]=cons refl m=n)
+    ... | triL m-le-n m≠n n-nle-m
+                            = triL (s≤s m-le-n) (λ sm=sn → m≠n (suc-injective sm=sn)) (λ sn≤sm → n-nle-m (suc-le-injective sn≤sm))
+    ... | triG m-nle-n m≠n n-le-m
+                            = triG (λ sm≤sn → m-nle-n (suc-le-injective sm≤sn)) (λ sm=sn → m≠n (suc-injective sm=sn)) (s≤s n-le-m)
+    ≤-trichotomy zero (suc n) = triL z≤ (λ ()) (λ ())
+    ≤-trichotomy (suc m) zero = triG (λ ()) (λ ()) z≤ 
+
+instance
+    ≤-is-reflexive : IsReflexive _≤_
+    ≤-is-reflexive = record {reflexive = ≤-reflexive}
+
+    ≤-is-transitive : IsTransitive _≤_
+    ≤-is-transitive = record {transitive = ≤-transitive}
+    
+    ≤-is-antisymmetric : IsAntisymmetric _≤_
+    ≤-is-antisymmetric = record {antisymmetric = ≤-antisymmetric}
+
+    ≤-pre-order : PreOrder _≤_
+    ≤-pre-order = record {}
+
+    ≤-partial-order : PartialOrder _≤_
+    ≤-partial-order = record { left-congruent-law = ≤-left-congruent ; right-congruent-law = ≤-right-congruent }
+
+    ≤-total-order : TotalOrder _≤_
+    ≤-total-order = record { trichotomy = ≤-trichotomy }

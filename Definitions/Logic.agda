@@ -31,5 +31,5 @@ _∧_ = _×_
 _∨_ : Set ℓA → Set ℓB → Set (ℓA ⊔ ℓB)
 _∨_ = Either 
 
-infixr 10 _∧_ 
-infixr 10 _∨_
+infixr 2 _∧_ 
+infixr 2 _∨_
