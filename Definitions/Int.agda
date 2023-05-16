@@ -2,7 +2,7 @@ module Definitions.Int where
 
 open import Agda.Primitive
 open import Definitions.Setoid
-open import Definitions.Top
+open import Agda.Builtin.Unit
 open import Definitions.Relation.Equivalence.Structural.Properties ⊤
 open import Definitions.List
 open import Definitions.Setoid.Equation

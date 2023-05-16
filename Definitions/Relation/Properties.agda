@@ -2,7 +2,7 @@ module Definitions.Relation.Properties where
 
 open import Agda.Primitive
 open import Definitions.Either
-open import Definitions.Not
+open import Definitions.Logic
 open import Definitions.Relation
 
 private variable

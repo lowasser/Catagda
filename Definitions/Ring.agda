@@ -13,6 +13,7 @@ open import Definitions.Function.Binary
 open import Definitions.Function.Binary.Properties
 open import Definitions.Relation
 open import Definitions.Ringoid
+open import Definitions.Ring.Semi
 
 private
     variable
@@ -48,3 +49,6 @@ record Ring {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_+_ : BinOp A) (_*_ : BinOp 
     instance
         zero : HasZero _*_ 0A
         zero = record {left-zero = left-zero; right-zero = right-zero}
+
+        semiring : Semiring _+_ _*_
+        semiring = record {}

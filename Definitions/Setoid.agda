@@ -2,7 +2,7 @@ open import Agda.Primitive
 
 module Definitions.Setoid where
 
-open import Definitions.Not
+open import Definitions.Logic
 open import Definitions.Relation
 open import Definitions.Relation.Properties
 

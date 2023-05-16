@@ -3,7 +3,8 @@ module Definitions.Function.Unary.Properties where
 open import Agda.Primitive
 open import Definitions.Relation
 open import Definitions.Setoid
-open import Definitions.DependentPair
+open import Agda.Builtin.Sigma
+open import Definitions.Logic
 
 open Setoid {{...}}
 
@@ -38,13 +39,13 @@ injective-on : {A : Set ℓA} {B : Set ℓB} → (f : A → B) → {{AS : Setoid
 injective-on _ = injective
 
 Surjective : {ℓA ℓB ℓ=B : Level} {A : Set ℓA} {B : Set ℓB} → (A → B) → {{BS : Setoid ℓ=B B}} → Set (ℓA ⊔ ℓB ⊔ ℓ=B)
-Surjective {_} {_} {_} {A} f = ∀ b → Σ A (λ a → f a ≅ b)
+Surjective {_} {_} {_} {A} f = ∀ b → ∃ A (λ a → f a ≅ b)
 
 preimage : {ℓA ℓB ℓ=B : Level} {A : Set ℓA} {B : Set ℓB} → (f : A → B) → {{BS : Setoid ℓ=B B}} → Surjective f → B → A
-preimage _ surj b = fstΣ (surj b)
+preimage _ surj b = fst (surj b)
 
 preimage-proof : {ℓA ℓB ℓ=B : Level} {A : Set ℓA} {B : Set ℓB} → (f : A → B) → {{BS : Setoid ℓ=B B}} → (surj : Surjective f) → (b : B) → f (preimage f surj b) ≅ b
-preimage-proof _ surj b = sndΣ (surj b)
+preimage-proof _ surj b = snd (surj b)
 
 record IsSurjective {A : Set ℓA} {B : Set ℓB} (f : A → B) {{BS : Setoid ℓ=B B}} : Set (ℓA ⊔ ℓB ⊔ ℓ=B) where
     field
@@ -56,7 +57,7 @@ surjective-on : {A : Set ℓA} {B : Set ℓB} → (f : A → B) → {{BS : Setoi
 surjective-on _ = surjective
 
 preimage-on : {A : Set ℓA} {B : Set ℓB} → (f : A → B) → {{BS : Setoid ℓ=B B}} → {{IsSurjective f}} → B → A
-preimage-on f b = fstΣ (surjective-on f b)
+preimage-on f b = fst (surjective-on f b)
 
 preimage-proof-on : {A : Set ℓA} {B : Set ℓB} → (f : A → B) → {{BS : Setoid ℓ=B B}} → {{ISF : IsSurjective f}} → (b : B) → f (preimage-on f b) ≅ b
-preimage-proof-on f b = sndΣ (surjective-on f b) 
+preimage-proof-on f b = snd (surjective-on f b)

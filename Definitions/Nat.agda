@@ -2,7 +2,7 @@ module Definitions.Nat where
 
 open import Agda.Primitive
 open import Definitions.Setoid
-open import Definitions.Top
+open import Agda.Builtin.Unit
 open import Definitions.Relation.Equivalence.Structural.Properties ⊤
 open import Definitions.List
 open import Definitions.Setoid.Equation
@@ -18,6 +18,7 @@ open import Definitions.Magma.Commutative
 open import Definitions.Semigroup
 open import Definitions.Semigroup.Commutative
 open import Definitions.Monoid.Commutative
+open import Definitions.Ringoid
 
 open Monoid {{...}}
 
@@ -140,6 +141,13 @@ private
         n * (1ℕ + m)        ≅<>
         n * suc m           ∎
 
+    *-right-distributes : (a b c : ℕ) → (a + b) * c ≅ a * c + b * c
+    *-right-distributes a b c = begin≅
+        (a + b) * c         ≅< *-commute (a + b) c >
+        c * (a + b)         ≅< *-distributes-over-+ c a b >
+        c * a + c * b       ≅< bi-congruent _+_ (*-commute c a) (*-commute c b) >
+        a * c + b * c       ∎
+
     *-assoc : Associate _*_
     *-assoc zero b c = begin≅
         zero * (b * c)      ≅<>
@@ -149,11 +157,8 @@ private
     *-assoc (suc a) b c = begin≅
         suc a * (b * c)                     ≅<>
         b * c + a * (b * c)                 ≅< left-congruent-on _+_ (*-assoc a b c) >
-        b * c + (a * b) * c                 ≅< left-congruent-on _+_ (*-commute (a * b) c) >
-        b * c + c * (a * b)                 ≅< right-congruent-on _+_ (*-commute b c) >
-        c * b + c * (a * b)                 ≅< symmetric-on ℕ (*-distributes-over-+ c b (a * b)) >
-        c * (b + a * b)                     ≅<>
-        c * (suc a * b)                     ≅< *-commute c (suc a * b) >
+        b * c + (a * b) * c                 ≅< symmetric-on ℕ (*-right-distributes b (a * b) c) >
+        (b + a * b) * c                     ≅<>
         (suc a * b) * c                     ∎
 
         
@@ -187,3 +192,6 @@ instance
 
     *-commutative-monoid : CommutativeMonoid _*_ 1ℕ
     *-commutative-monoid = record {}
+
+    *-ringoid : Ringoid _+_ _*_
+    *-ringoid = record { left-distribute = *-distributes-over-+ ; right-distribute = *-right-distributes }
