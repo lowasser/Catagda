@@ -23,6 +23,7 @@ open import Definitions.Relation
 open import Definitions.Relation.Properties
 open import Definitions.Relation.Order.Partial
 open import Definitions.Relation.Order.Total
+open import Definitions.Relation.Equivalence.Structural.Properties Ordering
 open import Definitions.Either
 open import Definitions.Relation.Equivalence.Structural
 open import Definitions.Function.Unary.Properties
@@ -251,7 +252,7 @@ private
     ... | triG m-nle-n m≠n n-le-m
                             = triG (λ sm≤sn → m-nle-n (suc-le-injective sm≤sn)) (λ sm=sn → m≠n (suc-injective sm=sn)) (s≤s n-le-m)
     ≤-trichotomy zero (suc n) = triL z≤ (λ ()) (λ ())
-    ≤-trichotomy (suc m) zero = triG (λ ()) (λ ()) z≤ 
+    ≤-trichotomy (suc m) zero = triG (λ ()) (λ ()) z≤
 
 instance
     ≤-is-reflexive : IsReflexive _≤_
@@ -271,3 +272,14 @@ instance
 
     ≤-total-order : TotalOrder _≤_
     ≤-total-order = record { trichotomy = ≤-trichotomy }
+
+private
+    ≤-suc-rhs : (a b : ℕ) → a ≤ b → a ≤ suc b
+    ≤-suc-rhs 0ℕ _ z≤ = z≤
+    ≤-suc-rhs (suc a) (suc b) (s≤s a≤b) = s≤s (≤-suc-rhs a b a≤b)
+
+addition-preserves-≤ : (a b c d : ℕ) → a ≤ b → c ≤ d → (a + c) ≤ (b + d)
+addition-preserves-≤ 0ℕ b 0ℕ d z≤ _ = z≤
+addition-preserves-≤ (suc a) (suc b) c d (s≤s a≤b) c≤d = s≤s (addition-preserves-≤ a b c d a≤b c≤d)
+addition-preserves-≤ 0ℕ 0ℕ (suc c) (suc d) z≤ (s≤s c≤d) = s≤s c≤d
+addition-preserves-≤ 0ℕ (suc b) (suc c) (suc d) z≤ (s≤s c≤d) = s≤s (addition-preserves-≤ 0ℕ b c (suc d) z≤ (≤-suc-rhs c d c≤d))

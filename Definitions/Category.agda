@@ -4,12 +4,11 @@ open import Agda.Primitive
 open import Definitions.Function.Binary
 open import Definitions.Relation
 open import Definitions.Relation.Properties
-open import Definitions.Relation.Equivalence
 open import Definitions.Setoid
 
 open Setoid {{...}}
 
-record Category {ℓOb ℓ→ : Level} (Ob : Set ℓOb) {{SOB : Setoid Ob}} (_⟶_ : Ob → Ob → Set ℓ→) : Set (ℓOb ⊔ lsuc ℓ→) where
+record Category {ℓOb ℓ=Ob ℓ→ : Level} (Ob : Set ℓOb) {{SOB : Setoid ℓ=Ob Ob}} (_⟶_ : Ob → Ob → Set ℓ→) : Set (ℓOb ⊔ lsuc ℓ→) where
     field
         _∘_ : { a b c : Ob } → (b ⟶ c) → (a ⟶ b) → (a ⟶ c)
         left-congruent-arrow : { a1 a2 b : Ob } → a1 ≅ a2 → (a1 ⟶ b) → (a2 ⟶ b)
