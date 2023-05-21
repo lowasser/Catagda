@@ -6,7 +6,7 @@ open import Definitions.Nat renaming (_+_ to _+ℕ_; _≤_ to _≤ℕ_; suc to s
 open import Definitions.Pair
 open import Agda.Primitive
 open import Agda.Builtin.Unit
-open import Definitions.List.Setoid {lzero} {lzero} ⊤
+open import Definitions.List.Setoid {lzero} {lzero} ⊤ renaming (cons=[]=cons to consℕ)
 open import Definitions.Group.Free {lzero} {lzero} ⊤
 open import Agda.Builtin.Sigma
 open import Definitions.Setoid
@@ -22,7 +22,13 @@ open import Definitions.Relation.Order.Total
 open import Definitions.Relation.Equivalence.Structural.Properties Ordering
 open import Definitions.Either.Setoid {lzero} {lzero} {lzero} {lzero} ⊤ ⊤
 open import Definitions.List.Setoid {lzero} {lzero} (Either ⊤ ⊤)
+open import Definitions.Relation
+open import Definitions.Semigroup.Commutative 
 open import Definitions.Relation.Properties
+open import Definitions.Relation.Order.Partial
+open import Definitions.List.Concatenation.Properties {lzero} {lzero} ⊤
+
+open CommutativeSemigroup {{...}}
 
 private
     Letter Word : Set
@@ -32,6 +38,8 @@ private
     _≅ℕ_ : {{SN : Setoid lzero ℕ}} → Rel lzero ℕ
     _≅ℕ_ {{SN}} = _≅_
         where open Setoid SN
+        
+    open Setoid {{...}}
 
     count-pos-word count-neg-word : Word → ℕ
     count-pos-word [] = 0ℕ
@@ -42,135 +50,254 @@ private
     count-neg-word (p1 :: x) = count-neg-word x
     count-neg-word (m1 :: x) = sucℕ (count-neg-word x)
 
+    count-pos-word-congruent : (x y : Word) → x ≅ y → count-pos-word x ≅ℕ count-pos-word y
+    count-pos-word-congruent _ _ nil=[]=nil = reflexive-on ℕ 0ℕ
+    count-pos-word-congruent (p1 :: x) (p1 :: y) (cons=[]=cons _ x=y) = consℕ ≡-refl (count-pos-word-congruent x y x=y)
+    count-pos-word-congruent (m1 :: x) (m1 :: y) (cons=[]=cons _ x=y) = count-pos-word-congruent x y x=y
+
+    count-neg-word-congruent : (x y : Word) → x ≅ y → count-neg-word x ≅ count-neg-word y
+    count-neg-word-congruent _ _ nil=[]=nil = reflexive-on ℕ 0ℕ
+    count-neg-word-congruent (p1 :: x) (p1 :: y) (cons=[]=cons _ x=y) = count-neg-word-congruent x y x=y
+    count-neg-word-congruent (m1 :: x) (m1 :: y) (cons=[]=cons _ x=y) = consℕ ≡-refl (count-neg-word-congruent x y x=y)
+
     count-pos count-neg : ℤ → ℕ
     count-pos (free x) = count-pos-word x
     count-neg (free x) = count-neg-word x
 
-    ℕ-to-word : ℕ → Word
-    ℕ-to-word 0ℕ = []
-    ℕ-to-word (sucℕ n) = p1 :: ℕ-to-word n
+    data _≤W_ : Rel lzero Word where
+        wle : (x y : Word) → count-pos-word x +ℕ count-neg-word y ≤ℕ count-pos-word y +ℕ count-neg-word x → x ≤W y
 
-    ℕ-to-ℤ : ℕ → ℤ
-    ℕ-to-ℤ n = free (ℕ-to-word n)
+    open PreOrder {{...}}
 
-    open Setoid {{...}}
-    open Group {{...}}
+    count-pos-insert-m1 : (x1 x2 : Word) → count-pos-word (x1 ++ m1 :: x2) ≅ℕ count-pos-word (x1 ++ x2)
+    count-pos-insert-m1 [] x2 = reflexive-on ℕ (count-pos-word x2)
+    count-pos-insert-m1 (p1 :: x1) x2 = consℕ ≡-refl (count-pos-insert-m1 x1 x2)
+    count-pos-insert-m1 (m1 :: x1) x2 = count-pos-insert-m1 x1 x2
 
-    _-ℕ_ : ℕ → ℕ → ℤ
-    m -ℕ n = ℕ-to-ℤ m + neg (ℕ-to-ℤ n)
+    count-pos-insert-p1 : (x1 x2 : Word) → count-pos-word (x1 ++ p1 :: x2) ≅ℕ sucℕ (count-pos-word (x1 ++ x2))
+    count-pos-insert-p1 [] x2 = reflexive-on ℕ (sucℕ (count-pos-word x2))
+    count-pos-insert-p1 (p1 :: x1) x2 = consℕ ≡-refl (count-pos-insert-p1 x1 x2)
+    count-pos-insert-p1 (m1 :: x1) x2 = count-pos-insert-p1 x1 x2
 
-    count-invariant : (x : ℤ) → x ≅ ℕ-to-ℤ (count-pos x) + neg (ℕ-to-ℤ (count-neg x))
-    count-invariant (free []) = reflexive-on ℤ 0ℤ
-    count-invariant (free (p1 :: x)) = begin≅
-        free (p1 :: x)              ≅<>
-        1ℤ + free x                 ≅< left-congruent-on _+_ (count-invariant (free x)) >
-        1ℤ + (ℕ-to-ℤ (count-pos (free x)) + neg (ℕ-to-ℤ (count-neg (free x))))
-                                    ≅< associate-on _+_ 1ℤ (ℕ-to-ℤ (count-pos (free x))) (neg (ℕ-to-ℤ (count-neg (free x)))) >
-        (1ℤ + ℕ-to-ℤ (count-pos (free x))) + neg (ℕ-to-ℤ (count-neg (free x)))
-                                    ≅<>
-        ℕ-to-ℤ (count-pos (free (p1 :: x))) + neg (ℕ-to-ℤ (count-neg (free (p1 :: x))))
-                                    ∎
-    count-invariant (free (m1 :: x)) = begin≅
-        free (m1 :: x)              ≅<>
-        -1ℤ + free x                ≅< left-congruent-on _+_ (count-invariant (free x)) >
-        -1ℤ + (ℕ-to-ℤ (count-pos (free x)) + neg (ℕ-to-ℤ (count-neg (free x))))
-                                    ≅< commute-on _+_ -1ℤ (ℕ-to-ℤ (count-pos (free x)) + neg (ℕ-to-ℤ (count-neg (free x)))) >
-        (ℕ-to-ℤ (count-pos (free x)) + neg (ℕ-to-ℤ (count-neg (free x)))) + -1ℤ
-                                    ≅< symmetric-on ℤ (associate-on _+_ (ℕ-to-ℤ (count-pos (free x))) (neg (ℕ-to-ℤ (count-neg (free x)))) -1ℤ) >
-        ℕ-to-ℤ (count-pos (free x)) + (neg (ℕ-to-ℤ (count-neg (free x))) + neg 1ℤ)
-                                    ≅< left-congruent-on _+_ (symmetric-on ℤ (distribute-inverse-on _+_ 0ℤ neg 1ℤ (ℕ-to-ℤ (count-neg (free x))))) >
-        ℕ-to-ℤ (count-pos (free x)) + neg (1ℤ + ℕ-to-ℤ (count-neg (free x)))
-                                    ≅<>
-        ℕ-to-ℤ (count-pos (free (m1 :: x))) + neg (ℕ-to-ℤ (count-neg (free (m1 :: x))))
-                                    ∎
+    count-neg-insert-p1 : (x1 x2 : Word) → count-neg-word (x1 ++ p1 :: x2) ≅ℕ count-neg-word (x1 ++ x2)
+    count-neg-insert-p1 [] x2 = reflexive-on ℕ (count-neg-word x2)
+    count-neg-insert-p1 (p1 :: x1) x2 = count-neg-insert-p1 x1 x2
+    count-neg-insert-p1 (m1 :: x1) x2 = consℕ ≡-refl (count-neg-insert-p1 x1 x2)
 
-    reduce-minus : (a b : ℕ) → (sucℕ a -ℕ sucℕ b) ≅ (a -ℕ b)
-    reduce-minus a b = begin≅
-        ℕ-to-ℤ (sucℕ a) + neg (ℕ-to-ℤ (sucℕ b))         ≅<>
-        (1ℤ + ℕ-to-ℤ a) + neg (1ℤ + ℕ-to-ℤ b)           ≅< left-congruent-on _+_ (distribute-inverse-on _+_ 0ℤ neg 1ℤ (ℕ-to-ℤ b)) >
-        (1ℤ + ℕ-to-ℤ a) + (neg (ℕ-to-ℤ b) + neg 1ℤ)     ≅< bi-congruent _+_ (commute-on _+_ 1ℤ (ℕ-to-ℤ a)) (commute-on _+_ (neg (ℕ-to-ℤ b)) (neg 1ℤ)) >
-        (ℕ-to-ℤ a + 1ℤ) + (neg 1ℤ + neg (ℕ-to-ℤ b))     ≅< associate-on _+_ (ℕ-to-ℤ a + 1ℤ) (neg 1ℤ) (neg (ℕ-to-ℤ b)) >
-        ((ℕ-to-ℤ a + 1ℤ) + neg 1ℤ) + neg (ℕ-to-ℤ b)     ≅< right-congruent-on _+_ (symmetric-on ℤ (associate-on _+_ (ℕ-to-ℤ a) 1ℤ (neg 1ℤ))) >
-        (ℕ-to-ℤ a + (1ℤ + neg 1ℤ)) + neg (ℕ-to-ℤ b)     ≅< right-congruent-on _+_ {neg (ℕ-to-ℤ b)} (left-congruent-on _+_ (right-inverse-on _+_ 0ℤ neg 1ℤ)) >
-        (ℕ-to-ℤ a + 0ℤ) + neg (ℕ-to-ℤ b)                ≅< right-congruent-on _+_ (right-identity-on _+_ (ℕ-to-ℤ a)) >
-        ℕ-to-ℤ a + neg (ℕ-to-ℤ b)                       ∎
+    count-neg-insert-m1 : (x1 x2 : Word) → count-neg-word (x1 ++ m1 :: x2) ≅ℕ sucℕ (count-neg-word (x1 ++ x2))
+    count-neg-insert-m1 [] x2 = reflexive-on ℕ (sucℕ (count-neg-word x2))
+    count-neg-insert-m1 (p1 :: x1) x2 = count-neg-insert-m1 x1 x2
+    count-neg-insert-m1 (m1 :: x1) x2 = consℕ ≡-refl (count-neg-insert-m1 x1 x2)
 
-    data Δ0 : Set where
-        [1+_] : ℕ → Δ0
-        -[1+_] : ℕ → Δ0
-        Δ=0 : Δ0
+    ≤W-transitive : {x y z : Word} → x ≤W y → y ≤W z → x ≤W z
+    ≤W-transitive (wle x y px+ny≤py+nx) (wle y z py+nz≤pz+ny) = wle x z 
+            (subtract-both-≤ 
+                (py +ℕ ny) 
+                (px +ℕ nz) 
+                (pz +ℕ nx) 
+                (bi-congruent-order _≤ℕ_ 
+                    (begin≅
+                        (py +ℕ ny) +ℕ (px +ℕ nz)    ≅< right-associate-on _+ℕ_ py ny (px +ℕ nz) >
+                        py +ℕ (ny +ℕ (px +ℕ nz))    ≅< left-congruent-on _+ℕ_ {py} (left-associate-on _+ℕ_ ny px nz) >
+                        py +ℕ ((ny +ℕ px) +ℕ nz)    ≅< commute-on _+ℕ_ py ((ny +ℕ px) +ℕ nz) >
+                        ((ny +ℕ px) +ℕ nz) +ℕ py    ≅< right-associate-on _+ℕ_ (ny +ℕ px) nz py >
+                        (ny +ℕ px) +ℕ (nz +ℕ py)    ≅< bi-congruent _+ℕ_ (commute-on _+ℕ_ ny px) (commute-on _+ℕ_ nz py) >
+                        (px +ℕ ny) +ℕ (py +ℕ nz)    ∎)
+                    (begin≅
+                        (py +ℕ ny) +ℕ (pz +ℕ nx)    ≅< right-associate-on _+ℕ_ py ny (pz +ℕ nx) >
+                        py +ℕ (ny +ℕ (pz +ℕ nx))    ≅< left-congruent-on _+ℕ_ {py} (left-associate-on _+ℕ_ ny pz nx) >
+                        py +ℕ ((ny +ℕ pz) +ℕ nx)    ≅< left-congruent-on _+ℕ_ {py} (commute-on _+ℕ_ (ny +ℕ pz) nx) >
+                        py +ℕ (nx +ℕ (ny +ℕ pz))    ≅< left-associate-on _+ℕ_ py nx (ny +ℕ pz) >
+                        (py +ℕ nx) +ℕ (ny +ℕ pz)    ≅< left-congruent-on _+ℕ_ {py +ℕ nx} (commute-on _+ℕ_ ny pz) >
+                        (py +ℕ nx) +ℕ (pz +ℕ ny)    ∎)
+                    (addition-preserves-≤ px+ny≤py+nx py+nz≤pz+ny)))
+        where   px = count-pos-word x
+                py = count-pos-word y
+                pz = count-pos-word z
+                nx = count-neg-word x
+                ny = count-neg-word y
+                nz = count-neg-word z
+
+    count-equality-word : {x y : Word} → EqClosure x y → (count-pos-word x +ℕ count-neg-word y) ≅ℕ (count-pos-word y +ℕ count-neg-word x)
+    count-equality-word (sym y=x) = symmetric-on ℕ (count-equality-word y=x)
+    count-equality-word (trans {x} {z} {y} x=z z=y) = left-injective-on _+ℕ_ (pz ++ nz) (begin≅
+                (pz ++ nz) ++ (px ++ ny)        ≅< left-associate-on _++_ (pz ++ nz) px ny >
+                ((pz ++ nz) ++ px) ++ ny        ≅< commute-on _++_ ((pz ++ nz) ++ px) ny >
+                ny ++ ((pz ++ nz) ++ px)        ≅< left-congruent-on _++_ {ny} (right-associate-on _++_ pz nz px) >
+                ny ++ (pz ++ (nz ++ px))        ≅< left-associate-on _++_ ny pz (nz ++ px) >
+                (ny ++ pz) ++ (nz ++ px)        ≅< bi-congruent _++_ (commute-on _++_ ny pz) (commute-on _++_ nz px) >
+                (pz ++ ny) ++ (px ++ nz)        ≅< bi-congruent _++_ (count-equality-word z=y) (count-equality-word x=z) >
+                (py ++ nz) ++ (pz ++ nx)        ≅< bi-congruent _++_ (commute-on _++_ py nz) (commute-on _++_ pz nx) >
+                (nz ++ py) ++ (nx ++ pz)        ≅< right-associate-on _++_ nz py (nx ++ pz) >
+                nz ++ (py ++ (nx ++ pz))        ≅< left-congruent-on _++_ {nz} (left-associate-on _++_ py nx pz) >
+                nz ++ ((py ++ nx) ++ pz)        ≅< left-congruent-on _++_ {nz} (commute-on _++_ (py ++ nx) pz) >
+                nz ++ (pz ++ (py ++ nx))        ≅< left-associate-on _++_ nz pz (py ++ nx) >
+                (nz ++ pz) ++ (py ++ nx)        ≅< right-congruent-on _++_ (commute-on _++_ nz pz) >
+                (pz ++ nz) ++ (py ++ nx)        ∎)
+            where   px = count-pos-word x
+                    py = count-pos-word y
+                    pz = count-pos-word z
+                    nx = count-neg-word x
+                    ny = count-neg-word y
+                    nz = count-neg-word z
+    count-equality-word (refl x y x=y) = begin≅
+        count-pos-word x ++ count-neg-word y    ≅< bi-congruent _++_ (count-pos-word-congruent x y x=y) (count-neg-word-congruent y x (symmetric-on Word x=y)) >
+        count-pos-word y ++ count-neg-word x    ∎
+    count-equality-word (imp (reduces x1 p1 x2)) = begin≅
+        count-pos-word (x1 ++ m1 :: p1 :: x2) ++ count-neg-word (x1 ++ x2)  ≅< right-congruent-on _++_ (count-pos-insert-m1 x1 (p1 :: x2)) >
+        count-pos-word (x1 ++ p1 :: x2) ++ count-neg-word (x1 ++ x2)        ≅< right-congruent-on _++_ (count-pos-insert-p1 x1 x2) >
+        (1ℕ ++ count-pos-word (x1 ++ x2)) ++ count-neg-word (x1 ++ x2)      ≅< right-congruent-on _++_ (commute-on _++_ 1ℕ (count-pos-word (x1 ++ x2))) >
+        (count-pos-word (x1 ++ x2) ++ 1ℕ) ++ count-neg-word (x1 ++ x2)      ≅< right-associate-on _++_ (count-pos-word (x1 ++ x2)) 1ℕ (count-neg-word (x1 ++ x2)) >
+        count-pos-word (x1 ++ x2) ++ (1ℕ ++ count-neg-word (x1 ++ x2))      ≅< left-congruent-on _++_ (left-congruent-on _++_ {1ℕ} (symmetric-on ℕ (count-neg-insert-p1 x1 x2))) >
+        count-pos-word (x1 ++ x2) ++ sucℕ (count-neg-word (x1 ++ p1 :: x2)) ≅< left-congruent-on _++_ (symmetric-on ℕ (count-neg-insert-m1 x1 (p1 :: x2))) >
+        count-pos-word (x1 ++ x2) ++ count-neg-word (x1 ++ m1 :: p1 :: x2)  ∎
+    count-equality-word (imp (reduces x1 m1 x2)) = begin≅
+        count-pos-word (x1 ++ p1 :: m1 :: x2) ++ count-neg-word (x1 ++ x2)  ≅< right-congruent-on _++_ (count-pos-insert-p1 x1 (m1 :: x2)) >
+        (1ℕ ++ count-pos-word (x1 ++ m1 :: x2)) ++ count-neg-word (x1 ++ x2) ≅< right-congruent-on _++_ (left-congruent-on _++_ {1ℕ} (count-pos-insert-m1 x1 x2)) >
+        (1ℕ ++ count-pos-word (x1 ++ x2)) ++ count-neg-word (x1 ++ x2)      ≅< right-congruent-on _++_ (commute-on _++_ 1ℕ (count-pos-word (x1 ++ x2))) >
+        (count-pos-word (x1 ++ x2) ++ 1ℕ) ++ count-neg-word (x1 ++ x2)      ≅< right-associate-on _++_ (count-pos-word (x1 ++ x2)) 1ℕ (count-neg-word (x1 ++ x2)) >
+        count-pos-word (x1 ++ x2) ++ (1ℕ ++ count-neg-word (x1 ++ x2))      ≅< left-congruent-on _++_ (symmetric-on ℕ (count-neg-insert-m1 x1 x2)) >
+        count-pos-word (x1 ++ x2) ++ count-neg-word (x1 ++ m1 :: x2)        ≅< left-congruent-on _++_ (symmetric-on ℕ (count-neg-insert-p1 x1 (m1 :: x2))) >
+        count-pos-word (x1 ++ x2) ++ count-neg-word (x1 ++ p1 :: m1 :: x2)  ∎
+
+    count-equality : (x y : ℤ) → x ≅ y → (count-pos x +ℕ count-neg y) ≅ℕ (count-pos y +ℕ count-neg x)
+    count-equality (free x) (free y) (eqfg x=y) = count-equality-word x=y
+
+    ≤W-reflexive : (x y : Word) → EqClosure x y → x ≤W y
+    ≤W-reflexive x y x=y = wle x y (reflexive-equiv-order-on _≤ℕ_ (count-equality-word x=y))
+
+    ≤W-left-congruent : {x y z : Word} → EqClosure x y → y ≤W z → x ≤W z
+    ≤W-left-congruent {x} {y} {z} x=y (wle y z y≤z) = wle x z 
+        (subtract-both-≤ (py ++ ny) (px ++ nz) (pz ++ nx) 
+            (bi-congruent-order _≤ℕ_ 
+                (begin≅
+                        (py ++ ny) ++ (px ++ nz)        ≅< left-associate-on _++_ (py ++ ny) px nz >
+                        ((py ++ ny) ++ px) ++ nz        ≅< right-congruent-on _++_ (right-associate-on _++_ py ny px) >
+                        (py ++ (ny ++ px)) ++ nz        ≅< right-congruent-on _++_ (commute-on _++_ py (ny ++ px)) >
+                        ((ny ++ px) ++ py) ++ nz        ≅< right-associate-on _++_ (ny ++ px) py nz >
+                        (ny ++ px) ++ (py ++ nz)        ≅< right-congruent-on _++_ (commute-on _++_ ny px) >
+                        (px ++ ny) ++ (py ++ nz)        ∎)
+                (begin≅
+                        (py ++ ny) ++ (pz ++ nx)        ≅< left-associate-on _++_ (py ++ ny) pz nx >
+                        ((py ++ ny) ++ pz) ++ nx        ≅< right-congruent-on _++_ (right-associate-on _++_ py ny pz) >
+                        (py ++ (ny ++ pz)) ++ nx        ≅< right-congruent-on _++_ (commute-on _++_ py (ny ++ pz)) >
+                        ((ny ++ pz) ++ py) ++ nx        ≅< right-associate-on _++_ (ny ++ pz) py nx >
+                        (ny ++ pz) ++ (py ++ nx)        ≅< right-congruent-on _++_ (commute-on _++_ ny pz) >
+                        (pz ++ ny) ++ (py ++ nx)        ≅< commute-on _++_ (pz ++ ny) (py ++ nx) >
+                        (py ++ nx) ++ (pz ++ ny)        ∎)
+                (addition-preserves-≤ (reflexive-equiv-order-on _≤ℕ_ (count-equality-word x=y)) y≤z)))
+        where   px = count-pos-word x
+                py = count-pos-word y
+                pz = count-pos-word z
+                nx = count-neg-word x 
+                ny = count-neg-word y
+                nz = count-neg-word z 
+ 
+    ≤W-right-congruent : {x y z : Word} → EqClosure y z → x ≤W y → x ≤W z
+    ≤W-right-congruent {x} {y} {z} y=z (wle x y x≤y) = wle x z 
+        (subtract-both-≤ (py ++ ny) (px ++ nz) (pz ++ nx) 
+            (bi-congruent-order _≤ℕ_ 
+                (begin≅
+                        (py ++ ny) ++ (px ++ nz)        ≅< left-associate-on _++_ (py ++ ny) px nz >
+                        ((py ++ ny) ++ px) ++ nz        ≅< right-congruent-on _++_ (right-associate-on _++_ py ny px) >
+                        (py ++ (ny ++ px)) ++ nz        ≅< right-congruent-on _++_ (commute-on _++_ py (ny ++ px)) >
+                        ((ny ++ px) ++ py) ++ nz        ≅< right-associate-on _++_ (ny ++ px) py nz >
+                        (ny ++ px) ++ (py ++ nz)        ≅< right-congruent-on _++_ (commute-on _++_ ny px) >
+                        (px ++ ny) ++ (py ++ nz)        ∎)
+                (begin≅
+                        (py ++ ny) ++ (pz ++ nx)        ≅< left-associate-on _++_ (py ++ ny) pz nx >
+                        ((py ++ ny) ++ pz) ++ nx        ≅< right-congruent-on _++_ (right-associate-on _++_ py ny pz) >
+                        (py ++ (ny ++ pz)) ++ nx        ≅< right-congruent-on _++_ (commute-on _++_ py (ny ++ pz)) >
+                        ((ny ++ pz) ++ py) ++ nx        ≅< right-associate-on _++_ (ny ++ pz) py nx >
+                        (ny ++ pz) ++ (py ++ nx)        ≅< right-congruent-on _++_ (commute-on _++_ ny pz) >
+                        (pz ++ ny) ++ (py ++ nx)        ≅< commute-on _++_ (pz ++ ny) (py ++ nx) >
+                        (py ++ nx) ++ (pz ++ ny)        ∎)
+                (addition-preserves-≤ x≤y (reflexive-equiv-order-on _≤ℕ_ (count-equality-word y=z)))))
+        where   px = count-pos-word x
+                py = count-pos-word y
+                pz = count-pos-word z
+                nx = count-neg-word x 
+                ny = count-neg-word y
+                nz = count-neg-word z
     
-    Δ0-to-ℤ : Δ0 → ℤ
-    Δ0-to-ℤ [1+ n ] = ℕ-to-ℤ (sucℕ n)
-    Δ0-to-ℤ -[1+ n ] = neg (ℕ-to-ℤ (sucℕ n))
-    Δ0-to-ℤ Δ=0 = 0ℤ
+    record WithoutP1 (x : Word) (y : Word) : Set where
+        field
+            without-p1-eq : free x ≅ free (p1 :: y)
+            count-pos-suc : count-pos-word x ≅ℕ sucℕ (count-pos-word y)
+            count-neg-eq : count-neg-word x ≅ℕ count-neg-word y
 
-    Canonicalization : (x : ℤ) → Set
-    Canonicalization x = Σ Δ0 (λ d → x ≅ Δ0-to-ℤ d)
+    inc-wp1-m1 : {x y : Word} → WithoutP1 x y → WithoutP1 (m1 :: x) (m1 :: y)
+    inc-wp1-m1 {x} {y} wp1 = record {
+            without-p1-eq = begin≅
+                free (m1 :: x)          ≅<>
+                -1ℤ + free x            ≅< left-congruent-on _+_ without-p1-eq >
+                -1ℤ + free (p1 :: y)    ≅<>
+                -1ℤ + (1ℤ + free y)     ≅< left-associate-on _+_ -1ℤ 1ℤ (free y) >
+                (-1ℤ + 1ℤ) + free y     ≅< right-congruent-on _+_ (commute-on _+_ -1ℤ 1ℤ) >
+                (1ℤ + -1ℤ) + free y     ≅<>
+                free (p1 :: m1 :: y)    ∎;
+            count-pos-suc = count-pos-suc;
+            count-neg-eq = begin≅
+                count-neg-word (m1 :: x)        ≅<>
+                sucℕ (count-neg-word x)         ≅< suc= count-neg-eq >
+                sucℕ (count-neg-word y)         ≅<>
+                count-neg-word (m1 :: y)        ∎}
+        where open WithoutP1 wp1
 
-    canonicalize-helper : (x : Word) → (p n : ℕ) → (free x ≅ p -ℕ n) → Canonicalization (free x)
-    canonicalize-helper x (sucℕ p) (sucℕ n) x=sp+nsn = canonicalize-helper x p n (begin≅
-        free x              ≅< x=sp+nsn >
-        sucℕ p -ℕ sucℕ n   ≅< reduce-minus p n >
-        p -ℕ n              ∎)
-    canonicalize-helper _ 0ℕ 0ℕ x=0+0 = Δ=0 , x=0+0
-    canonicalize-helper _ 0ℕ (sucℕ n) x=0+nsn = -[1+ n ] , x=0+nsn
-    canonicalize-helper x (sucℕ p) 0ℕ x=sp-0 = [1+ p ] , (begin≅
-        free x                               ≅< x=sp-0 >
-        sucℕ p -ℕ 0ℕ                        ≅<>
-        ℕ-to-ℤ (sucℕ p) + neg (ℕ-to-ℤ 0ℕ)   ≅<>
-        ℕ-to-ℤ (sucℕ p) + 0ℤ                ≅< right-identity-on _+_ (ℕ-to-ℤ (sucℕ p)) >
-        ℕ-to-ℤ (sucℕ p)                     ≅<>
-        Δ0-to-ℤ [1+ p ]                     ∎)
+    pos-to-front : (x : Word) → Either (Σ Word (WithoutP1 x)) (count-pos-word x ≅ℕ 0ℕ)
+    pos-to-front [] = right (reflexive-on ℕ 0ℕ)
+    pos-to-front (p1 :: x) = left (x , record { 
+        without-p1-eq = reflexive-on ℤ (free (p1 :: x));
+        count-pos-suc = begin≅
+            count-pos-word (p1 :: x)    ≅<>
+            sucℕ (count-pos-word x)     ∎;
+        count-neg-eq = reflexive-on ℕ (count-neg-word x) })
+    pos-to-front (m1 :: x) with pos-to-front x
+    ... | left (y , wp1y)   = left (m1 :: y , inc-wp1-m1 wp1y)
+    ... | right cpx=0       = right cpx=0
 
-    canonicalize-word : (x : Word) → Canonicalization (free x)
-    canonicalize-word x = canonicalize-helper x (count-pos-word x) (count-neg-word x) (count-invariant (free x))
+    record WithoutM1 (x : Word) (y : Word) : Set where
+        field
+            without-m1-eq : free x ≅ free (m1 :: y)
+            count-pos-eq : count-pos-word x ≅ℕ count-pos-word y
+            count-neg-suc : count-neg-word x ≅ℕ sucℕ (count-neg-word y)
 
-    canonicalize : (x : ℤ) → Canonicalization x
-    canonicalize (free x) = canonicalize-word x
-    
-    data _Δ0-eq_ : Rel lzero Δ0 where
-        1+eq : (m n : ℕ) → m ≅ℕ n → [1+ m ] Δ0-eq [1+ n ]
-        -1-eq : (m n : ℕ) → m ≅ℕ n → -[1+ m ] Δ0-eq -[1+ n ]
-        Δ=0-eq : Δ=0 Δ0-eq Δ=0
+    inc-wm1-p1 : {x y : Word} → WithoutM1 x y → WithoutM1 (p1 :: x) (p1 :: y)
+    inc-wm1-p1 {x} {y} wm1 = record {
+            without-m1-eq = begin≅
+                free (p1 :: x)          ≅<>
+                1ℤ + free x             ≅< left-congruent-on _+_ without-m1-eq >
+                1ℤ + free (m1 :: y)     ≅<>
+                1ℤ + (-1ℤ + free y)     ≅< left-associate-on _+_ 1ℤ -1ℤ (free y) >
+                (1ℤ + -1ℤ) + free y     ≅< right-congruent-on _+_ (commute-on _+_ 1ℤ -1ℤ) >
+                (-1ℤ + 1ℤ) + free y     ≅<>
+                free (m1 :: p1 :: y)    ∎;
+            count-neg-suc = count-neg-suc;
+            count-pos-eq = begin≅
+                count-pos-word (p1 :: x)        ≅<>
+                sucℕ (count-pos-word x)         ≅< suc= count-pos-eq >
+                sucℕ (count-pos-word y)         ≅<>
+                count-pos-word (p1 :: y)        ∎}
+        where open WithoutM1 wm1
 
-    Δ0-eq-reflexive : Reflexive _Δ0-eq_
-    Δ0-eq-reflexive [1+ n ] = 1+eq n n (reflexive-on ℕ n)
-    Δ0-eq-reflexive -[1+ n ] = -1-eq n n (reflexive-on ℕ n)
-    Δ0-eq-reflexive Δ=0 = Δ=0-eq
+    neg-to-front : (x : Word) → Either (Σ Word (WithoutM1 x)) (count-neg-word x ≅ℕ 0ℕ)
+    neg-to-front [] = right (reflexive-on ℕ 0ℕ)
+    neg-to-front (m1 :: x) = left (x , record { 
+        without-m1-eq = reflexive-on ℤ (free (m1 :: x));
+        count-neg-suc = begin≅
+            count-neg-word (m1 :: x)    ≅<>
+            sucℕ (count-neg-word x)     ∎;
+        count-pos-eq = reflexive-on ℕ (count-pos-word x) })
+    neg-to-front (p1 :: x) with neg-to-front x
+    ... | left (y , wm1y)   = left (p1 :: y , inc-wm1-p1 wm1y)
+    ... | right cnx=0       = right cnx=0
 
-    Δ0-eq-symmetric : Symmetric _Δ0-eq_
-    Δ0-eq-symmetric (1+eq m n m=n) = 1+eq n m (symmetric-on ℕ m=n)
-    Δ0-eq-symmetric (-1-eq m n m=n) = -1-eq n m (symmetric-on ℕ m=n)
-    Δ0-eq-symmetric Δ=0-eq = Δ=0-eq
+data _≤_ : Rel lzero ℤ where 
+    zle : {x y : Word} → x ≤W y → free x ≤ free y
 
-    Δ0-eq-transitive : Transitive _Δ0-eq_
-    Δ0-eq-transitive (1+eq a b a=b) (1+eq b c b=c) = 1+eq a c (transitive-on ℕ a=b b=c)
-    Δ0-eq-transitive (-1-eq a b a=b) (-1-eq b c b=c) = -1-eq a c (transitive-on ℕ a=b b=c)
-    Δ0-eq-transitive Δ=0-eq Δ=0-eq = Δ=0-eq
+private
+    ≤-reflexive : Reflexive _≤_
+    ≤-reflexive (free x) = zle (≤W-reflexive x x (refl x x (reflexive-on Word x)))
 
-    instance
-        Δ0-eq-is-reflexive : IsReflexive _Δ0-eq_
-        Δ0-eq-is-reflexive = record {reflexive = Δ0-eq-reflexive}
-
-        Δ0-eq-is-symmetric : IsSymmetric _Δ0-eq_
-        Δ0-eq-is-symmetric = record {symmetric = Δ0-eq-symmetric}
-
-        Δ0-eq-is-transitive : IsTransitive _Δ0-eq_
-        Δ0-eq-is-transitive = record {transitive = Δ0-eq-transitive}
-
-        Δ0-eq-preorder : PreOrder _Δ0-eq_
-        Δ0-eq-preorder = record {}
-
-        Δ0-equivalence : Equivalence _Δ0-eq_
-        Δ0-equivalence = record {}
-
-        Δ0-setoid : Setoid lzero Δ0
-        Δ0-setoid = record { _≅_ = _Δ0-eq_ }
-
-    canonicalization-unique-word : (x y : Word) → EqClosure x y → fst (canonicalize-word x) Δ0-eq fst (canonicalize-word y)
-    canonicalization-unique-word x y (imp x₁) = {!   !}
-    canonicalization-unique-word 0ℕ 0ℕ (refl 0ℕ 0ℕ nil=[]=nil) = Δ=0-eq
-    canonicalization-unique-word (p1 :: x) (p1 :: y) (refl (p1 :: x) (p1 :: y) (cons=[]=cons (r= _) x=y)) = {!   !}
-    canonicalization-unique-word x y (sym y=x) = symmetric-on Δ0 (canonicalization-unique-word y x y=x)
-    canonicalization-unique-word x y (trans {x} {z} {y} x=z z=y) = transitive-on Δ0 (canonicalization-unique-word x z x=z) (canonicalization-unique-word z y z=y)
+    ≤-transitive : Transitive _≤_
+    ≤-transitive (zle x≤y) (zle y≤z) = zle (≤W-transitive x≤y y≤z)

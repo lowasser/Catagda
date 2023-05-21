@@ -79,6 +79,12 @@ open IsAssociative {{...}}
 associate-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → {{IsAssociative _∙_}} → Associate _∙_
 associate-on _ = associate
 
+left-associate-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → {{IsAssociative _∙_}} → Associate _∙_
+left-associate-on = associate-on
+
+right-associate-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → {{IsAssociative _∙_}} → (a b c : A) → (a ∙ b) ∙ c ≅ a ∙ (b ∙ c)
+right-associate-on {_} {_} {A} _∙_ a b c = symmetric-on A (left-associate-on _∙_ a b c)
+
 LeftIdentity : {A : Set ℓA} → {{Setoid ℓ=A A}} → BinOp A → A → Set (ℓA ⊔ ℓ=A)
 LeftIdentity _∙_ i = ∀ x → i ∙ x ≅ x
 

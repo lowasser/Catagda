@@ -1,48 +1,56 @@
 open import Agda.Primitive
 open import Definitions.Setoid
 
-module Definitions.Function.Properties {ℓA ℓB : Level} (A : Set ℓA) (B : Set ℓB) {{AS : Setoid A}} {{BS : Setoid B}} where
+module Definitions.Function.Properties where
 
 open import Definitions.Relation
 open import Definitions.Relation.Properties
-open import Definitions.Relation.Equivalence
 open import Definitions.Function.Unary.Properties
 open import Definitions.Setoid.Equation
+open import Definitions.Function.Composition
 
 open Setoid {{...}}
 
-data _Congruent→_ : Set ℓA → Set ℓB → Set (lsuc (ℓA ⊔ ℓB)) where
-    cong→ : (f : A → B) → Congruent {ℓA} {ℓB} {A} {B} f {{AS}} {{BS}} → A Congruent→ B
- 
-_cong$_ : A Congruent→ B → A → B
-(cong→ f _) cong$ a = f a
+private
+    variable
+        ℓA ℓB ℓC ℓ=A ℓ=B ℓ=C : Level
 
-data _≡→_ : Relation (A Congruent→ B) where
-    fequiv : { f g : A Congruent→ B } → (∀ {a1 a2 : A} → a1 ≅ a2 → f cong$ a1 ≅ g cong$ a2) → f ≡→ g
+record _Congruent→_ (A : Set ℓA) (B : Set ℓB) {{SA : Setoid ℓ=A A}} {{SB : Setoid ℓ=B B}} : Set (ℓA ⊔ ℓB ⊔ ℓ=A ⊔ ℓ=B) where 
+    field
+        cong-func : A → B
+        is-congruent : Congruent cong-func
+
+open _Congruent→_
+
+id-congruent : (A : Set ℓA) → {{SA : Setoid ℓ=A A}} → A Congruent→ A
+id-congruent _ = record {
+    cong-func = λ a → a;
+    is-congruent = λ a=b → a=b}
+
+_cong$_ : {A : Set ℓA} {B : Set ℓB} → {{SA : Setoid ℓ=A A}} → {{SB : Setoid ℓ=B B}} → A Congruent→ B → A → B
+congf cong$ a = cong-func congf a
+
+_cong∘_ : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{SA : Setoid ℓ=A A}} → {{SB : Setoid ℓ=B B}} → {{SC : Setoid ℓ=C C}} → B Congruent→ C → A Congruent→ B → A Congruent→ C
+f cong∘ g = record {
+    cong-func = cong-func f ∘ cong-func g;
+    is-congruent = λ {a1} {a2} a1=a2 → is-congruent f (is-congruent g (a1=a2))}
+
+data ≡→ (A : Set ℓA) (B : Set ℓB) {{SA : Setoid ℓ=A A}} {{SB : Setoid ℓ=B B}} : Relation (A Congruent→ B) where
+    fequiv : (f g : A Congruent→ B) → ((a : A) → f cong$ a ≅ g cong$ a) → ≡→ A B f g
 
 private
-    ≡→-reflexive : Reflexive _≡→_
-    ≡→-reflexive (cong→ f cong) = fequiv (λ a1≅a2 → cong a1≅a2)
+    ≡→-reflexive : (A : Set ℓA) (B : Set ℓB) → {{SA : Setoid ℓ=A A}} {{SB : Setoid ℓ=B B}} → Reflexive (≡→ A B)
+    ≡→-reflexive A B congf = fequiv congf congf (λ a → reflexive-on B (congf cong$ a))
+        where open _Congruent→_ congf
 
-    ≡→-symmetric : Symmetric _≡→_
-    ≡→-symmetric (fequiv eq) = fequiv (λ a1≅a2 → symmetric-on B (eq (symmetric-on A a1≅a2)))
+    ≡→-symmetric : (A : Set ℓA) (B : Set ℓB) → {{SA : Setoid ℓ=A A}} {{SB : Setoid ℓ=B B}} → Symmetric (≡→ A B)
+    ≡→-symmetric A B (fequiv fa fb eq) = fequiv fb fa (λ a → symmetric-on B (eq a))
 
-    ≡→-transitive : Transitive _≡→_
-    ≡→-transitive (fequiv {f} {g} feqg) (fequiv {g} {h} geqh) = fequiv (λ {a1} {a2} a1≅a2 → begin≅
-        f cong$ a1      ≅< feqg a1≅a2 >
-        g cong$ a2      ≅< geqh (reflexive-on A a2) >
-        h cong$ a2      ∎)
+    ≡→-transitive : (A : Set ℓA) (B : Set ℓB) → {{SA : Setoid ℓ=A A}} {{SB : Setoid ℓ=B B}} → Transitive (≡→ A B)
+    ≡→-transitive A B (fequiv f g feqg) (fequiv g h geqh) = fequiv f h (λ a → begin≅
+        f cong$ a      ≅< feqg a >
+        g cong$ a      ≅< geqh a >
+        h cong$ a      ∎)
 
-instance 
-    ≡→-IsReflexive : IsReflexive _≡→_
-    ≡→-IsReflexive = record { reflexive = ≡→-reflexive }
-
-    ≡→-IsSymmetric : IsSymmetric _≡→_
-    ≡→-IsSymmetric = record { symmetric = ≡→-symmetric }
-
-    ≡→-IsTransitive : IsTransitive _≡→_
-    ≡→-IsTransitive = record { transitive = ≡→-transitive }
-
-    ≡→-Equivalence : Equivalence _≡→_
-    ≡→-Equivalence = record {}
-    
+≡→-equivalence : (A : Set ℓA) (B : Set ℓB) → {{SA : Setoid ℓ=A A}} {{SB : Setoid ℓ=B B}} → Equivalence (≡→ A B)
+≡→-equivalence A B = make-equivalence (≡→ A B) (≡→-reflexive A B) (≡→-transitive A B) (≡→-symmetric A B)  

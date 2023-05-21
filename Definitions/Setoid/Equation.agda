@@ -4,6 +4,7 @@ open import Agda.Primitive
 open import Definitions.Setoid
 open import Definitions.Relation
 open import Definitions.Relation.Properties
+open import Definitions.Relation.Equivalence.Structural
 
 open Setoid {{...}}
 open Equivalence {{...}}
@@ -25,12 +26,16 @@ x ∎ = reflexive x
 _≅<_>_ : {{SA : Setoid ℓ=A A}} → (x : A) → { y z : A } → x ≅ y → y ≅ z → x ≅ z
 x ≅< p > q = transitive p q
 
+_≡<_>_ : {{SA : Setoid ℓ=A A}} → (x : A) → { y z : A } → x ≡ y → y ≅ z → x ≅ z
+x ≡< refl > q = q
+
 _≅<>_ : {{SA : Setoid ℓ=A A}} → (x : A) → { y : A } → x ≅ y → x ≅ y
 x ≅<> q = x ≅< reflexive x > q
 
 infix 1 begin≅_
 infix 3 _∎
 infixr 2 _≅<_>_
+infixr 2 _≡<_>_
 infixr 2 _≅<>_
 
 ≇-left-≅ : {{SA : Setoid ℓ=A A}} → {a b c : A} → a ≅ b → b ≇ c → a ≇ c

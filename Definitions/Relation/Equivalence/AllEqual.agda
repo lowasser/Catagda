@@ -4,10 +4,9 @@ module Definitions.Relation.Equivalence.AllEqual {ℓ : Level} (A : Set ℓ) whe
 
 open import Definitions.Relation
 open import Definitions.Relation.Properties
-open import Definitions.Relation.Equivalence
 open import Definitions.Setoid
 
-data _==_ : Relation A where
+data _==_ : Rel ℓ A where
     eq : {x y : A} → x == y
 
 instance
@@ -20,8 +19,11 @@ instance
     alleq-transitive : IsTransitive _==_
     alleq-transitive = record {transitive = λ _ _ → eq}
 
+    alleq-preorder : PreOrder _==_
+    alleq-preorder = record {}
+
     alleq-equivalence : Equivalence _==_
     alleq-equivalence = record {}
 
-    alleq-setoid : Setoid A
+    alleq-setoid : Setoid ℓ A
     alleq-setoid = record {_≅_ = _==_}

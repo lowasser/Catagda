@@ -3,7 +3,7 @@ open import Definitions.Setoid
 open import Definitions.Relation
 open import Definitions.Relation.Order.Partial
 
-module Definitions.Relation.Order.Partial.Category {ℓ : Level} (A : Set ℓ) {{SA : Setoid A}} (_≤_ : Relation A) {{PO : PartialOrder _≤_}} where
+module Definitions.Relation.Order.Partial.Category {ℓ : Level} (A : Set ℓ) {{SA : Setoid ℓ A}} (_≤_ : Relation A) {{PO : PartialOrder _≤_}} where
 
 open import Definitions.Category
 open import Definitions.Relation.Properties

@@ -42,6 +42,7 @@ pattern zero = []
 pattern 0ℕ = zero
 pattern suc n = (tt :: n)
 pattern 1ℕ = suc 0ℕ
+pattern suc= x=y = (cons=[]=cons refl x=y)
 
 open Setoid {{...}}
 
@@ -52,8 +53,7 @@ private
     +-commute-lemma : (x y : ℕ) → (suc x + y) ≅ (x + suc y)
     +-commute-lemma zero y = begin≅
         suc zero + y        ≅<>
-        [ tt :] + y         ≅<>
-        tt :: y             ≅<>
+        1ℕ + y              ≅<>
         suc y               ≅< symmetric-on ℕ (left-identity-on _+_ (suc y)) >
         zero + suc y        ∎
     +-commute-lemma (suc x) y = begin≅
@@ -74,6 +74,17 @@ private
         suc y + x           ≅< +-commute-lemma y x >
         y + suc x           ∎
 
+    +-left-injective : (a : ℕ) → Injective (a +_)
+    +-left-injective 0ℕ ab=ac = ab=ac
+    +-left-injective (suc a) (suc= ab=ac) = +-left-injective a ab=ac
+
+    +-right-injective : (a : ℕ) → Injective (_+ a)
+    +-right-injective a {b} {c} ba=ca = +-left-injective a (begin≅
+        a + b       ≅< +-commute a b >
+        b + a       ≅< ba=ca >
+        c + a       ≅< +-commute c a >
+        a + c       ∎)
+
 instance
     +-commutative : IsCommutative  _+_
     +-commutative = record {commute = +-commute}
@@ -86,6 +97,9 @@ instance
 
     +-commutative-monoid : CommutativeMonoid _+_ zero
     +-commutative-monoid = record {}
+
+    +-bi-injective : BiInjective _+_
+    +-bi-injective = record {left-injective = +-left-injective; right-injective = +-right-injective}
 
 _*_ : BinOp ℕ
 zero * n = zero
@@ -115,11 +129,11 @@ private
         suc a * (b + c)             ≅<>
         (b + c) + a * (b + c)       ≅< left-congruent-on _+_ (*-distributes-over-+ a b c) >
         (b + c) + (a * b + a * c)   ≅< right-congruent-on _+_ (+-commute b c) >
-        (c + b) + (a * b + a * c)   ≅< associate-on _+_ (c + b) (a * b) (a * c) >
-        ((c + b) + a * b) + a * c   ≅< right-congruent-on _+_ (symmetric-on ℕ (associate-on _+_ c b (a * b))) >
+        (c + b) + (a * b + a * c)   ≅< left-associate-on _+_ (c + b) (a * b) (a * c) >
+        ((c + b) + a * b) + a * c   ≅< right-congruent-on _+_ (right-associate-on _+_ c b (a * b)) >
         (c + (b + a * b)) + a * c   ≅<>
         (c + suc a * b) + a * c     ≅< right-congruent-on _+_ (+-commute c (suc a * b)) >
-        (suc a * b + c) + a * c     ≅< symmetric-on ℕ (associate-on _+_ (suc a * b) c (a * c)) >
+        (suc a * b + c) + a * c     ≅< right-associate-on _+_ (suc a * b) c (a * c) >
         suc a * b + (c + a * c)     ≅<>
         suc a * b + suc a * c       ∎
 
@@ -211,6 +225,8 @@ data _≤_ : Rel lzero ℕ where
     z≤ : { x : ℕ } → 0ℕ ≤ x
     s≤s : { x y : ℕ } → x ≤ y → suc x ≤ suc y
 
+infixr 6 _≤_
+
 private
     ≤-reflexive : Reflexive _≤_ 
     ≤-reflexive 0ℕ = z≤
@@ -278,8 +294,12 @@ private
     ≤-suc-rhs 0ℕ _ z≤ = z≤
     ≤-suc-rhs (suc a) (suc b) (s≤s a≤b) = s≤s (≤-suc-rhs a b a≤b)
 
-addition-preserves-≤ : (a b c d : ℕ) → a ≤ b → c ≤ d → (a + c) ≤ (b + d)
-addition-preserves-≤ 0ℕ b 0ℕ d z≤ _ = z≤
-addition-preserves-≤ (suc a) (suc b) c d (s≤s a≤b) c≤d = s≤s (addition-preserves-≤ a b c d a≤b c≤d)
-addition-preserves-≤ 0ℕ 0ℕ (suc c) (suc d) z≤ (s≤s c≤d) = s≤s c≤d
-addition-preserves-≤ 0ℕ (suc b) (suc c) (suc d) z≤ (s≤s c≤d) = s≤s (addition-preserves-≤ 0ℕ b c (suc d) z≤ (≤-suc-rhs c d c≤d))
+addition-preserves-≤ : {a b c d : ℕ} → a ≤ b → c ≤ d → (a + c) ≤ (b + d)
+addition-preserves-≤ {0ℕ} {b} {0ℕ} {d} z≤ _ = z≤
+addition-preserves-≤ (s≤s a≤b) c≤d = s≤s (addition-preserves-≤ a≤b c≤d)
+addition-preserves-≤ {0ℕ} {0ℕ} z≤ (s≤s c≤d) = s≤s c≤d
+addition-preserves-≤ {0ℕ} {suc b} {suc c} {suc d} z≤ (s≤s c≤d) = s≤s (addition-preserves-≤ z≤ (≤-suc-rhs c d c≤d))
+
+subtract-both-≤ : (a b c : ℕ) → (a + b) ≤ (a + c) → b ≤ c
+subtract-both-≤ 0ℕ b c ab≤ac = ab≤ac
+subtract-both-≤ (suc a) b c (s≤s ab≤ac) = subtract-both-≤ a b c ab≤ac
