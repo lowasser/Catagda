@@ -1,9 +1,7 @@
 module Definitions.Category.One where
 
 open import Agda.Primitive
-open import Definitions.Logic
 open import Definitions.Category
-open import Definitions.Relation
 open import Agda.Builtin.Unit
 
 data OneMorph : ⊤ → ⊤ → Set where
