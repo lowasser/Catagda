@@ -52,6 +52,9 @@ record Equivalence { A : Set ℓA } (_∼_ : Rel ℓ=A A) : Set (ℓA ⊔ ℓ=A)
 make-equivalence : {A : Set ℓA} → (_~_ : Rel ℓ=A A) → Reflexive _~_ → Transitive _~_ → Symmetric _~_ → Equivalence _~_
 make-equivalence _~_ refl trans sym = record {preorder = make-preorder _~_ refl trans; is-symmetric = record {symmetric = sym}}
 
+transitive-equivalence : {A : Set ℓA} → {_~_ : Rel ℓ=A A} → Equivalence _~_ → Transitive _~_
+transitive-equivalence equiv = IsTransitive.transitive (PreOrder.is-transitive (Equivalence.preorder equiv))
+
 record Decidable { A : Set ℓA } { B : Set ℓB } (_~_ : A → B → Set ℓ=AB) : Set (ℓA ⊔ ℓB ⊔ ℓ=AB) where
     field
         decide : (a : A) → (b : B) → Either (a ~ b) (¬ (a ~ b))

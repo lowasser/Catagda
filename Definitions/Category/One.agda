@@ -15,15 +15,21 @@ instance
     OneCategory : Category ⊤ OneMorph
     OneCategory = record {
             _∘_ = λ the-morph the-morph → the-morph;
-            _=→_ = λ {tt} {tt} → _≡_;
+            _=Arrow_ = λ {tt} {tt} → _≡_;
             identity-arrow = λ tt → the-morph;
             left-congruent-arrow = λ _ morph → morph;
             right-congruent-arrow = λ _ morph → morph;
             associative-law = λ _ _ _ → refl;
             left-identity-law = λ _ → refl;
             right-identity-law = right-id-law;
-            =→-equivalence = λ {tt} {tt} → morph-equivalence;
-            =→-left-congruence = λ _ refl → refl;
-            =→-right-congruence = λ _ refl → refl}
+            =Arrow-equivalence = λ {tt} {tt} → morph-equivalence;
+            =Arrow-left-congruence = λ _ refl → refl;
+            =Arrow-right-congruence = λ _ refl → refl;
+            left-congruent-compose = left-congruent-compose;
+            right-congruent-compose = right-congruent-compose}
         where   right-id-law : {a b : ⊤} (f : OneMorph a b) → the-morph ≡ f
                 right-id-law {tt} {tt} the-morph = refl
+                right-congruent-compose : {a b c : ⊤} {bc1 bc2 : OneMorph b c} → bc1 ≡ bc2 → (ab : OneMorph a b) → ab ≡ ab
+                right-congruent-compose _ the-morph = refl
+                left-congruent-compose : {a b c : ⊤} {ab1 ab2 : OneMorph a b} → ab1 ≡ ab2 → (bc : OneMorph b c) → ab1 ≡ ab2
+                left-congruent-compose refl _ = refl

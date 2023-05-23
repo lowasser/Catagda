@@ -100,17 +100,48 @@ private
             =Morphism a b2 (right-congruent-arrow b1=b2 ab1) (right-congruent-arrow b1=b2 ab2)
     =Morph-right-congruence refl eq = eq
 
+    right-congruent-compose : {a b c : Ob} {bc1 bc2 : Morph b c} → =Morphism b c bc1 bc2 → (ab : Morph a b) → =Morphism a c (morph-composition bc1 ab) (morph-composition bc2 ab)
+    right-congruent-compose {a} {b} {c} {bc1} {bc2} (=-morphism (fequiv _ _ bc1=bc2)) ab = 
+        =-morphism (fequiv (morph-fn (morph-composition bc1 ab)) (morph-fn (morph-composition bc2 ab)) (λ a → begin≅
+            (morph-fn (morph-composition bc1 ab)) cong$ a       ≡< ≡-cong (_cong$ a) (composition-composes bc1 ab) >
+            (morph-fn bc1 cong∘ morph-fn ab) cong$ a            ≅<>
+            morph-fn bc1 cong$ (morph-fn ab cong$ a)            ≅< bc1=bc2 (morph-fn ab cong$ a) >
+            morph-fn bc2 cong$ (morph-fn ab cong$ a)            ≅<>
+            (morph-fn bc2 cong∘ morph-fn ab) cong$ a            ≡< ≡-cong (_cong$ a) (≡-sym (composition-composes bc2 ab)) >
+            morph-fn (morph-composition bc2 ab) cong$ a         ∎))
+            where   instance
+                        a-setoid = ob-setoid a
+                        b-setoid = ob-setoid b
+                        c-setoid = ob-setoid c
+
+    left-congruent-compose : {a b c : Ob} {ab1 ab2 : Morph a b} → =Morphism a b ab1 ab2 → (bc : Morph b c) → =Morphism a c (morph-composition bc ab1) (morph-composition bc ab2)
+    left-congruent-compose {a} {b} {c} {ab1} {ab2} (=-morphism (fequiv _ _ ab1=ab2)) bc =
+        =-morphism (fequiv (morph-fn (morph-composition bc ab1)) (morph-fn (morph-composition bc ab2)) (λ a → begin≅
+            morph-fn (morph-composition bc ab1) cong$ a     ≡< ≡-cong (_cong$ a) (composition-composes bc ab1) >
+            (morph-fn bc cong∘ morph-fn ab1) cong$ a        ≅<>
+            morph-fn bc cong$ (morph-fn ab1 cong$ a)        ≅< is-congruent (morph-fn bc) (ab1=ab2 a) >
+            morph-fn bc cong$ (morph-fn ab2 cong$ a)        ≅<>
+            (morph-fn bc cong∘ morph-fn ab2) cong$ a        ≡< ≡-cong (_cong$ a) (≡-sym (composition-composes bc ab2)) >
+            morph-fn (morph-composition bc ab2) cong$ a     ∎))
+            where   instance
+                        a-setoid = ob-setoid a
+                        b-setoid = ob-setoid b
+                        c-setoid = ob-setoid c
+
 instance
     morph-category : Category {lsuc ℓ} {lsuc ℓ} {lsuc ℓ} {lsuc ℓ} Ob Morph
     morph-category = record {
         _∘_ = morph-composition;
         left-congruent-arrow = left-congruent-arrow;
         right-congruent-arrow = right-congruent-arrow;
-        _=→_ = λ {A} {B} → =Morphism A B;
-        =→-equivalence = =Morph-equivalence;
+        _=Arrow_ = λ {A} {B} → =Morphism A B;
+        =Arrow-equivalence = =Morph-equivalence;
         identity-arrow = id-morph;
         left-identity-law = left-identity-law;
         right-identity-law = right-identity-law;
-        =→-left-congruence = =Morph-left-congruence;
-        =→-right-congruence = =Morph-right-congruence;
-        associative-law = associative-law}
+        =Arrow-left-congruence = =Morph-left-congruence;
+        =Arrow-right-congruence = =Morph-right-congruence;
+        associative-law = associative-law;
+        right-congruent-compose = right-congruent-compose;
+        left-congruent-compose = left-congruent-compose}
+ 

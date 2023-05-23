@@ -26,11 +26,11 @@ instance
         _∘_ = _∘_;
         left-congruent-arrow = left-congruent-law;
         right-congruent-arrow = right-congruent-law;
-        _=→_ = _==_;
-        =→-equivalence = λ {a b} → alleq-equivalence (a ≤ b);
+        _=Arrow_ = _==_;
+        =Arrow-equivalence = λ {a b} → alleq-equivalence (a ≤ b);
         identity-arrow = reflexive-order-on _≤_;
         left-identity-law = λ _ → eq;
         right-identity-law = λ _ → eq;
         associative-law = λ _ _ _ → eq;
-        =→-left-congruence = λ _ _ → eq;
-        =→-right-congruence = λ _ _ → eq}
+        =Arrow-left-congruence = λ _ _ → eq;
+        =Arrow-right-congruence = λ _ _ → eq}

@@ -14,10 +14,10 @@ instance
     ZeroCat = record {
         _∘_ = λ ();
         left-congruent-arrow = λ _ ();
-        _=→_ = λ _ ();
-        =→-equivalence = λ {};
-        =→-left-congruence = λ {};
-        =→-right-congruence = λ {};
+        _=Arrow_ = λ _ ();
+        =Arrow-equivalence = λ {};
+        =Arrow-left-congruence = λ {};
+        =Arrow-right-congruence = λ {};
         right-congruent-arrow = λ {};
         identity-arrow = λ ();
         left-identity-law = λ {};

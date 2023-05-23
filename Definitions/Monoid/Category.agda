@@ -69,13 +69,13 @@ instance
     monoid-category : Category Object Morphism
     monoid-category = record {
         _∘_ = _∘_;
-        _=→_ = _=m=_ ;
+        _=Arrow_ = _=m=_ ;
         identity-arrow = id-morph;
         left-congruent-arrow = left-cong;
         right-congruent-arrow = right-cong;
-        =→-equivalence = λ {a} {b} → make-equivalence (_=m=_ {a} {b}) (=m=-reflexive {a} {b}) (=m=-transitive {a} {b}) (=m=-symmetric {a} {b});
+        =Arrow-equivalence = λ {a} {b} → make-equivalence (_=m=_ {a} {b}) (=m=-reflexive {a} {b}) (=m=-transitive {a} {b}) (=m=-symmetric {a} {b});
         left-identity-law = left-id-law;
         right-identity-law = right-id-law;
         associative-law = associative-law;
-        =→-left-congruence = left-cong-arrow;
-        =→-right-congruence = right-cong-arrow}
+        =Arrow-left-congruence = left-cong-arrow;
+        =Arrow-right-congruence = right-cong-arrow}
