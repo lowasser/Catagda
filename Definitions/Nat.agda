@@ -38,8 +38,7 @@ a + b = a ∙ b
 
 infixr 9 _+_
 
-pattern zero = []
-pattern 0ℕ = zero
+pattern 0ℕ = []
 pattern suc n = (tt :: n)
 pattern 1ℕ = suc 0ℕ
 pattern suc= x=y = (cons=[]=cons refl x=y)
@@ -49,7 +48,7 @@ open Setoid {{...}}
 
 private
     suc-injective : Injective suc
-    suc-injective {x} {y} (cons=[]=cons _ x=y) = x=y
+    suc-injective (suc= x=y) = x=y
 
     +-commute-lemma : (x y : ℕ) → (suc x + y) ≅ (x + suc y)
     +-commute-lemma 0ℕ y = begin≅
@@ -95,36 +94,32 @@ instance
     +-commutative-semigroup : CommutativeSemigroup _+_
     +-commutative-semigroup = record {}
 
-    +-commutative-monoid : CommutativeMonoid _+_ zero
+    +-commutative-monoid : CommutativeMonoid _+_ 0ℕ
     +-commutative-monoid = record {}
 
     +-bi-injective : BiInjective _+_
     +-bi-injective = record {left-injective = +-left-injective; right-injective = +-right-injective}
 
 _*_ : BinOp ℕ
-zero * n = zero
+0ℕ * n = 0ℕ
 suc m * n = n + (m * n)
 
 infixr 10 _*_
 
 private
     *-left-congruent : LeftCongruent _*_
-    *-left-congruent {zero} {_} {_} _ = reflexive-on ℕ zero
+    *-left-congruent {0ℕ}  _ = 0ℕ=
     *-left-congruent {suc a} {b} {c} b=c = bi-congruent _+_ b=c (*-left-congruent {a} {b} {c} b=c)
 
-    *-left-zero : LeftZero _*_ zero
-    *-left-zero x = reflexive-on ℕ zero
+    *-left-zero : LeftZero _*_ 0ℕ
+    *-left-zero _ = 0ℕ=
 
-    *-right-zero : RightZero _*_ zero
-    *-right-zero zero = reflexive-on ℕ zero
-    *-right-zero (suc n) = begin≅
-        suc n * zero        ≅<>
-        zero + (n * zero)   ≅<>
-        n * zero            ≅< *-right-zero n >
-        zero                ∎
+    *-right-zero : RightZero _*_ 0ℕ
+    *-right-zero 0ℕ = 0ℕ=
+    *-right-zero (suc n) = *-right-zero n
 
     *-distributes-over-+ : (a b c : ℕ) → a * (b + c) ≅ a * b + a * c
-    *-distributes-over-+ zero _ _ = reflexive-on ℕ zero
+    *-distributes-over-+ 0ℕ _ _ = 0ℕ=
     *-distributes-over-+ (suc a) b c = begin≅
         suc a * (b + c)             ≅<>
         (b + c) + a * (b + c)       ≅< left-congruent-on _+_ (*-distributes-over-+ a b c) >
@@ -138,26 +133,15 @@ private
         suc a * b + suc a * c       ∎
 
     *-left-id : LeftIdentity _*_ 1ℕ
-    *-left-id zero = reflexive-on ℕ zero
-    *-left-id (suc n) = begin≅
-        1ℕ * suc n              ≅<>
-        suc n + (0ℕ * suc n)    ≅<>
-        suc n + 0ℕ              ≅< right-identity-on _+_ (suc n) >
-        suc n                   ∎
+    *-left-id 0ℕ = 0ℕ=
+    *-left-id (suc n) = right-identity-on _+_ (suc n)
 
     *-right-id : RightIdentity _*_ 1ℕ
-    *-right-id zero = reflexive-on ℕ zero
-    *-right-id (suc n) = begin≅
-        suc n * 1ℕ              ≅<>
-        1ℕ + (n * 1ℕ)           ≅< left-congruent-on _+_ (*-right-id n) >
-        1ℕ + n                  ≅<>
-        suc n                   ∎
+    *-right-id 0ℕ = 0ℕ=
+    *-right-id (suc n) = left-congruent-on _+_ (*-right-id n)
     
     *-commute : Commute _*_
-    *-commute zero n = begin≅
-        zero * n            ≅<>
-        zero                ≅< symmetric-on ℕ (*-right-zero n) >
-        n * zero            ∎
+    *-commute 0ℕ n = symmetric-on ℕ (*-right-zero n)
     *-commute (suc m) n = begin≅
         suc m * n           ≅<>
         n + (m * n)         ≅< left-congruent-on _+_ (*-commute m n) >
@@ -174,11 +158,7 @@ private
         a * c + b * c       ∎
 
     *-assoc : Associate _*_
-    *-assoc zero b c = begin≅
-        zero * (b * c)      ≅<>
-        zero                ≅<>
-        zero * c            ≅<>
-        (zero * b) * c      ∎
+    *-assoc 0ℕ _ _ = 0ℕ=
     *-assoc (suc a) b c = begin≅
         suc a * (b * c)                     ≅<>
         b * c + a * (b * c)                 ≅< left-congruent-on _+_ (*-assoc a b c) >
@@ -250,8 +230,8 @@ private
     ≤-right-congruent (suc= b1=b2) (s≤s a≤b1) = s≤s (≤-right-congruent b1=b2 a≤b1)
 
     ≤-compare : (m n : ℕ) → Either (m ≤ n) (n ≤ m)
-    ≤-compare zero _ = left z≤
-    ≤-compare _ zero = right z≤
+    ≤-compare 0ℕ _ = left z≤
+    ≤-compare _ 0ℕ = right z≤
     ≤-compare (suc m) (suc n) with ≤-compare m n
     ... | left m≤n      = left (s≤s m≤n)
     ... | right n≤m     = right (s≤s n≤m)
@@ -260,15 +240,15 @@ private
     suc-le-injective (s≤s m≤n) = m≤n
 
     ≤-trichotomy : (m n : ℕ) → Tri _≅_ _≤_ m n
-    ≤-trichotomy zero zero = triE (reflexive-on ℕ zero)
+    ≤-trichotomy 0ℕ 0ℕ = triE 0ℕ=
+    ≤-trichotomy 0ℕ (suc n) = triL z≤ (λ ()) (λ ())
+    ≤-trichotomy (suc m) 0ℕ = triG (λ ()) (λ ()) z≤
     ≤-trichotomy (suc m) (suc n) with ≤-trichotomy m n
-    ... | triE m=n          = triE (cons=[]=cons refl m=n)
+    ... | triE m=n          = triE (suc= m=n)
     ... | triL m-le-n m≠n n-nle-m
                             = triL (s≤s m-le-n) (λ sm=sn → m≠n (suc-injective sm=sn)) (λ sn≤sm → n-nle-m (suc-le-injective sn≤sm))
     ... | triG m-nle-n m≠n n-le-m
                             = triG (λ sm≤sn → m-nle-n (suc-le-injective sm≤sn)) (λ sm=sn → m≠n (suc-injective sm=sn)) (s≤s n-le-m)
-    ≤-trichotomy zero (suc n) = triL z≤ (λ ()) (λ ())
-    ≤-trichotomy (suc m) zero = triG (λ ()) (λ ()) z≤
 
 instance
     ≤-is-reflexive : IsReflexive _≤_
@@ -302,4 +282,4 @@ addition-preserves-≤ {0ℕ} {suc b} {suc c} {suc d} z≤ (s≤s c≤d) = s≤s
 
 subtract-both-≤ : (a b c : ℕ) → (a + b) ≤ (a + c) → b ≤ c
 subtract-both-≤ 0ℕ b c ab≤ac = ab≤ac
-subtract-both-≤ (suc a) b c (s≤s ab≤ac) = subtract-both-≤ a b c ab≤ac
+subtract-both-≤ (suc a) b c (s≤s ab≤ac) = subtract-both-≤ a b c ab≤ac 
