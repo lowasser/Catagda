@@ -24,7 +24,7 @@ private
         [ x :]                  ∎
 
     reverse-congruent : Congruent reverse
-    reverse-congruent nil=[]=nil = nil=[]=nil
+    reverse-congruent []=[] = []=[]
     reverse-congruent {x :: xs} {y :: ys} (cons=[]=cons x≅y xs≅ys) = begin≅
         reverse (x :: xs)       ≅<>
         reverse xs ++ [ x :]    ≅< left-congruent-on _++_ (right-congruent-on _::_ x≅y) >

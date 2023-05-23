@@ -14,22 +14,22 @@ open IsSymmetric {{...}}
 open IsTransitive {{...}}
 
 data _=[]=_ : Rel ℓ=A [ A ] where
-    nil=[]=nil : nil =[]= nil
+    []=[] : [] =[]= []
     cons=[]=cons : { x y : A } → x ≅ y → {xs ys : [ A ]} → xs =[]= ys → (x :: xs) =[]= (y :: ys)
 
 open _=[]=_ public
 
 private
     =[]=-reflexive : Reflexive _=[]=_
-    =[]=-reflexive nil = nil=[]=nil
+    =[]=-reflexive [] = []=[]
     =[]=-reflexive (x :: xs) = cons=[]=cons (reflexive x) (=[]=-reflexive xs)
 
     =[]=-symmetric : Symmetric _=[]=_
-    =[]=-symmetric nil=[]=nil = nil=[]=nil
+    =[]=-symmetric []=[] = []=[]
     =[]=-symmetric (cons=[]=cons x≅y xs≅ys) = cons=[]=cons (symmetric x≅y) (=[]=-symmetric xs≅ys)
 
     =[]=-transitive : Transitive _=[]=_
-    =[]=-transitive nil=[]=nil nil=[]=nil = nil=[]=nil
+    =[]=-transitive []=[] []=[] = []=[]
     =[]=-transitive (cons=[]=cons x≅y xs≅ys) (cons=[]=cons y≅z ys≅zs) =
         cons=[]=cons (transitive x≅y y≅z) (=[]=-transitive xs≅ys ys≅zs)
 

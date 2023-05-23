@@ -42,10 +42,10 @@ private
     ++-left-id = reflexive-on [ A ]
 
     ++-right-id : RightIdentity _++_ []
-    ++-right-id nil = nil=[]=nil
+    ++-right-id [] = []=[]
     ++-right-id (x :: xs) = begin≅
-        (x :: xs) ++ nil    ≅<>
-        x :: (xs ++ nil)    ≅< left-congruent-on _::_ (++-right-id xs) >
+        (x :: xs) ++ []    ≅<>
+        x :: (xs ++ [])    ≅< left-congruent-on _::_ (++-right-id xs) >
         x :: xs             ∎
     
     ++-right-congruent : RightCongruent _++_
@@ -54,7 +54,7 @@ private
         xs              ≅< xs≅ys >
         ys              ≅< symmetric-on [ A ] (++-right-id ys) >
         ys ++ []        ∎
-    ++-right-congruent {zs} nil=[]=nil = reflexive-on [ A ] zs
+    ++-right-congruent {zs} []=[] = reflexive-on [ A ] zs
     ++-right-congruent {zs} (cons=[]=cons x≅y xs≅ys) =
         cons=[]=cons (x≅y) (++-right-congruent {zs} xs≅ys)
 

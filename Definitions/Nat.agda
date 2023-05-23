@@ -42,7 +42,7 @@ pattern 0ℕ = []
 pattern suc n = (tt :: n)
 pattern 1ℕ = suc 0ℕ
 pattern suc= x=y = (cons=[]=cons refl x=y)
-pattern 0ℕ= = nil=[]=nil
+pattern 0ℕ= = []=[]
 
 open Setoid {{...}}
 

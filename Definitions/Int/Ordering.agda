@@ -51,12 +51,12 @@ private
     count-neg-word (m1 :: x) = sucℕ (count-neg-word x)
 
     count-pos-word-congruent : (x y : Word) → x ≅ y → count-pos-word x ≅ℕ count-pos-word y
-    count-pos-word-congruent _ _ nil=[]=nil = reflexive-on ℕ 0ℕ
+    count-pos-word-congruent _ _ []=[] = reflexive-on ℕ 0ℕ
     count-pos-word-congruent (p1 :: x) (p1 :: y) (cons=[]=cons _ x=y) = consℕ ≡-refl (count-pos-word-congruent x y x=y)
     count-pos-word-congruent (m1 :: x) (m1 :: y) (cons=[]=cons _ x=y) = count-pos-word-congruent x y x=y
 
     count-neg-word-congruent : (x y : Word) → x ≅ y → count-neg-word x ≅ count-neg-word y
-    count-neg-word-congruent _ _ nil=[]=nil = reflexive-on ℕ 0ℕ
+    count-neg-word-congruent _ _ []=[] = reflexive-on ℕ 0ℕ
     count-neg-word-congruent (p1 :: x) (p1 :: y) (cons=[]=cons _ x=y) = count-neg-word-congruent x y x=y
     count-neg-word-congruent (m1 :: x) (m1 :: y) (cons=[]=cons _ x=y) = consℕ ≡-refl (count-neg-word-congruent x y x=y)
 

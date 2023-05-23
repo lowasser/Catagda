@@ -9,15 +9,13 @@ open import Definitions.Setoid
 open Setoid{{...}}
 
 data [_] { ℓ : Level } (A : Set ℓ) : Set ℓ where
-    nil : [ A ]
+    [] : [ A ]
     _::_ : A → [ A ] → [ A ]
 
 infixr 7 _::_
 
-pattern [] = nil
-
 _++_ : {ℓ : Level} {A : Set ℓ} → BinOp [ A ]
-nil ++ list = list
+[] ++ list = list
 (x :: xs) ++ ys = x :: (xs ++ ys)
 
 infixr 6 _++_
