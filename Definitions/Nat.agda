@@ -43,6 +43,7 @@ pattern 0ℕ = zero
 pattern suc n = (tt :: n)
 pattern 1ℕ = suc 0ℕ
 pattern suc= x=y = (cons=[]=cons refl x=y)
+pattern 0ℕ= = nil=[]=nil
 
 open Setoid {{...}}
 
@@ -51,11 +52,10 @@ private
     suc-injective {x} {y} (cons=[]=cons _ x=y) = x=y
 
     +-commute-lemma : (x y : ℕ) → (suc x + y) ≅ (x + suc y)
-    +-commute-lemma zero y = begin≅
-        suc zero + y        ≅<>
+    +-commute-lemma 0ℕ y = begin≅
         1ℕ + y              ≅<>
         suc y               ≅< symmetric-on ℕ (left-identity-on _+_ (suc y)) >
-        zero + suc y        ∎
+        0ℕ + suc y          ∎
     +-commute-lemma (suc x) y = begin≅
         suc (suc x) + y     ≅<>
         suc (suc x + y)     ≅< left-congruent-on _::_ (+-commute-lemma x y) >
@@ -63,10 +63,10 @@ private
         suc x + suc y       ∎
 
     +-commute : Commute _+_
-    +-commute [] ys = begin≅
-        [] ++ ys            ≅<>
+    +-commute 0ℕ ys = begin≅
+        0ℕ + ys            ≅<>
         ys                  ≅< symmetric-on ℕ (right-identity-on _++_ ys) >
-        ys ++ []            ∎
+        ys + 0ℕ            ∎
     +-commute (suc x) y = begin≅
         suc x + y           ≅<>
         suc (x + y)         ≅< left-congruent-on _::_ (+-commute x y) >
@@ -237,17 +237,17 @@ private
     ≤-transitive (s≤s x≤y) (s≤s y≤z) = s≤s (≤-transitive x≤y y≤z)
 
     ≤-antisymmetric : Antisymmetric _≤_
-    ≤-antisymmetric z≤ z≤ = reflexive-on ℕ 0ℕ 
-    ≤-antisymmetric (s≤s x≤y) (s≤s y≤x) = bi-congruent _::_ (reflexive-on ⊤ tt) (≤-antisymmetric x≤y y≤x)
+    ≤-antisymmetric z≤ z≤ = 0ℕ=
+    ≤-antisymmetric (s≤s x≤y) (s≤s y≤x) = bi-congruent _::_ refl (≤-antisymmetric x≤y y≤x)
 
     ≤-left-congruent : {a1 a2 b : ℕ} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
-    ≤-left-congruent nil=[]=nil z≤ = z≤
-    ≤-left-congruent (cons=[]=cons _ a1=a2) (s≤s a1≤b) = s≤s (≤-left-congruent a1=a2 a1≤b)
+    ≤-left-congruent 0ℕ= z≤ = z≤
+    ≤-left-congruent (suc= a1=a2) (s≤s a1≤b) = s≤s (≤-left-congruent a1=a2 a1≤b)
 
     ≤-right-congruent : {a b1 b2 : ℕ} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
-    ≤-right-congruent nil=[]=nil a≤b1 = a≤b1
-    ≤-right-congruent (cons=[]=cons _ b1=b2) z≤ = z≤
-    ≤-right-congruent (cons=[]=cons x b1=b2) (s≤s a≤b1) = s≤s (≤-right-congruent b1=b2 a≤b1)
+    ≤-right-congruent 0ℕ= a≤b1 = a≤b1
+    ≤-right-congruent (suc= _) z≤ = z≤
+    ≤-right-congruent (suc= b1=b2) (s≤s a≤b1) = s≤s (≤-right-congruent b1=b2 a≤b1)
 
     ≤-compare : (m n : ℕ) → Either (m ≤ n) (n ≤ m)
     ≤-compare zero _ = left z≤
