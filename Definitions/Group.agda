@@ -43,7 +43,7 @@ record Group {ℓA ℓ=A : Level} {A : Set ℓA} {{SA : Setoid ℓ=A A}}  (_∙_
 
     distribute-inverse : (a b : A) → (a ∙ b) ⁻¹ ≅ (b ⁻¹) ∙ (a ⁻¹)
     distribute-inverse a b = symmetric-on A (left-inverse-is-unique (a ∙ b) ((b ⁻¹) ∙ (a ⁻¹)) (begin≅
-        ((b ⁻¹) ∙ (a ⁻¹)) ∙ (a ∙ b)                 ≅< associate-on _∙_ ((b ⁻¹) ∙ (a ⁻¹)) a b >
+        ((b ⁻¹) ∙ (a ⁻¹)) ∙ (a ∙ b)                 ≅< left-associate-on _∙_ ((b ⁻¹) ∙ (a ⁻¹)) a b >
         (((b ⁻¹) ∙ (a ⁻¹)) ∙ a) ∙ b                 ≅< right-congruent-on _∙_ (right-associate-on _∙_ (b ⁻¹) (a ⁻¹) a) >
         ((b ⁻¹) ∙ ((a ⁻¹) ∙ a)) ∙ b                 ≅< right-congruent-on _∙_ (left-congruent-on _∙_ (left-inverse-on _∙_ i _⁻¹ a)) >
         ((b ⁻¹) ∙ i) ∙ b                            ≅< right-congruent-on _∙_ (right-id-on _∙_ (b ⁻¹)) >

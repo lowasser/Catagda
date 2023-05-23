@@ -33,8 +33,8 @@ private
         reverse (y :: ys)       ∎
 
 instance
-    reverse-IsCongruent : IsCongruent reverse
-    reverse-IsCongruent = record { congruent = reverse-congruent }
+    reverse-is-congruent : IsCongruent reverse
+    reverse-is-congruent = record { congruent = reverse-congruent }
 
 reverse-++ : (xs ys : [ A ]) → reverse (xs ++ ys) ≅ reverse ys ++ reverse xs
 reverse-++ [] ys = begin≅
@@ -46,7 +46,7 @@ reverse-++ (x :: xs) ys = begin≅
     reverse ((x :: xs) ++ ys)               ≅<>
     reverse (x :: (xs ++ ys))               ≅<>
     reverse (xs ++ ys) ++ [ x :]            ≅< right-congruent-on _++_ (reverse-++ xs ys) >
-    (reverse ys ++ reverse xs) ++ [ x :]    ≅< symmetric-on [ A ] (associate-on _++_ (reverse ys) (reverse xs) [ x :]) >
+    (reverse ys ++ reverse xs) ++ [ x :]    ≅< right-associate-on _++_ (reverse ys) (reverse xs) [ x :] >
     reverse ys ++ (reverse xs ++ [ x :])    ≅<>
     reverse ys ++ reverse (x :: xs)         ∎
 

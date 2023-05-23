@@ -80,7 +80,7 @@ private
     sg-associate : Associate _<sg>_
     sg-associate (free-semi x xs) (free-semi y ys) (free-semi z zs) = begin≅
         free-semi x (xs ++ (y :: (ys ++ (z :: zs))))    ≅<>
-        free-semi x (xs ++ ((y :: ys) ++ (z :: zs)))    ≅< cong-left-on free-semi (associate-on _++_ xs (y :: ys) (z :: zs)) >
+        free-semi x (xs ++ ((y :: ys) ++ (z :: zs)))    ≅< cong-left-on free-semi (left-associate-on _++_ xs (y :: ys) (z :: zs)) >
         free-semi x ((xs ++ (y :: ys)) ++ (z :: zs))    ∎
 
 instance

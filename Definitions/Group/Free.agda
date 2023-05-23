@@ -97,13 +97,13 @@ private
         (refl 
                 (xs ++ ys1 ++ invLetter y :: y :: ys2) 
                 ((xs ++ ys1) ++ invLetter y :: y :: ys2) 
-                (associate-on _++_ xs ys1 (invLetter y :: y :: ys2)))
+                (left-associate-on _++_ xs ys1 (invLetter y :: y :: ys2)))
         (trans 
             (imp (reduces (xs ++ ys1) y ys2)) 
             (refl
                 ((xs ++ ys1) ++ ys2)
                 (xs ++ ys1 ++ ys2) 
-                (symmetric-on Word (associate-on _++_ xs ys1 ys2))))
+                (right-associate-on _++_ xs ys1 ys2)))
 
     right-cong' : (xs : Word) → {ys zs : Word} → EqClosure ys zs → EqClosure (ys ++ xs) (zs ++ xs)
     right-cong' xs (refl ys zs ys=zs) = refl (ys ++ xs) (zs ++ xs) (right-congruent-on _++_ ys=zs)
@@ -111,11 +111,10 @@ private
     right-cong' xs (trans {ys} {ws} {zs} ys=ws ws=zs) = trans (right-cong' xs ys=ws) (right-cong' xs ws=zs)
     right-cong' xs (imp (reduces ys1 y ys2)) = trans 
         (refl' 
-            (symmetric-on Word 
-                (associate-on _++_ ys1 (invLetter y :: y :: ys2) xs)))
+            (right-associate-on _++_ ys1 (invLetter y :: y :: ys2) xs))
         (trans
             (imp (reduces ys1 y (ys2 ++ xs))) 
-            (refl' (associate-on _++_ ys1 ys2 xs)))
+            (refl' (left-associate-on _++_ ys1 ys2 xs)))
 
     left-cong : LeftCongruent _∙_
     left-cong {free xs} (eqfg ys=zs) = eqfg (left-cong' xs ys=zs)
@@ -132,7 +131,7 @@ instance
 
 private
     ∙-assoc : Associate _∙_
-    ∙-assoc (free xs) (free ys) (free zs) = eqfg (refl' (associate-on _++_ xs ys zs))
+    ∙-assoc (free xs) (free ys) (free zs) = eqfg (refl' (left-associate-on _++_ xs ys zs))
 
 instance
     ∙fg-is-associative : IsAssociative _∙_ 
@@ -184,9 +183,9 @@ private
             (reverse (invLetter x :: map invLetter xs2) ++ [ x :]) ++ reverse (map invLetter xs1)
                                                                             ≅<>
             ((reverse (map invLetter xs2) ++ [ invLetter x :]) ++ [ x :]) ++ reverse (map invLetter xs1)
-                                                                            ≅< right-congruent-on _++_ (symmetric-on Word (associate-on _++_ (reverse (map invLetter xs2)) [ invLetter x :] [ x :])) >
+                                                                            ≅< right-congruent-on _++_ (right-associate-on _++_ (reverse (map invLetter xs2)) [ invLetter x :] [ x :]) >
             (reverse (map invLetter xs2) ++ invLetter x :: x :: []) ++ reverse (map invLetter xs1)
-                                                                            ≅< symmetric-on Word (associate-on _++_ (reverse (map invLetter xs2)) (invLetter x :: x :: []) (reverse (map invLetter xs1))) >
+                                                                            ≅< right-associate-on _++_ (reverse (map invLetter xs2)) (invLetter x :: x :: []) (reverse (map invLetter xs1)) >
             reverse (map invLetter xs2) ++ (invLetter x :: x :: [] ++ reverse (map invLetter xs1))
                                                                             ≅< right-congruent-on _++_ (reverse-map-commute invLetter xs2) >
             map invLetter (reverse xs2) ++ (invLetter x :: x :: [] ++ reverse (map invLetter xs1))
@@ -223,7 +222,7 @@ private
         free (map invLetter (reverse (x :: xs))) ∙ free (x :: xs)       ≅<>
         free (map invLetter (reverse (x :: xs)) ++ x :: xs)             ≅<>
         free (map invLetter (reverse xs ++ [ x :]) ++ x :: xs)          ≅< eqfg (refl' (right-congruent-on _++_ (map-distributes-over-++ invLetter (reverse xs) [ x :]))) >
-        free ((map invLetter (reverse xs) ++ [ invLetter x :]) ++ x :: xs)  ≅< eqfg (refl' (symmetric-on Word (associate-on _++_ (map invLetter (reverse xs)) [ invLetter x :] (x :: xs)))) >
+        free ((map invLetter (reverse xs) ++ [ invLetter x :]) ++ x :: xs)  ≅< eqfg (refl' (right-associate-on _++_ (map invLetter (reverse xs)) [ invLetter x :] (x :: xs))) >
         free (map invLetter (reverse xs) ++ (invLetter x :: x :: xs))       ≅< eqfg (imp (reduces (map invLetter (reverse xs)) x xs)) >
         free (map invLetter (reverse xs) ++ xs)                         ≅<>
         inverse (free xs) ∙ free xs                                     ≅< left-inv (free xs) >
@@ -238,7 +237,7 @@ private
         free ([ x :] ++ (xs ++ map invLetter (reverse xs ++ [ x :])))   ≅<>
         free [ x :] ∙ free (xs ++ map invLetter (reverse xs ++ [ x :])) ≅< left-cong { free [ x :]} (eqfg (refl' (left-congruent-on _++_ (map-distributes-over-++ invLetter (reverse xs) [ x :])))) >
         free [ x :] ∙ free (xs ++ (map invLetter (reverse xs) ++ [ invLetter x :])) 
-                                                                        ≅< left-cong { free [ x :]} (eqfg (refl' (associate-on _++_ xs (map invLetter (reverse xs)) [ invLetter x :]))) >
+                                                                        ≅< left-cong { free [ x :]} (eqfg (refl' (left-associate-on _++_ xs (map invLetter (reverse xs)) [ invLetter x :]))) >
         free [ x :] ∙ free ((xs ++ map invLetter (reverse xs)) ++ [ invLetter x :])
                                                                         ≅<>
         free [ x :] ∙ ((free xs ∙ inverse (free xs)) ∙ free [ invLetter x :])

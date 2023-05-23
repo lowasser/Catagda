@@ -54,7 +54,7 @@ private
     right-id-law (morph f) = meq (right-identity-on _∙_ f)
 
     associative-law : {a b c d : ⊤} → (h : Morphism c d) → (g : Morphism b c) → (f : Morphism a b) → (h ∘ (g ∘ f)) =m= ((h ∘ g) ∘ f)
-    associative-law (morph h) (morph g) (morph f) = meq (associate-on _∙_ h g f)
+    associative-law (morph h) (morph g) (morph f) = meq (left-associate-on _∙_ h g f)
 
     left-cong-arrow : {a1 a2 b : ⊤} → (a1=a2 : a1 ≡ a2) → {ab1 ab2 : Morphism a1 b} → ab1 =m= ab2 → left-cong a1=a2 ab1 =m= left-cong a1=a2 ab2
     left-cong-arrow refl (meq eq12) = meq eq12

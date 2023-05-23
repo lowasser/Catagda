@@ -54,9 +54,9 @@ private
     +-commute-lemma2 (x1 :: x) y s = begin≅
         free (s :: x1 :: x) + free y            ≅< right-congruent-on _+_ (+-commute-lemma1 x s x1) >
         free (x1 :: s :: x) + free y            ≅<>
-        (free [ x1 :] + free (s :: x)) + free y ≅< symmetric-on ℤ (associate-on _+_ (free [ x1 :]) (free (s :: x)) (free y)) >
+        (free [ x1 :] + free (s :: x)) + free y ≅< right-associate-on _+_ (free [ x1 :]) (free (s :: x)) (free y) >
         free [ x1 :] + (free (s :: x) + free y) ≅< left-congruent-on _+_ {free [ x1 :]} (+-commute-lemma2 x y s) >
-        free [ x1 :] + (free x + free (s :: y)) ≅< associate-on _+_ (free [ x1 :]) (free x) (free (s :: y)) >
+        free [ x1 :] + (free x + free (s :: y)) ≅< left-associate-on _+_ (free [ x1 :]) (free x) (free (s :: y)) >
         (free [ x1 :] + free x) + free (s :: y) ≅<>
         free (x1 :: x) + free (s :: y)          ∎
 
@@ -67,9 +67,9 @@ private
         y + 0ℤ      ∎
     +-commute (free (s :: x)) (free y) = begin≅
         free (s :: x) + free y          ≅<>
-        (free [ s :] + free x) + free y ≅< symmetric-on ℤ (associate-on _+_ (free [ s :]) (free x) (free y)) >
+        (free [ s :] + free x) + free y ≅< right-associate-on _+_ (free [ s :]) (free x) (free y) >
         free [ s :] + (free x + free y) ≅< left-congruent-on _+_ {free [ s :]} (+-commute (free x) (free y)) >
-        free [ s :] + (free y + free x) ≅< associate-on _+_ (free [ s :]) (free y) (free x) >
+        free [ s :] + (free y + free x) ≅< left-associate-on _+_ (free [ s :]) (free y) (free x) >
         free (s :: y) + free x          ≅< +-commute-lemma2 y x s >
         free y + free (s :: x)          ∎
 
