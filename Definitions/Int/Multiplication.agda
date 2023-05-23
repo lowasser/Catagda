@@ -103,11 +103,11 @@ private
                                                 ∎
     *-distributive-+ (free (m1 :: a)) b c = begin≅
         free (m1 :: a) * (b + c)                       ≅<>
-        neg (b + c) + (free a * (b + c))                    ≅< left-congruent-on _+_ (*-distributive-+ (free a) b c) >
-        neg (b + c) + (free a * b + free a * c)             ≅< right-congruent-on _+_ (distribute-inverse-on _+_ 0ℤ neg b c) >
-        (neg c + neg b) + (free a * b + free a * c)         ≅< left-associate-on _+_ (neg c + neg b) (free a * b) (free a * c) >
-        ((neg c + neg b) + free a * b) + free a * c         ≅< right-congruent-on _+_ (right-associate-on _+_ (neg c) (neg b) (free a * b)) >
-        (neg c + (neg b + free a * b)) + free a * c         ≅<>
+        neg (b + c) + (free a * (b + c))               ≅< left-congruent-on _+_ (*-distributive-+ (free a) b c) >
+        neg (b + c) + (free a * b + free a * c)        ≅< right-congruent-on _+_ (distribute-inverse-on _+_ 0ℤ neg b c) >
+        (neg c + neg b) + (free a * b + free a * c)    ≅< left-associate-on _+_ (neg c + neg b) (free a * b) (free a * c) >
+        ((neg c + neg b) + free a * b) + free a * c    ≅< right-congruent-on _+_ (right-associate-on _+_ (neg c) (neg b) (free a * b)) >
+        (neg c + (neg b + free a * b)) + free a * c    ≅<>
         (neg c + (free (m1 :: a) * b)) + free a * c    ≅< right-congruent-on _+_ (commute-on _+_ (neg c) (free (m1 :: a) * b)) >
         (free (m1 :: a) * b + neg c) + free a * c      ≅< right-associate-on _+_ (free (m1 :: a) * b) (neg c) (free a * c) >
         free (m1 :: a) * b + (neg c + free a * c)      ≅<>
