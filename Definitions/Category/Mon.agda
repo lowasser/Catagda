@@ -20,6 +20,9 @@ record MonOb : Set (lsuc ℓ) where
         identity : elements
         {{monoid}} : Monoid _∙_ identity
 
+mon-ob : {elements : Set ℓ} → {{S : Setoid ℓ elements}} → {_∙_ : BinOp elements} → {i : elements} → Monoid _∙_ i → MonOb
+mon-ob {elements} {_∙_} {i} mon = record {monoid = mon}
+
 open import Definitions.Relation.Equivalence.Structural
 open MonOb
 open Setoid

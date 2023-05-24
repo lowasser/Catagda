@@ -53,5 +53,8 @@ record TotalOrder {A : Set ℓA} {{AS : Setoid ℓ=A A}} (_≤_ : Rel ℓ≤A A)
 
 open TotalOrder {{...}}
 
-compare-order-on : {ℓA ℓ=A ℓ≤A : Level} {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{TO : TotalOrder _≤_}} → (a b : A) → Either (a ≤ b) (b ≤ a)
+trichotomy-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{TO : TotalOrder _≤_}} → (a b : A) → Tri (Setoid._≅_ AS) _≤_ a b
+trichotomy-on _≤_ {{TO}} = TotalOrder.trichotomy TO
+
+compare-order-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{TO : TotalOrder _≤_}} → (a b : A) → Either (a ≤ b) (b ≤ a)
 compare-order-on _ = compare

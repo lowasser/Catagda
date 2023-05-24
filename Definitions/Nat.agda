@@ -44,7 +44,10 @@ pattern 1ℕ = suc 0ℕ
 pattern suc= x=y = (cons=[]=cons refl x=y)
 pattern 0ℕ= = []=[]
 
-open Setoid {{...}}
+_≅_ : Rel lzero ℕ
+_≅_ = _=[]=_
+
+infix 4 _≅_
 
 private
     suc-injective : Injective suc
@@ -85,6 +88,12 @@ private
         a + c       ∎)
 
 instance
+    suc-is-injective : IsInjective suc
+    suc-is-injective = record { injective = suc-injective }
+
+    suc-is-congruent : IsCongruent suc
+    suc-is-congruent = record { congruent = left-congruent-on _::_}
+
     +-commutative : IsCommutative  _+_
     +-commutative = record {commute = +-commute}
 
@@ -280,6 +289,10 @@ addition-preserves-≤ (s≤s a≤b) c≤d = s≤s (addition-preserves-≤ a≤b
 addition-preserves-≤ {0ℕ} {0ℕ} z≤ (s≤s c≤d) = s≤s c≤d
 addition-preserves-≤ {0ℕ} {suc b} {suc c} {suc d} z≤ (s≤s c≤d) = s≤s (addition-preserves-≤ z≤ (≤-suc-rhs c d c≤d))
 
-subtract-both-≤ : (a b c : ℕ) → (a + b) ≤ (a + c) → b ≤ c
-subtract-both-≤ 0ℕ b c ab≤ac = ab≤ac
-subtract-both-≤ (suc a) b c (s≤s ab≤ac) = subtract-both-≤ a b c ab≤ac 
+cancel-left-+-≤ : (a b c : ℕ) → (a + b) ≤ (a + c) → b ≤ c
+cancel-left-+-≤ 0ℕ b c ab≤ac = ab≤ac
+cancel-left-+-≤ (suc a) b c (s≤s ab≤ac) = cancel-left-+-≤ a b c ab≤ac 
+
+open import Definitions.Relation.Equivalence.Structural.Properties ⊤ public
+open import Definitions.List.Setoid {lzero} {lzero} ⊤ public
+open import Definitions.List.Concatenation.Properties {lzero} {lzero} ⊤ public

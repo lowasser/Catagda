@@ -131,6 +131,9 @@ record HasZero {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_∙_ : BinOp A) (z : A) 
         left-zero : LeftZero _∙_ z
         right-zero : RightZero _∙_ z
 
+right-zero-on :{A : Set ℓA} → {{S : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (z : A) → {{HZ : HasZero _∙_ z}} → RightZero _∙_ z
+right-zero-on _ _ {{HZ}} = HasZero.right-zero HZ
+
 LeftInverse : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (id : A) → {{HasIdentity _∙_ id}} → (A → A) → Set (ℓA ⊔ ℓ=A)
 LeftInverse _∙_ i inv = ∀ x → inv x ∙ x ≅ i
 

@@ -48,11 +48,11 @@ transitive-order-on _ = transitive
 antisymmetric-order-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → Antisymmetric _≤_
 antisymmetric-order-on _ = antisymmetric
 
-left-congruent-law-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a1 a2 b : A} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
-left-congruent-law-on _ = left-congruent-law
+left-congruent-on-order : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a1 a2 b : A} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
+left-congruent-on-order _ = left-congruent-law
 
-right-congruent-law-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a b1 b2 : A} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
-right-congruent-law-on _ = right-congruent-law
+right-congruent-on-order : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a b1 b2 : A} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
+right-congruent-on-order _ = right-congruent-law
 
 bi-congruent-order : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a1 a2 b1 b2 : A} → a1 ≅ a2 → b1 ≅ b2 → a2 ≤ b2 → a1 ≤ b1
-bi-congruent-order {_} {_} {_} {A} _≤_ a1=a2 b1=b2 a2≤b2 = left-congruent-law-on _≤_ (symmetric-on A a1=a2) (right-congruent-law-on _≤_ (symmetric-on A b1=b2) a2≤b2)
+bi-congruent-order {_} {_} {_} {A} _≤_ a1=a2 b1=b2 a2≤b2 = left-congruent-on-order _≤_ (symmetric-on A a1=a2) (right-congruent-on-order _≤_ (symmetric-on A b1=b2) a2≤b2)

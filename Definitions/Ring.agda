@@ -30,21 +30,20 @@ record Ring {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_+_ : BinOp A) (_*_ : BinOp 
     open Group {{...}}
     open BiInjective {{...}}
     open Ringoid {{...}}
- 
-    private
-        left-zero : LeftZero _*_ 0A
-        left-zero a = left-injective (0A * a) (begin≅
-            (0A * a) + (0A * a)         ≅< symmetric-on A (right-distribute 0A 0A a) >
-            (0A + 0A) * a               ≅< right-congruent-on _*_ (left-id-on _+_ 0A) >
-            0A * a                      ≅< symmetric-on A (right-id-on _+_ (0A * a)) >
-            (0A * a) + 0A               ∎)
-        
-        right-zero : RightZero _*_ 0A
-        right-zero a = left-injective (a * 0A) (begin≅
-            (a * 0A) + (a * 0A)         ≅< symmetric-on A (left-distribute a 0A 0A) >
-            a * (0A + 0A)               ≅< left-congruent-on _*_ (left-id-on _+_ 0A) >
-            a * 0A                      ≅< symmetric-on A (right-id-on _+_ (a * 0A)) >
-            (a * 0A) + 0A               ∎)
+    
+    left-zero : LeftZero _*_ 0A
+    left-zero a = left-injective (0A * a) (begin≅
+        (0A * a) + (0A * a)         ≅< symmetric-on A (right-distribute 0A 0A a) >
+        (0A + 0A) * a               ≅< right-congruent-on _*_ (left-id-on _+_ 0A) >
+        0A * a                      ≅< symmetric-on A (right-id-on _+_ (0A * a)) >
+        (0A * a) + 0A               ∎)
+    
+    right-zero : RightZero _*_ 0A
+    right-zero a = left-injective (a * 0A) (begin≅
+        (a * 0A) + (a * 0A)         ≅< symmetric-on A (left-distribute a 0A 0A) >
+        a * (0A + 0A)               ≅< left-congruent-on _*_ (left-id-on _+_ 0A) >
+        a * 0A                      ≅< symmetric-on A (right-id-on _+_ (a * 0A)) >
+        (a * 0A) + 0A               ∎)
 
     instance
         zero : HasZero _*_ 0A

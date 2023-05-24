@@ -1,90 +1,119 @@
 module Definitions.Int.Addition where
 
 open import Definitions.Int.Base
-open import Definitions.Function.Binary
-open import Agda.Builtin.Unit
-open import Agda.Primitive
-open import Definitions.List
-open import Definitions.Either
-open import Definitions.Relation.Equivalence.Structural.Properties ⊤
-open import Definitions.Group.Free {lzero} {lzero} ⊤
 open import Definitions.Setoid
-open import Definitions.Group
-open import Definitions.Function.Binary.Properties
-open import Definitions.Monoid
-open import Definitions.Semigroup
-open import Definitions.Group.Abelian
-open import Definitions.Monoid.Commutative
+open import Definitions.Nat renaming (_+_ to _++_; _≤_ to _≤N_; _≅_ to _=N_) hiding (+-commutative-magma; +-commutative-semigroup; +-commutative-monoid)
+open import Definitions.Function.Binary
+open import Definitions.Setoid.Equation
 open import Definitions.Semigroup.Commutative
+open import Definitions.Function.Binary.Properties
+open import Definitions.Function.Unary.Properties
 open import Definitions.Magma
 open import Definitions.Magma.Commutative
-open import Definitions.Setoid.Equation
-open import Definitions.Either.Setoid {lzero} {lzero} {lzero} {lzero} ⊤ ⊤
+open import Definitions.Semigroup
+open import Definitions.Monoid
+open import Definitions.Monoid.Commutative
+open import Definitions.Group
+open import Definitions.Group.Abelian
 
 _+_ : BinOp ℤ
-_+_ = _∙_
+int px nx + int py ny = int (px ++ py) (nx ++ ny)
 
 infixr 9 _+_
 
-open Setoid {{...}}
-open Group {{...}}
-open HasInverse {{...}}
-open Monoid {{...}}
-open Semigroup {{...}}
+private
+    +-right-congruent : {x y z : ℤ} → x ≅ y → x + z ≅ y + z
+    +-right-congruent {int px nx} {int py ny} {int pz nz} (z= px+ny=py+nx) = z= (begin≅
+        (px ++ pz) ++ (ny ++ nz)        ≅< <ab><cd>-to-<ac><bd>-on _++_ px pz ny nz >
+        (px ++ ny) ++ (pz ++ nz)        ≅< right-congruent-on _++_ px+ny=py+nx >
+        (py ++ nx) ++ (pz ++ nz)        ≅< <ab><cd>-to-<ac><bd>-on _++_ py nx pz nz >
+        (py ++ pz) ++ (nx ++ nz)        ∎)
+
+    +-left-congruent : {x y z : ℤ} → x ≅ y → z + x ≅ z + y
+    +-left-congruent {int px nx} {int py ny} {int pz nz} (z= px+ny=py+nx) = z= (begin≅
+        (pz ++ px) ++ (nz ++ ny)        ≅< <ab><cd>-to-<ac><bd>-on _++_ pz px nz ny >
+        (pz ++ nz) ++ (px ++ ny)        ≅< left-congruent-on _++_ {pz ++ nz} px+ny=py+nx >
+        (pz ++ nz) ++ (py ++ nx)        ≅< <ab><cd>-to-<ac><bd>-on _++_ pz nz py nx >
+        (pz ++ py) ++ (nz ++ nx)        ∎)
+    
+instance
+    +-bi-congruent : BiCongruent _+_
+    +-bi-congruent = record { left-congruent = +-left-congruent; right-congruent = +-right-congruent }
+
+    +-magma : Magma _+_
+    +-magma = record {}
 
 private
-    +-commute-lemma1 : (x : [ Either ⊤ ⊤ ]) → (x1 x2 : Either ⊤ ⊤) → free (x1 :: x2 :: x) ≅ free (x2 :: x1 :: x)
-    +-commute-lemma1 x m1 m1 = reflexive-on ℤ (free (m1 :: m1 :: x))
-    +-commute-lemma1 x p1 p1 = reflexive-on ℤ (free (p1 :: p1 :: x))
-    +-commute-lemma1 x m1 p1 = begin≅
-        free (m1 :: p1 :: x)                     ≅<>
-        free [ m1 :] + free (p1 :: x)            ≅<>
-        free (m1 :: p1 :: []) + free x           ≅<>
-        (free [ m1 :] + free [ p1 :]) + free x   ≅< right-congruent-on _+_ (left-inverse-on _+_ 0ℤ inverse (free [ p1 :])) >
-        0ℤ + free x                                         ≅< right-congruent-on _+_ (symmetric-on ℤ (right-inverse-on _+_ 0ℤ inverse (free [ p1 :]))) >
-        (free [ p1 :] + free [ m1 :]) + free x   ≅<>
-        free (p1 :: m1 :: x)                     ∎ 
-    +-commute-lemma1 x p1 m1 = symmetric-on ℤ (+-commute-lemma1 x (m1) (p1))
-
-    +-commute-lemma2 : (x y : [ Either ⊤ ⊤ ]) → (s : Either ⊤ ⊤) → free (s :: x) + free y ≅ free x + free (s :: y)
-    +-commute-lemma2 [] y s = begin≅
-        free [ s :] + free y   ≅<>
-        free (s :: y)           ≅< symmetric-on ℤ (left-identity-on _+_ (free (s :: y))) >
-        0ℤ + free (s :: y)      ∎
-    +-commute-lemma2 (x1 :: x) y s = begin≅
-        free (s :: x1 :: x) + free y            ≅< right-congruent-on _+_ (+-commute-lemma1 x s x1) >
-        free (x1 :: s :: x) + free y            ≅<>
-        (free [ x1 :] + free (s :: x)) + free y ≅< right-associate-on _+_ (free [ x1 :]) (free (s :: x)) (free y) >
-        free [ x1 :] + (free (s :: x) + free y) ≅< left-congruent-on _+_ {free [ x1 :]} (+-commute-lemma2 x y s) >
-        free [ x1 :] + (free x + free (s :: y)) ≅< left-associate-on _+_ (free [ x1 :]) (free x) (free (s :: y)) >
-        (free [ x1 :] + free x) + free (s :: y) ≅<>
-        free (x1 :: x) + free (s :: y)          ∎
-
-    +-commute : (x y : ℤ) → (x + y) ≅ (y + x)
-    +-commute 0ℤ y = begin≅
-        0ℤ + y      ≅< left-identity-on _+_ y >
-        y           ≅< symmetric-on ℤ (right-identity-on _+_ y) >
-        y + 0ℤ      ∎
-    +-commute (free (s :: x)) (free y) = begin≅
-        free (s :: x) + free y          ≅<>
-        (free [ s :] + free x) + free y ≅< right-associate-on _+_ (free [ s :]) (free x) (free y) >
-        free [ s :] + (free x + free y) ≅< left-congruent-on _+_ {free [ s :]} (+-commute (free x) (free y)) >
-        free [ s :] + (free y + free x) ≅< left-associate-on _+_ (free [ s :]) (free y) (free x) >
-        free (s :: y) + free x          ≅< +-commute-lemma2 y x s >
-        free y + free (s :: x)          ∎
+    +-commute : Commute _+_
+    +-commute (int px nx) (int py ny) = z= (begin≅
+        (px ++ py) ++ (ny ++ nx)    ≅< bi-congruent _++_ (commute-on _++_ px py) (commute-on _++_ ny nx) >
+        (py ++ px) ++ (nx ++ ny)    ∎)
 
 instance
-    +ℤ-commutative : IsCommutative _+_
-    +ℤ-commutative = record { commute = +-commute }
+    +-is-commutative : IsCommutative _+_
+    +-is-commutative = record { commute = +-commute }
 
-    +ℤ-commutative-magma : CommutativeMagma _+_
-    +ℤ-commutative-magma = record {}
+    +-commutative-magma : CommutativeMagma _+_
+    +-commutative-magma = record {}
 
-    +ℤ-commutative-semigroup : CommutativeSemigroup _+_
-    +ℤ-commutative-semigroup = record {}
+private    
+    +-assoc : Associate _+_
+    +-assoc (int px nx) (int py ny) (int pz nz) = z= (begin≅
+        (px ++ (py ++ pz)) ++ ((nx ++ ny) ++ nz)    ≅< bi-congruent _++_ (left-associate-on _++_ px py pz) (right-associate-on _++_ nx ny nz) >
+        ((px ++ py) ++ pz) ++ (nx ++ (ny ++ nz))    ∎)
 
-    +ℤ-commutative-monoid : CommutativeMonoid _+_ 0ℤ
-    +ℤ-commutative-monoid = record {}
+instance
+    +-is-associative : IsAssociative _+_
+    +-is-associative = record { associate = +-assoc }
 
-    +ℤ-commutative-group : AbelianGroup _+_ 0ℤ inverse
-    +ℤ-commutative-group = record {}
+    +-semigroup : Semigroup _+_
+    +-semigroup = record {}
+
+    +-commutative-semigroup : CommutativeSemigroup _+_
+    +-commutative-semigroup = record {}
+
+private
+    +-left-id : LeftIdentity _+_ 0ℤ
+    +-left-id (int px nx) = z= (bi-congruent _++_ (left-identity-on _++_ px) (symmetric-on ℕ (left-identity-on _++_ nx)))
+
+instance
+    +-has-identity : HasIdentity _+_ 0ℤ
+    +-has-identity = has-identity-commute +-left-id
+
+    +-monoid : Monoid _+_ 0ℤ
+    +-monoid = record {}
+
+    +-commutative-monoid : CommutativeMonoid _+_ 0ℤ
+    +-commutative-monoid = record {}
+
+neg : ℤ → ℤ
+neg (int p n) = int n p
+
+private
+    neg-congruent : Congruent neg
+    neg-congruent {int px nx} {int py ny} (z= px+ny=py+nx) = z= (begin≅
+        nx ++ py        ≅< commute-on _++_ nx py >
+        py ++ nx        ≅< symmetric-on ℕ px+ny=py+nx >
+        px ++ ny        ≅< commute-on _++_ px ny >
+        ny ++ px        ∎)
+
+instance
+    neg-is-congruent : IsCongruent neg
+    neg-is-congruent = record { congruent = neg-congruent }
+
+private
+    neg-left-inverse : LeftInverse _+_ 0ℤ neg
+    neg-left-inverse (int p n) = z= (begin≅
+        (n ++ p) ++ 0ℕ      ≅< right-identity-on _++_ (n ++ p) >
+        n ++ p              ≅< commute-on _++_ n p >
+        p ++ n              ∎)
+
+instance
+    +-has-inverse : HasInverse _+_ 0ℤ neg
+    +-has-inverse = has-inverse-commute neg-left-inverse
+
+    +-group : Group _+_ 0ℤ neg
+    +-group = record {}
+
+    +-abelian-group : AbelianGroup _+_ 0ℤ neg
+    +-abelian-group = record {}

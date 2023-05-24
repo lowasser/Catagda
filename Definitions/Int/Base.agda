@@ -1,27 +1,62 @@
 module Definitions.Int.Base where
 
 open import Agda.Primitive
-open import Agda.Builtin.Unit
-open import Definitions.List
-open import Definitions.Either
-open import Definitions.Relation.Equivalence.Structural.Properties ⊤
-open import Definitions.Group.Free {lzero} {lzero} ⊤
+open import Definitions.Nat renaming (_+_ to _++_; _≅_ to _=N_)
+open import Definitions.Relation
+open import Definitions.Relation.Properties
+open import Definitions.Setoid
+open import Definitions.Setoid.Equation
+open import Definitions.Function.Binary.Properties
+open import Definitions.Function.Properties
+open import Definitions.Function.Unary.Properties
+open import Definitions.Semigroup.Commutative
 
-ℤ : Set
-ℤ = FreeGroup ⊤
+data ℤ : Set where 
+    int : ℕ → ℕ → ℤ
 
-pattern 0ℤ = free []
-pattern p1 = right tt
-pattern m1 = left tt
+0ℤ 1ℤ -1ℤ : ℤ
+0ℤ = int 0ℕ 0ℕ
+1ℤ = int 1ℕ 0ℕ
+-1ℤ = int 0ℕ 1ℕ
 
-suc : ℤ → ℤ
-suc (free z) = free (p1 :: z)
+ℕ-to-ℤ : ℕ → ℤ
+ℕ-to-ℤ n = int n 0ℕ
 
-negsuc : ℤ → ℤ
-negsuc (free z) = free (m1 :: z)
+data _≅_ : Rel lzero ℤ where
+    z= : { px nx py ny : ℕ } → (px ++ ny) =N (py ++ nx) → int px nx ≅ int py ny
 
-neg : ℤ → ℤ
-neg = inverse
+infix 4 _≅_
 
-pattern 1ℤ = free (p1 :: [])
-pattern -1ℤ = free (m1 :: [])
+private
+    reflexive : Reflexive _≅_
+    reflexive (int p n) = z= (reflexive-on ℕ (p ++ n))
+
+    symmetric : Symmetric _≅_
+    symmetric (z= eq) = z= (symmetric-on ℕ eq)
+
+    transitive : Transitive _≅_
+    transitive (z= {px} {nx} {py} {ny} x=y) (z= {py} {ny} {pz} {nz} y=z) = z= (left-injective-on _++_ (py ++ ny) (begin≅
+        (py ++ ny) ++ (px ++ nz)        ≅< <ab><cd>-to-<ad><cb>-on _++_ py ny px nz >
+        (py ++ nz) ++ (px ++ ny)        ≅< bi-congruent _++_ y=z x=y >
+        (pz ++ ny) ++ (py ++ nx)        ≅< symmetric-on ℕ (<ab><cd>-to-<ad><cb>-on _++_ pz nx py ny) >
+        (pz ++ nx) ++ (py ++ ny)        ≅< commute-on _++_ (pz ++ nx) (py ++ ny) >
+        (py ++ ny) ++ (pz ++ nx)        ∎))
+    
+instance
+    equivalence : Equivalence _≅_
+    equivalence = make-equivalence _≅_ reflexive transitive symmetric
+
+    setoid : Setoid lzero ℤ
+    setoid = record {_≅_ = _≅_}
+
+private
+    ℕ-to-ℤ-congruent : Congruent ℕ-to-ℤ
+    ℕ-to-ℤ-congruent 0ℕ= = reflexive-on ℤ 0ℤ
+    ℕ-to-ℤ-congruent {x} {y} x=y = z= (begin≅
+        x ++ 0ℕ         ≅< right-identity-on _++_ x >
+        x               ≅< x=y >
+        y               ≅< symmetric-on ℕ (right-identity-on _++_ y) >
+        y ++ 0ℕ         ∎)
+
+ℕ-Congruent→-ℤ : ℕ Congruent→ ℤ
+ℕ-Congruent→-ℤ = record {cong-func = ℕ-to-ℤ; is-congruent = ℕ-to-ℤ-congruent}

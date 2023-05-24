@@ -34,5 +34,5 @@ private
         cons=[]=cons (transitive x≅y y≅z) (=[]=-transitive xs≅ys ys≅zs)
 
 instance
-    []-Setoid : Setoid ℓ=A [ A ]
-    []-Setoid = make-setoid _=[]=_ =[]=-reflexive =[]=-transitive =[]=-symmetric
+    []-setoid : Setoid ℓ=A [ A ]
+    []-setoid = make-setoid _=[]=_ =[]=-reflexive =[]=-transitive =[]=-symmetric
