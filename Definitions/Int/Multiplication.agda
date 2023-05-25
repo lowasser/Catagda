@@ -19,6 +19,7 @@ open import Definitions.Monoid
 open import Definitions.Monoid.Commutative
 open import Definitions.Ring
 open import Definitions.Ring.Semi
+open import Definitions.Ring.Commutative
 
 _*_ : BinOp ℤ
 int px nx * int py ny = int (px *N py ++ nx *N ny) (px *N ny ++ nx *N py)
@@ -193,3 +194,6 @@ instance
 
     *-+-semiring : Semiring _+_ _*_
     *-+-semiring = record {}
+
+    *-+-commutative-ring : CommutativeRing _+_ _*_ 0ℤ 1ℤ neg
+    *-+-commutative-ring = record {}

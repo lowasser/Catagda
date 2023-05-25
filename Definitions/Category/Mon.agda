@@ -34,7 +34,7 @@ record MonHom (MA MB : MonOb) : Set (lsuc ℓ) where
         distributes : (a b : elements MA) → _≅_ (setoid MB) (function cong$ (_∙_ MA a b)) (_∙_ MB (function cong$ a) (function cong$ b))
 
 data =MonHom (MA MB : MonOb) : Rel ℓ (MonHom MA MB) where
-    =-mon-hom : {a b : MonHom MA MB} → ≡→ (elements MA) (elements MB) (MonHom.function a) (MonHom.function b) → =MonHom MA MB a b
+    =-mon-hom : {a b : MonHom MA MB} → Pointwise= (elements MA) (elements MB) (MonHom.function a) (MonHom.function b) → =MonHom MA MB a b
 
 open MonHom
 open _Congruent→_

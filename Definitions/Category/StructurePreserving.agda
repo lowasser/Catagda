@@ -24,7 +24,7 @@ open _Congruent→_
 open import Definitions.Relation.Equivalence.Structural.Properties Ob renaming (≡-Setoid to setoid-of-obs)
 
 data =Morphism (A B : Ob) : Rel (lsuc ℓ) (Morph A B) where
-    =-morphism : {f g : Morph A B} → ≡→ (ob-elements A) (ob-elements B) {{ob-setoid A}} {{ob-setoid B}} (morph-fn f) (morph-fn g) → =Morphism A B f g
+    =-morphism : {f g : Morph A B} → Pointwise= (ob-elements A) (ob-elements B) {{ob-setoid A}} {{ob-setoid B}} (morph-fn f) (morph-fn g) → =Morphism A B f g
 
 private
     left-identity-law : {A B : Ob} → (f : Morph A B) → =Morphism A B (morph-composition (id-morph B) f) f
