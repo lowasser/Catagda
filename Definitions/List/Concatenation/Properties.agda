@@ -59,20 +59,15 @@ private
     ++-right-congruent {zs} (cons=[]=cons x≅y xs≅ys) =
         cons=[]=cons (x≅y) (++-right-congruent {zs} xs≅ys)
 
-    ++-left-injective : (xs : [ A ]) → Injective (xs ++_)
-    ++-left-injective [] ys≅zs = ys≅zs
-    ++-left-injective (x :: xs) (cons=[]=cons _ xsys≅xszs) = ++-left-injective xs xsys≅xszs
-
 instance
-    ++-BiCongruent : BiCongruent _++_
-    ++-BiCongruent = record {left-congruent = ++-left-congruent; right-congruent = ++-right-congruent}
+    ++-bi-congruent : BiCongruent _++_
+    ++-bi-congruent = record {left-congruent = ++-left-congruent; right-congruent = ++-right-congruent}
     
-    ++-Magma : Magma _++_
-    ++-Magma = make-magma _++_ ++-left-congruent ++-right-congruent
+    ++-magma : Magma _++_
+    ++-magma = make-magma _++_ ++-left-congruent ++-right-congruent
 
-instance
-    ++-HasIdentity : HasIdentity _++_ []
-    ++-HasIdentity = record { left-identity = ++-left-id ; right-identity = ++-right-id }
+    ++-has-identity : HasIdentity _++_ []
+    ++-has-identity = record { left-identity = ++-left-id ; right-identity = ++-right-id }
 
 private
     ++-assoc : Associate _++_
@@ -88,14 +83,14 @@ private
         ((x :: xs) ++ ys) ++ zs     ∎
 
 instance
-    ++-IsAssociative : IsAssociative _++_
-    ++-IsAssociative = record { associate = ++-assoc }
+    ++-is-associative : IsAssociative _++_
+    ++-is-associative = record { associate = ++-assoc }
 
-    ++-Semigroup : Semigroup _++_
-    ++-Semigroup = record {}
+    ++-semigroup : Semigroup _++_
+    ++-semigroup = record {}
 
-    ++-Monoid : Monoid _++_ []
-    ++-Monoid = record {}
+    ++-monoid : Monoid _++_ []
+    ++-monoid = record {}
 
 map-distributes-over-++ : {ℓB : Level} {B : Set ℓB} → (f : B → A) → (xs ys : [ B ]) → map f (xs +?+ ys) ≅ map f xs ++ map f ys
 map-distributes-over-++ f [] ys = reflexive-on [ A ] (map f ys)

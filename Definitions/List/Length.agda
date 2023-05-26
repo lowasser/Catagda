@@ -5,10 +5,13 @@ module Definitions.List.Length {ℓA ℓ=A : Level} (A : Set ℓA) {{SA : Setoid
 
 open import Agda.Builtin.Unit
 open import Definitions.List
-open import Definitions.Nat renaming (_≅_ to _=N_) hiding (_=[]=_)
+open import Definitions.Nat.Base renaming (_≅_ to _=N_)
+open import Definitions.Nat
 open import Definitions.List.Setoid A {{SA}}
+open import Definitions.Relation.Equivalence.Structural.Properties ⊤ renaming (≡-setoid to ⊤-setoid)
 open import Definitions.Logic
 open import Definitions.Setoid.Equation
+open import Definitions.List.Concatenation.Properties ⊤ {{⊤-setoid}}
 
 open Setoid {{...}}
 

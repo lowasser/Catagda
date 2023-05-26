@@ -6,13 +6,9 @@ open import Agda.Builtin.Unit
 open import Definitions.Relation.Equivalence.Structural.Properties ⊤
 open import Definitions.List
 open import Definitions.Setoid.Equation
-open import Definitions.List.Setoid {lzero} {lzero} ⊤
-open import Definitions.Monoid.Free {lzero} {lzero} ⊤
 open import Definitions.Function.Binary
 open import Definitions.Function.Binary.Properties
 open import Definitions.Monoid
-open import Definitions.List.Properties {lzero} {lzero} ⊤
-open import Definitions.List.Concatenation.Properties {lzero} {lzero} ⊤
 open import Definitions.Magma
 open import Definitions.Magma.Commutative
 open import Definitions.Semigroup
@@ -28,32 +24,9 @@ open import Definitions.Either
 open import Definitions.Relation.Equivalence.Structural
 open import Definitions.Function.Unary.Properties
 open import Definitions.Logic
-
-open Monoid {{...}}
-
-ℕ : Set
-ℕ = FreeMonoid ⊤
-
-_+_ : BinOp ℕ
-a + b = a ∙ b
-
-infixr 9 _+_
-
-pattern 0ℕ = []
-pattern suc n = (tt :: n)
-pattern 1ℕ = suc 0ℕ
-pattern suc= x=y = (cons=[]=cons refl x=y)
-pattern 0ℕ= = []=[]
-
-_≅_ : Rel lzero ℕ
-_≅_ = _=[]=_
-
-infix 4 _≅_
+open import Definitions.Nat.Base
 
 private
-    suc-injective : Injective suc
-    suc-injective (suc= x=y) = x=y
-
     +-commute-lemma : (x y : ℕ) → (suc x + y) ≅ (x + suc y)
     +-commute-lemma 0ℕ y = begin≅
         1ℕ + y              ≅<>
@@ -61,7 +34,7 @@ private
         0ℕ + suc y          ∎
     +-commute-lemma (suc x) y = begin≅
         suc (suc x) + y     ≅<>
-        suc (suc x + y)     ≅< left-congruent-on _::_ (+-commute-lemma x y) >
+        suc (suc x + y)     ≅< congruent-on suc (+-commute-lemma x y) >
         suc (x + suc y)     ≅<>
         suc x + suc y       ∎
 
@@ -72,7 +45,7 @@ private
         ys + 0ℕ            ∎
     +-commute (suc x) y = begin≅
         suc x + y           ≅<>
-        suc (x + y)         ≅< left-congruent-on _::_ (+-commute x y) >
+        suc (x + y)         ≅< congruent-on suc (+-commute x y) >
         suc (y + x)         ≅<>
         suc y + x           ≅< +-commute-lemma y x >
         y + suc x           ∎
@@ -89,12 +62,6 @@ private
         a + c       ∎)
 
 instance
-    suc-is-injective : IsInjective suc
-    suc-is-injective = record { injective = suc-injective }
-
-    suc-is-congruent : IsCongruent suc
-    suc-is-congruent = record { congruent = left-congruent-on _::_}
-
     +-commutative : IsCommutative  _+_
     +-commutative = record {commute = +-commute}
 
@@ -228,7 +195,7 @@ private
 
     ≤-antisymmetric : Antisymmetric _≤_
     ≤-antisymmetric z≤ z≤ = 0ℕ=
-    ≤-antisymmetric (s≤s x≤y) (s≤s y≤x) = bi-congruent _::_ refl (≤-antisymmetric x≤y y≤x)
+    ≤-antisymmetric (s≤s x≤y) (s≤s y≤x) = congruent-on suc (≤-antisymmetric x≤y y≤x)
 
     ≤-left-congruent : {a1 a2 b : ℕ} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
     ≤-left-congruent 0ℕ= z≤ = z≤
@@ -256,9 +223,9 @@ private
     ≤-trichotomy (suc m) (suc n) with ≤-trichotomy m n
     ... | triE m=n          = triE (suc= m=n)
     ... | triL m-le-n m≠n n-nle-m
-                            = triL (s≤s m-le-n) (λ sm=sn → m≠n (suc-injective sm=sn)) (λ sn≤sm → n-nle-m (suc-le-injective sn≤sm))
+                            = triL (s≤s m-le-n) (λ sm=sn → m≠n (injective-on suc sm=sn)) (λ sn≤sm → n-nle-m (suc-le-injective sn≤sm))
     ... | triG m-nle-n m≠n n-le-m
-                            = triG (λ sm≤sn → m-nle-n (suc-le-injective sm≤sn)) (λ sm=sn → m≠n (suc-injective sm=sn)) (s≤s n-le-m)
+                            = triG (λ sm≤sn → m-nle-n (suc-le-injective sm≤sn)) (λ sm=sn → m≠n (injective-on suc sm=sn)) (s≤s n-le-m)
 
 instance
     ≤-is-reflexive : IsReflexive _≤_
@@ -301,6 +268,8 @@ nat-not-nonzero-plus-itself m (suc n) (suc= eq) = nat-not-nonzero-plus-itself m 
     m + suc n   ≅< eq >
     n           ∎)
 
-open import Definitions.Relation.Equivalence.Structural.Properties ⊤ public
-open import Definitions.List.Setoid {lzero} {lzero} ⊤ public
-open import Definitions.List.Concatenation.Properties {lzero} {lzero} ⊤ public
+nat-not-itself-plus-nonzero : (m n : ℕ) → ¬ (n + suc m ≅ n)
+nat-not-itself-plus-nonzero m n eq = nat-not-nonzero-plus-itself m n (begin≅
+    suc m + n       ≅< commute-on _+_ (suc m) n >
+    n + suc m       ≅< eq >
+    n               ∎)

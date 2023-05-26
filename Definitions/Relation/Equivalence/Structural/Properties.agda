@@ -43,8 +43,8 @@ open Equivalence{{...}}
 open IsReflexive{{...}}
 
 instance
-    ≡-Setoid : Setoid ℓ A
-    ≡-Setoid = record {_≅_ = _≡_ }
+    ≡-setoid : Setoid ℓ A
+    ≡-setoid = record {_≅_ = _≡_ }
 
 private
     variable
