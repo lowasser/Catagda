@@ -27,6 +27,7 @@ open import Definitions.Relation.Equivalence.Structural.Properties Ordering
 open import Definitions.Either
 open import Definitions.Relation.Equivalence.Structural
 open import Definitions.Function.Unary.Properties
+open import Definitions.Logic
 
 open Monoid {{...}}
 
@@ -292,6 +293,13 @@ addition-preserves-≤ {0ℕ} {suc b} {suc c} {suc d} z≤ (s≤s c≤d) = s≤s
 cancel-left-+-≤ : (a b c : ℕ) → (a + b) ≤ (a + c) → b ≤ c
 cancel-left-+-≤ 0ℕ b c ab≤ac = ab≤ac
 cancel-left-+-≤ (suc a) b c (s≤s ab≤ac) = cancel-left-+-≤ a b c ab≤ac 
+
+nat-not-nonzero-plus-itself : (m n : ℕ) → ¬ (suc m + n ≅ n)
+nat-not-nonzero-plus-itself m 0ℕ ()
+nat-not-nonzero-plus-itself m (suc n) (suc= eq) = nat-not-nonzero-plus-itself m n (begin≅
+    suc m + n   ≅< +-commute-lemma m n >
+    m + suc n   ≅< eq >
+    n           ∎)
 
 open import Definitions.Relation.Equivalence.Structural.Properties ⊤ public
 open import Definitions.List.Setoid {lzero} {lzero} ⊤ public

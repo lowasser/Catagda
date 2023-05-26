@@ -16,6 +16,9 @@ private
 ¬_ : Set ℓ → Set ℓ
 ¬ P = P → ⊥
 
+contradiction-implies-anything : {A : Set ℓ} → ⊥ → A
+contradiction-implies-anything ()
+
 ByContradiction : Set ℓ → Set ℓ
 ByContradiction P = ¬ (¬ P)
 

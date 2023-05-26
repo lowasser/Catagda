@@ -15,6 +15,7 @@ open import Definitions.Magma
 open import Definitions.Function.Binary
 open import Definitions.Semigroup
 open import Definitions.Monoid
+open import Definitions.Logic
 
 open Setoid {{...}}
 open Equivalence {{...}}
