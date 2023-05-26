@@ -273,3 +273,16 @@ nat-not-itself-plus-nonzero m n eq = nat-not-nonzero-plus-itself m n (begin≅
     suc m + n       ≅< commute-on _+_ (suc m) n >
     n + suc m       ≅< eq >
     n               ∎)
+
+cancel-right-multiplication-nonzero : {x y z : ℕ} → (y * suc x ≅ z * suc x) → y ≅ z
+cancel-right-multiplication-nonzero {x} {suc y} {suc z} sysx=szsx = suc= (cancel-right-multiplication-nonzero (left-injective-on _+_ (suc x) sysx=szsx))
+cancel-right-multiplication-nonzero {suc x} {0ℕ} {suc z} ()
+cancel-right-multiplication-nonzero {suc x} {suc y} {0ℕ} ()
+cancel-right-multiplication-nonzero {_} {0ℕ} {0ℕ} _ = 0ℕ=
+
+cancel-left-multiplication-nonzero : {x y z : ℕ} → (suc x * y ≅ suc x * z) → y ≅ z
+cancel-left-multiplication-nonzero {x} {y} {z} eq = cancel-right-multiplication-nonzero {x} {y} {z} (begin≅
+    y * suc x   ≅< commute-on _*_ y (suc x) >
+    suc x * y   ≅< eq >
+    suc x * z   ≅< commute-on _*_ (suc x) z >
+    z * suc x   ∎)

@@ -86,21 +86,6 @@ instance
     +-commutative-monoid : CommutativeMonoid _+_ 0ℤ
     +-commutative-monoid = record {}
 
-neg : ℤ → ℤ
-neg (int p n) = int n p
-
-private
-    neg-congruent : Congruent neg
-    neg-congruent {int px nx} {int py ny} (z= px+ny=py+nx) = z= (begin≅
-        nx ++ py        ≅< commute-on _++_ nx py >
-        py ++ nx        ≅< symmetric-on ℕ px+ny=py+nx >
-        px ++ ny        ≅< commute-on _++_ px ny >
-        ny ++ px        ∎)
-
-instance
-    neg-is-congruent : IsCongruent neg
-    neg-is-congruent = record { congruent = neg-congruent }
-
 private
     neg-left-inverse : LeftInverse _+_ 0ℤ neg
     neg-left-inverse (int p n) = z= (begin≅

@@ -1,7 +1,9 @@
 module Definitions.Int.Base where
 
 open import Agda.Primitive
-open import Definitions.Nat renaming (_+_ to _++_; _≅_ to _=N_)
+open import Agda.Builtin.Sigma
+open import Definitions.Nat.Base renaming (_+_ to _++_; _≅_ to _=N_)
+open import Definitions.Nat
 open import Definitions.Relation
 open import Definitions.Relation.Properties
 open import Definitions.Setoid
@@ -60,3 +62,48 @@ private
 
 ℕ-Congruent→-ℤ : ℕ Congruent→ ℤ
 ℕ-Congruent→-ℤ = record {cong-func = ℕ-to-ℤ; is-congruent = ℕ-to-ℤ-congruent}
+
+neg : ℤ → ℤ
+neg (int p n) = int n p
+
+private
+    neg-congruent : Congruent neg
+    neg-congruent {int px nx} {int py ny} (z= px+ny=py+nx) = z= (begin≅
+        nx ++ py        ≅< commute-on _++_ nx py >
+        py ++ nx        ≅< symmetric-on ℕ px+ny=py+nx >
+        px ++ ny        ≅< commute-on _++_ px ny >
+        ny ++ px        ∎)
+
+    neg-injective : {px py nx ny : ℕ} → neg (int px nx) ≅ neg (int py ny) → int px nx ≅ int py ny
+    neg-injective eq = neg-congruent eq
+
+instance
+    neg-is-congruent : IsCongruent neg
+    neg-is-congruent = record { congruent = neg-congruent }
+
+    neg-is-injective : IsInjective neg
+    neg-is-injective = record { injective = help-injective } where
+        help-injective : {x y : ℤ} → neg x ≅ neg y → x ≅ y
+        help-injective {int _ _} {int _ _} = neg-injective
+
+data PosNegℤ : Set where
+    nonneg : ℕ → PosNegℤ
+    negsuc : ℕ → PosNegℤ
+
+posnegℤ-to-ℤ : PosNegℤ → ℤ
+posnegℤ-to-ℤ (nonneg n) = ℕ-to-ℤ n
+posnegℤ-to-ℤ (negsuc n) = neg (ℕ-to-ℤ (suc n))
+
+private
+    sub-both : (p n : ℕ) → int (suc p) (suc n) ≅ int p n
+    sub-both p n = z= (begin≅
+        suc p ++ n      ≅<>
+        (1ℕ ++ p) ++ n  ≅< right-congruent-on _++_ (commute-on _++_ 1ℕ p) >
+        (p ++ 1ℕ) ++ n  ≅< right-associate-on _++_ p 1ℕ n >
+        p ++ suc n      ∎)
+
+canonicalize : (x : ℤ) → Σ PosNegℤ (λ pnz → x ≅ posnegℤ-to-ℤ pnz)
+canonicalize (int n 0ℕ) = nonneg n , reflexive-on ℤ (int n 0ℕ)
+canonicalize (int 0ℕ (suc n)) = negsuc n , reflexive-on ℤ (int 0ℕ (suc n))
+canonicalize (int (suc p) (suc n)) with canonicalize (int p n)
+... | pnz , eq  = pnz , transitive-on ℤ (sub-both p n) eq
