@@ -2,7 +2,8 @@ module Definitions.Int.Addition where
 
 open import Definitions.Int.Base
 open import Definitions.Setoid
-open import Definitions.Nat renaming (_+_ to _++_; _≤_ to _≤N_; _≅_ to _=N_) hiding (+-commutative-magma; +-commutative-semigroup; +-commutative-monoid)
+open import Definitions.Nat.Base renaming (_+_ to _++_; _≅_ to _=N_) hiding (+-bi-congruent; +-has-identity)
+open import Definitions.Nat renaming (_≤_ to _≤N_) hiding (+-commutative-magma; +-commutative-semigroup; +-commutative-monoid)
 open import Definitions.Function.Binary
 open import Definitions.Setoid.Equation
 open import Definitions.Semigroup.Commutative

@@ -21,8 +21,7 @@ data ℤ : Set where
 1ℤ = int 1ℕ 0ℕ
 -1ℤ = int 0ℕ 1ℕ
 
-ℕ-to-ℤ : ℕ → ℤ
-ℕ-to-ℤ n = int n 0ℕ
+pattern ℕ-to-ℤ n = int n 0ℕ
 
 data _≅_ : Rel lzero ℤ where
     z= : { px nx py ny : ℕ } → (px ++ ny) =N (py ++ nx) → int px nx ≅ int py ny

@@ -1,9 +1,10 @@
 module Definitions.Int.Multiplication where
 
 open import Agda.Primitive
+open import Definitions.Nat.Base renaming (_+_ to _++_; _≅_ to _=N_)
 open import Definitions.Nat
     hiding (*-magma; *-is-commutative; *-commutative-magma; *-is-associative; *-semigroup; *-commutative-semigroup; *-has-identity; *-monoid; *-commutative-monoid; *-ringoid)
-    renaming (_+_ to _++_; _≅_ to _=N_; _*_ to _*N_)
+    renaming (_*_ to _*N_)
 open import Definitions.Int.Base
 open import Definitions.Int.Addition
 open import Definitions.Function.Binary
@@ -197,3 +198,12 @@ instance
 
     *-+-commutative-ring : CommutativeRing _+_ _*_ 0ℤ 1ℤ neg
     *-+-commutative-ring = record {}
+
+-1ℤ*-is-neg : (x : ℤ) → -1ℤ * x ≅ neg x
+-1ℤ*-is-neg (int p n) = z= (begin≅
+    1ℕ *N n ++ p                ≅< right-congruent-on _++_ (left-identity-on _*N_ n) >
+    n ++ p                      ≅< left-congruent-on _++_ (symmetric-on ℕ (left-identity-on _*N_ p)) >
+    n ++ 1ℕ *N p                ∎)
+
+postulate 
+    cancel-left-multiplication-by-nonzero-positive : (n : ℕ) (x y : ℤ) → ℕ-to-ℤ (suc n) * x ≅ ℕ-to-ℤ (suc n) * y → x ≅ y
