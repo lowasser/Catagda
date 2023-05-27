@@ -3,6 +3,7 @@ module Definitions.Nat where
 open import Agda.Primitive
 open import Definitions.Setoid
 open import Agda.Builtin.Unit
+open import Agda.Builtin.Sigma
 open import Definitions.Relation.Equivalence.Structural.Properties ⊤
 open import Definitions.List
 open import Definitions.Setoid.Equation
@@ -175,7 +176,7 @@ instance
     *-commutative-monoid : CommutativeMonoid _*_ 1ℕ
     *-commutative-monoid = record {}
 
-    *-ringoid : Ringoid _+_ _*_
+    *-ringoid : Ringoid _*_ _+_
     *-ringoid = record { left-distribute = *-distributes-over-+ ; right-distribute = *-right-distributes }
 
 data _≤_ : Rel lzero ℕ where
@@ -286,3 +287,33 @@ cancel-left-multiplication-nonzero {x} {y} {z} eq = cancel-right-multiplication-
     suc x * y   ≅< eq >
     suc x * z   ≅< commute-on _*_ (suc x) z >
     z * suc x   ∎)
+
+product-is-zero : {a b : ℕ} → (a * b ≅ 0ℕ) → Either (a ≅ 0ℕ) (b ≅ 0ℕ)
+product-is-zero {0ℕ} {_} _ = left 0ℕ=
+product-is-zero {_} {0ℕ} _ = right 0ℕ=
+-- compiler can prove no other cases
+
+ordering-to-subtraction : {a b : ℕ} → a ≤ b → Σ ℕ (λ c → a + c ≅ b)
+ordering-to-subtraction {0ℕ} {b} z≤ = b , reflexive-on ℕ b
+ordering-to-subtraction {suc a} {suc b} (s≤s a≤b) with ordering-to-subtraction a≤b
+... | c , eq    = c , suc= eq
+
+data TriΔ (a b : ℕ) : Set where
+    tri< : (c : ℕ) → (suc c + a ≅ b) → TriΔ a b
+    tri= : (a ≅ b) → TriΔ a b
+    tri> : (c : ℕ) → (suc c + b ≅ a) → TriΔ a b
+
+triΔ : (a b : ℕ) → TriΔ a b
+triΔ 0ℕ 0ℕ = tri= (reflexive-on ℕ 0ℕ)
+triΔ 0ℕ (suc b) = tri< b (right-identity-on _+_ (suc b))
+triΔ (suc a) 0ℕ = tri> a (right-identity-on _+_ (suc a))
+triΔ (suc a) (suc b) with triΔ a b
+... | tri= eq   = tri= (suc= eq)
+... | tri< c eq = tri< c (suc= (begin≅
+    c ++ suc a      ≅< symmetric-on ℕ (+-commute-lemma c a) >
+    suc c ++ a      ≅< eq >
+    b               ∎))
+... | tri> c eq = tri> c (suc= (begin≅
+    c ++ suc b      ≅< symmetric-on ℕ (+-commute-lemma c b) >
+    suc c ++ b      ≅< eq >
+    a               ∎)) 

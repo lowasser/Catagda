@@ -52,6 +52,12 @@ a<bc>-to-b<ac>-on _∙_ a b c = begin≅
         (b ∙ a) ∙ c             ≅< right-associate-on _∙_ b a c >
         b ∙ (a ∙ c)             ∎
 
+a<bc>-to-b<ca>-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c : S) → a ∙ (b ∙ c) ≅ b ∙ (c ∙ a)
+a<bc>-to-b<ca>-on _∙_ a b c = begin≅
+        a ∙ (b ∙ c)             ≅< a<bc>-to-b<ac>-on _∙_ a b c >
+        b ∙ (a ∙ c)             ≅< left-congruent-on _∙_ (commute-on _∙_ a c) >
+        b ∙ (c ∙ a)             ∎
+
 <ab><cd>-to-<ac><bd>-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c d : S) → (a ∙ b) ∙ (c ∙ d) ≅ (a ∙ c) ∙ (b ∙ d)
 <ab><cd>-to-<ac><bd>-on _∙_ a b c d = begin≅
     (a ∙ b) ∙ (c ∙ d)           ≅< left-associate-on _∙_ (a ∙ b) c d >
@@ -73,3 +79,33 @@ a<bc>-to-c<ba>-on _∙_ a b c = begin≅
     (a ∙ b) ∙ c     ≅< commute-on _∙_ (a ∙ b) c >
     c ∙ (a ∙ b)     ≅< left-congruent-on _∙_ (commute-on _∙_ a b) >
     c ∙ (b ∙ a)     ∎  
+
+<ab>c-to-a<cb>-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c : S) → (a ∙ b) ∙ c ≅ a ∙ (c ∙ b)
+<ab>c-to-a<cb>-on _∙_ a b c = begin≅
+    (a ∙ b) ∙ c     ≅< right-associate-on _∙_ a b c >
+    a ∙ (b ∙ c)     ≅< left-congruent-on _∙_ (commute-on _∙_ b c) >
+    a ∙ (c ∙ b)     ∎
+
+a<bc>-to-<ac>b-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c : S) → a ∙ (b ∙ c) ≅ (a ∙ c) ∙ b
+a<bc>-to-<ac>b-on _∙_ a b c = begin≅
+    a ∙ (b ∙ c)     ≅< left-congruent-on _∙_ (commute-on _∙_ b c) >
+    a ∙ (c ∙ b)     ≅< left-associate-on _∙_ a c b >
+    (a ∙ c) ∙ b     ∎
+
+<ab>c-to-<ac>b-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c : S) → (a ∙ b) ∙ c ≅ (a ∙ c) ∙ b
+<ab>c-to-<ac>b-on _∙_ a b c = begin≅
+    (a ∙ b) ∙ c     ≅< right-associate-on _∙_ a b c >
+    a ∙ (b ∙ c)     ≅< a<bc>-to-<ac>b-on _∙_ a b c >
+    (a ∙ c) ∙ b     ∎
+
+<ab>c-to-<bc>a-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c : S) → (a ∙ b) ∙ c ≅ (b ∙ c) ∙ a
+<ab>c-to-<bc>a-on _∙_ a b c = begin≅
+    (a ∙ b) ∙ c     ≅< right-associate-on _∙_ a b c >
+    a ∙ (b ∙ c)     ≅< commute-on _∙_ a (b ∙ c) >
+    (b ∙ c) ∙ a     ∎
+
+<ab>c-to-b<ca>-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c : S) → (a ∙ b) ∙ c ≅ b ∙ (c ∙ a)
+<ab>c-to-b<ca>-on _∙_ a b c = begin≅
+    (a ∙ b) ∙ c     ≅< <ab>c-to-<bc>a-on _∙_ a b c >
+    (b ∙ c) ∙ a     ≅< right-associate-on _∙_ b c a >
+    b ∙ (c ∙ a)     ∎

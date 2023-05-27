@@ -3,8 +3,8 @@ module Definitions.Int.Multiplication where
 open import Agda.Primitive
 open import Definitions.Nat.Base renaming (_+_ to _++_; _≅_ to _=N_)
 open import Definitions.Nat
-    hiding (*-magma; *-is-commutative; *-commutative-magma; *-is-associative; *-semigroup; *-commutative-semigroup; *-has-identity; *-monoid; *-commutative-monoid; *-ringoid)
-    renaming (_*_ to _*N_)
+    hiding (*-magma; *-is-commutative; *-commutative-magma; *-is-associative; *-semigroup; *-commutative-semigroup; *-has-identity; *-monoid; *-commutative-monoid; *-ringoid; product-is-zero)
+    renaming (_*_ to _*N_; _≤_ to _≤N_)
 open import Definitions.Int.Base
 open import Definitions.Int.Addition
 open import Definitions.Function.Binary
@@ -21,6 +21,8 @@ open import Definitions.Monoid.Commutative
 open import Definitions.Ring
 open import Definitions.Ring.Semi
 open import Definitions.Ring.Commutative
+open import Definitions.Either
+open import Definitions.IntegralDomain
 
 _*_ : BinOp ℤ
 int px nx * int py ny = int (px *N py ++ nx *N ny) (px *N ny ++ nx *N py)
@@ -187,23 +189,58 @@ private
         x * z + y * z   ∎
 
 instance
-    *-+-ringoid : Ringoid _+_ _*_
+    *-+-ringoid : Ringoid _*_ _+_
     *-+-ringoid = record {left-distribute = *-left-distributes; right-distribute = *-right-distributes}
 
-    *-+-ring : Ring _+_ _*_ 0ℤ 1ℤ neg
+    *-+-ring : Ring _*_ _+_ 1ℤ 0ℤ neg
     *-+-ring = record {}
 
-    *-+-semiring : Semiring _+_ _*_
+    *-+-semiring : Semiring _*_ _+_
     *-+-semiring = record {}
 
-    *-+-commutative-ring : CommutativeRing _+_ _*_ 0ℤ 1ℤ neg
+    *-+-commutative-ring : CommutativeRing _*_ _+_ 1ℤ 0ℤ neg
     *-+-commutative-ring = record {}
 
--1ℤ*-is-neg : (x : ℤ) → -1ℤ * x ≅ neg x
--1ℤ*-is-neg (int p n) = z= (begin≅
-    1ℕ *N n ++ p                ≅< right-congruent-on _++_ (left-identity-on _*N_ n) >
-    n ++ p                      ≅< left-congruent-on _++_ (symmetric-on ℕ (left-identity-on _*N_ p)) >
-    n ++ 1ℕ *N p                ∎)
+    *-zero : HasZero _*_ 0ℤ
+    *-zero = Ring.zero *-+-ring
 
-postulate 
-    cancel-left-multiplication-by-nonzero-positive : (n : ℕ) (x y : ℤ) → ℕ-to-ℤ (suc n) * x ≅ ℕ-to-ℤ (suc n) * y → x ≅ y
+private
+    integral-domain-lemma : (a b c d : ℕ) → (a *N c ++ b *N d) =N (a *N d ++ b *N c) → Either (a =N b) (c =N d)
+    integral-domain-lemma a b c d eq with triΔ c d
+    ... | tri= c=d      = right c=d
+    ... | tri< n snc=d  = left (cancel-right-multiplication-nonzero {n} (right-injective-on _++_ (a *N c ++ b *N c) (begin≅
+            a *N suc n ++ (a *N c ++ b *N c)    ≅< left-associate-on _++_ (a *N suc n) (a *N c) (b *N c) >
+            (a *N suc n ++ a *N c) ++ b *N c    ≅< right-congruent-on _++_ (symmetric-on ℕ (left-distribute-on _*N_ _++_ a (suc n) c)) >
+            a *N (suc n ++ c) ++ b *N c         ≅< right-congruent-on _++_ {b *N c} (left-congruent-on _*N_ {a} snc=d) >
+            a *N d ++ b *N c                    ≅< symmetric-on ℕ eq >
+            a *N c ++ b *N d                    ≅< left-congruent-on _++_ {a *N c} (left-congruent-on _*N_ {b} (symmetric-on ℕ snc=d)) >
+            a *N c ++ b *N (suc n ++ c)         ≅< left-congruent-on _++_ (left-distribute-on _*N_ _++_ b (suc n) c) >
+            a *N c ++ (b *N suc n ++ b *N c)    ≅< a<bc>-to-b<ac>-on _++_ (a *N c) (b *N suc n) (b *N c) >
+            b *N suc n ++ (a *N c ++ b *N c)    ∎)))
+    ... | tri> n snd=c = left (cancel-right-multiplication-nonzero {n} (right-injective-on _++_ (a *N d ++ b *N d) (begin≅
+            a *N suc n ++ (a *N d ++ b *N d)    ≅< left-associate-on _++_ (a *N suc n) (a *N d) (b *N d) >
+            (a *N suc n ++ a *N d) ++ b *N d    ≅< right-congruent-on _++_ (symmetric-on ℕ (left-distribute-on _*N_ _++_ a (suc n) d)) >
+            a *N (suc n ++ d) ++ b *N d         ≅< right-congruent-on _++_ {b *N d} (left-congruent-on _*N_ {a} snd=c) >
+            a *N c ++ b *N d                    ≅< eq >
+            a *N d ++ b *N c                    ≅< left-congruent-on _++_ {a *N d} (left-congruent-on _*N_ {b} (symmetric-on ℕ snd=c)) >
+            a *N d ++ b *N (suc n ++ d)         ≅< left-congruent-on _++_ {a *N d} (left-distribute-on _*N_ _++_ b (suc n) d) >
+            a *N d ++ (b *N suc n ++ b *N d)    ≅< a<bc>-to-b<ac>-on _++_ (a *N d) (b *N suc n) (b *N d) >
+            b *N suc n ++ (a *N d ++ b *N d)    ∎)))
+
+    integral-domain : (x y : ℤ) → (x * y ≅ 0ℤ) → Either (x ≅ 0ℤ) (y ≅ 0ℤ)
+    integral-domain (int a b) (int c d) (z= eq) with integral-domain-lemma a b c d (begin≅
+        a *N c ++ b *N d            ≅< symmetric-on ℕ (right-identity-on _++_ (a *N c ++ b *N d)) >
+        (a *N c ++ b *N d) ++ 0ℕ    ≅< eq >
+        a *N d ++ b *N c            ∎)
+    ... | left a=b = left (z= (begin≅
+            a ++ 0ℕ     ≅< right-identity-on _++_ a >
+            a           ≅< a=b >
+            b           ∎))
+    ... | right c=d = right (z= (begin≅
+            c ++ 0ℕ     ≅< right-identity-on _++_ c >
+            c           ≅< c=d >
+            d           ∎))
+
+instance
+    ℤ-integral-domain : IntegralDomain _*_ _+_ 1ℤ 0ℤ neg
+    ℤ-integral-domain = record {product-is-zero-one-is-zero = integral-domain}

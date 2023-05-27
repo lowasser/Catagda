@@ -43,7 +43,6 @@ right-congruent-on : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} → {{SA : Set
     (_∙_ : A → B → C) → {{BiCongruent _∙_}} → RightCongruent _∙_
 right-congruent-on _ = right-congruent
 
-
 Commute : {A : Set ℓA} {B : Set ℓB} → {{Setoid ℓ=B B}} → (A → A → B) → Set (ℓA ⊔ ℓ=B)
 Commute _∙_ = ∀ x y → (x ∙ y) ≅ (y ∙ x) 
 
@@ -130,6 +129,9 @@ record HasZero {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_∙_ : BinOp A) (z : A) 
     field
         left-zero : LeftZero _∙_ z
         right-zero : RightZero _∙_ z
+
+left-zero-on :{A : Set ℓA} → {{S : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (z : A) → {{HZ : HasZero _∙_ z}} → LeftZero _∙_ z
+left-zero-on _ _ {{HZ}} = HasZero.left-zero HZ
 
 right-zero-on :{A : Set ℓA} → {{S : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (z : A) → {{HZ : HasZero _∙_ z}} → RightZero _∙_ z
 right-zero-on _ _ {{HZ}} = HasZero.right-zero HZ

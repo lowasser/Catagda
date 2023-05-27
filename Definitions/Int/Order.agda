@@ -1,8 +1,9 @@
 module Definitions.Int.Order where
 
 open import Agda.Primitive
+open import Definitions.Nat.Base renaming (_+_ to _++_; _≅_ to _=N_)
 open import Definitions.Nat hiding (≤-is-reflexive; ≤-is-transitive; ≤-is-antisymmetric; ≤-partial-order; ≤-pre-order; ≤-total-order) 
-    renaming (_+_ to _++_; _≅_ to _=N_; _≤_ to _≤N_; cancel-left-+-≤ to cancel-left-+-≤N; addition-preserves-≤ to addition-preserves-≤N)
+    renaming (_≤_ to _≤N_; cancel-left-+-≤ to cancel-left-+-≤N; addition-preserves-≤ to addition-preserves-≤N)
 open import Definitions.Relation
 open import Definitions.Relation.Properties
 open import Definitions.Relation.Order.Partial

@@ -7,8 +7,8 @@ open import Definitions.Ringoid
 open import Definitions.Function.Binary
 open import Definitions.Setoid
 
-record Semiring {ℓA ℓ=A : Level} {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_+_ _*_ : BinOp A) : Set (ℓA ⊔ lsuc ℓ=A) where
+record Semiring {ℓA ℓ=A : Level} {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_*_ _+_ : BinOp A) : Set (ℓA ⊔ lsuc ℓ=A) where
     field
         {{+-commutative-semigroup}} : CommutativeSemigroup _+_
         {{*-semigroup}} : Semigroup _*_
-        {{ringoid}} : Ringoid _+_ _*_
+        {{ringoid}} : Ringoid _*_ _+_
