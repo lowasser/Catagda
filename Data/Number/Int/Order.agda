@@ -12,9 +12,12 @@ open import Data.Number.Int.Base
 open import Structure.Algebraic.Semigroup.Commutative
 open import Structure.Setoid
 open import Logic
+open import Function.Binary.Properties
 
 data _≤_ : Rel lzero ℤ where
     z≤ : {px py nx ny : ℕ} → px ++ ny ≤N py ++ nx → int px nx ≤ int py ny
+
+infix 7 _≤_
 
 private
     ≤-reflexive : Reflexive _≤_
@@ -73,3 +76,6 @@ instance
 
     ≤-total-order : TotalOrder _≤_
     ≤-total-order = record {trichotomy = ≤-trichotomy}
+
+neg-swaps-order : {x y : ℤ} → x ≤ y → neg y ≤ neg x
+neg-swaps-order {int px nx} {int py ny} (z≤ pxny≤pynx) = z≤ (left-congruent-on-order _≤N_ (commute-on _++_ px ny) (right-congruent-on-order _≤N_ (commute-on _++_ py nx) pxny≤pynx))

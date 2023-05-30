@@ -84,3 +84,6 @@ right-inverse-is-unique-on _ _ _ = right-inverse-is-unique
 
 distribute-inverse-on : {ℓA ℓ=A : Level} {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (i : A) → (_⁻¹ : A → A) → {{G : Group _∙_ i _⁻¹}} → (a b : A) → ((a ∙ b) ⁻¹) ≅ (b ⁻¹) ∙ (a ⁻¹)
 distribute-inverse-on _ _ _ = distribute-inverse
+
+inverse-inverse-on : {ℓA ℓ=A : Level} {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (i : A) → (_⁻¹ : A → A) → {{G : Group _∙_ i _⁻¹}} → (a : A) → (a ⁻¹) ⁻¹ ≅ a
+inverse-inverse-on _ _ _ = inverse-inverse

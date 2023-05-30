@@ -65,6 +65,9 @@ private
 neg : ℤ → ℤ
 neg (int p n) = int n p
 
+neg-neg : (x : ℤ) → neg (neg x) ≅ x
+neg-neg (int p n) = reflexive-on ℤ (int p n)
+
 private
     neg-congruent : Congruent neg
     neg-congruent {int px nx} {int py ny} (z= px+ny=py+nx) = z= (begin≅

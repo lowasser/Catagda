@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Data.Number.Rational where
 
 open import Agda.Primitive
@@ -30,7 +29,7 @@ data ℚ : Set where
     frac : (x y : ℤ) → ¬ (y =Z 0ℤ) → ℚ
 
 data _≅_ : Rel lzero ℚ where
-    q= : {p q r s : ℤ} → {q≠0 : ¬ (q =Z 0ℤ)} → {s≠0 : ¬ (s =Z 0ℤ)} → p *Z s =Z q *Z r → frac p q q≠0 ≅ frac r s s≠0
+    q= : {p q r s : ℤ} → {q≠0 : ¬ (q =Z 0ℤ)} → {s≠0 : ¬ (s =Z 0ℤ)} → p *Z s =Z r *Z q → frac p q q≠0 ≅ frac r s s≠0
 
 infix 4 _≅_
 
@@ -45,23 +44,19 @@ private
 
 private
     ≅-reflexive : Reflexive _≅_
-    ≅-reflexive (frac p q q≠0) = q= (commute-on _*Z_ p q)
+    ≅-reflexive (frac p q q≠0) = q= (reflexive-on ℤ (p *Z q))
 
     ≅-symmetric : Symmetric _≅_
-    ≅-symmetric {frac p q q≠0} {frac r s s≠0} (q= eq) = q= (begin≅
-        r *Z q      ≅< commute-on _*Z_ r q >
-        q *Z r      ≅< symmetric-on ℤ eq >
-        p *Z s      ≅< commute-on _*Z_ p s >
-        s *Z p      ∎)
+    ≅-symmetric {frac p q q≠0} {frac r s s≠0} (q= eq) = q= (symmetric-on ℤ eq)
     
     ≅-transitive : Transitive _≅_
-    ≅-transitive {frac p q q≠0} {frac r s s≠0} {frac t u u≠0} (q= ps=qr) (q= ru=st) = q= (cancel-left-multiplication-by-nonzero-on _*Z_ _+Z_ 1ℤ 0ℤ negZ s (p *Z u) (q *Z t) s≠0 (begin≅
+    ≅-transitive {frac p q q≠0} {frac r s s≠0} {frac t u u≠0} (q= ps=rq) (q= ru=ts) = q= (cancel-left-multiplication-by-nonzero-on _*Z_ _+Z_ 1ℤ 0ℤ negZ s (p *Z u) (t *Z q) s≠0 (begin≅
         s *Z (p *Z u)       ≅< a<bc>-to-c<ba>-on _*Z_ s p u >
-        u *Z (p *Z s)       ≅< left-congruent-on _*Z_ ps=qr >
-        u *Z (q *Z r)       ≅< a<bc>-to-b<ca>-on _*Z_ u q r >
-        q *Z (r *Z u)       ≅< left-congruent-on _*Z_ ru=st >
-        q *Z (s *Z t)       ≅< a<bc>-to-b<ac>-on _*Z_ q s t >
-        s *Z (q *Z t)       ∎))
+        u *Z (p *Z s)       ≅< left-congruent-on _*Z_ ps=rq >
+        u *Z (r *Z q)       ≅< a<bc>-to-c<ba>-on _*Z_ u r q >
+        q *Z (r *Z u)       ≅< left-congruent-on _*Z_ ru=ts >
+        q *Z (t *Z s)       ≅< a<bc>-to-c<ba>-on _*Z_ q t s >
+        s *Z (t *Z q)       ∎))
 
 instance
     ℚ-setoid : Setoid lzero ℚ

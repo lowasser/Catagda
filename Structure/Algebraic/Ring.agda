@@ -77,3 +77,10 @@ commute-times-neg-on {_} {_} {A} _*_ _+_ 1A 0A neg a b = begin≅
     neg a * b               ≅< left-times-neg-on _*_ _+_ 1A 0A neg a b >
     neg (a * b)             ≅< symmetric-on A (right-times-neg-on _*_ _+_ 1A 0A neg a b) >
     a * neg b               ∎
+
+neg-times-neg-on : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_*_ _+_ : BinOp A) (1A 0A : A) (neg : A → A) → {{R : Ring _*_ _+_ 1A 0A neg}} →
+    (a b : A) → neg a * neg b ≅ a * b
+neg-times-neg-on {_} {_} {A} _*_ _+_ 1A 0A neg a b = begin≅
+    neg a * neg b           ≅< commute-times-neg-on _*_ _+_ 1A 0A neg a (neg b) >
+    a * neg (neg b)         ≅< left-congruent-on _*_ (inverse-inverse-on _+_ 0A neg b) >
+    a * b                   ∎

@@ -179,6 +179,9 @@ instance
     *-ringoid : Ringoid _*_ _+_
     *-ringoid = record { left-distribute = *-distributes-over-+ ; right-distribute = *-right-distributes }
 
+    *-has-zero : HasZero _*_ 0ℕ
+    *-has-zero = record {left-zero = *-left-zero; right-zero = *-right-zero}
+
 data _≤_ : Rel lzero ℕ where
     z≤ : { x : ℕ } → 0ℕ ≤ x
     s≤s : { x y : ℕ } → x ≤ y → suc x ≤ suc y
@@ -298,6 +301,31 @@ ordering-to-subtraction {0ℕ} {b} z≤ = b , reflexive-on ℕ b
 ordering-to-subtraction {suc a} {suc b} (s≤s a≤b) with ordering-to-subtraction a≤b
 ... | c , eq    = c , suc= eq
 
+subtraction-to-ordering : {a b c : ℕ} → a + c ≅ b → a ≤ b
+subtraction-to-ordering {suc a} {suc b} {c} (suc= ac=b) = s≤s (subtraction-to-ordering ac=b)
+subtraction-to-ordering {0ℕ} _ = z≤
+
+multiplication-preserves-≤ : {a b c d : ℕ} → a ≤ b → c ≤ d → a * c ≤ b * d
+multiplication-preserves-≤ {a} {b} {c} {d} a≤b c≤d with ordering-to-subtraction a≤b | ordering-to-subtraction c≤d
+... | x , a+x=b | y , c+y=d = subtraction-to-ordering (symmetric-on ℕ (begin≅
+        b * d                               ≅< bi-congruent _*_ (symmetric-on ℕ a+x=b) (symmetric-on ℕ c+y=d) >
+        (a + x) * (c + y)                   ≅< left-distribute-on _*_ _+_ (a + x) c y >
+        (a + x) * c + (a + x) * y           ≅< bi-congruent _+_ (right-distribute-on _*_ _+_ a x c) (right-distribute-on _*_ _+_ a x y) >
+        (a * c + x * c) + (a * y + x * y)   ≅< right-associate-on _+_ (a * c) (x * c) (a * y + x * y) >
+        a * c + (x * c + (a * y + x * y))   ∎))
+
+cancel-right-multiplication-nonzero-≤ : {x y z : ℕ} → x * suc z ≤ y * suc z → x ≤ y
+cancel-right-multiplication-nonzero-≤ {x} {y} {0ℕ} x1≤y1 = bi-congruent-order _≤_ (symmetric-on ℕ (right-identity-on _*_ x)) (symmetric-on ℕ (right-identity-on _*_ y)) x1≤y1
+cancel-right-multiplication-nonzero-≤ {0ℕ} _ = z≤
+cancel-right-multiplication-nonzero-≤ {x} {0ℕ} xsz≤ysz = reflexive-equiv-order-on _≤_ (cancel-right-multiplication-nonzero-≤-lemma xsz≤ysz)
+    where   cancel-right-multiplication-nonzero-≤-lemma : {x y : ℕ} → x * suc y ≤ 0ℕ → x ≅ 0ℕ
+            cancel-right-multiplication-nonzero-≤-lemma {0ℕ} _ = 0ℕ=
+cancel-right-multiplication-nonzero-≤ {suc x} {suc y} {z} xsz≤ysz = 
+    s≤s (cancel-right-multiplication-nonzero-≤ (cancel-left-+-≤ (suc z) (x * suc z) (y * suc z) xsz≤ysz))
+
+cancel-left-multiplication-nonzero-≤ : {x y z : ℕ} → suc x * y ≤ suc x * z → y ≤ z
+cancel-left-multiplication-nonzero-≤ {x} {y} {z} sxy≤sxz = cancel-right-multiplication-nonzero-≤ (bi-congruent-order _≤_ (commute-on _*_ y (suc x)) (commute-on _*_ z (suc x)) sxy≤sxz)
+
 data TriΔ (a b : ℕ) : Set where
     tri< : (c : ℕ) → (suc c + a ≅ b) → TriΔ a b
     tri= : (a ≅ b) → TriΔ a b
@@ -316,4 +344,4 @@ triΔ (suc a) (suc b) with triΔ a b
 ... | tri> c eq = tri> c (suc= (begin≅
     c ++ suc b      ≅< symmetric-on ℕ (+-commute-lemma c b) >
     suc c ++ b      ≅< eq >
-    a               ∎)) 
+    a               ∎))  
