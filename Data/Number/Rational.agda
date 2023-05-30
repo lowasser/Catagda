@@ -7,6 +7,7 @@ open import Data.Number.Int.Addition renaming (_+_ to _+Z_)
 open import Data.Number.Int.Multiplication renaming (_*_ to _*Z_)
 open import Data.Number.Nat.Base renaming (_≅_ to _=N_; _+_ to _+N_)
 open import Data.Number.Nat renaming (_*_ to _*N_)
+open import Data.Number.Int.Order renaming (_≤_ to _≤Z_)
 open import Function.Binary
 open import Function.Binary.Properties
 open import Relation
@@ -26,10 +27,10 @@ private
     a ≠Z b = ¬ (a =Z b)
 
 data ℚ : Set where 
-    frac : (x y : ℤ) → ¬ (y =Z 0ℤ) → ℚ
+    frac : (x y : ℤ) → ¬ (y =Z 0ℤ) → (0ℤ ≤Z y) → ℚ
 
 data _≅_ : Rel lzero ℚ where
-    q= : {p q r s : ℤ} → {q≠0 : ¬ (q =Z 0ℤ)} → {s≠0 : ¬ (s =Z 0ℤ)} → p *Z s =Z r *Z q → frac p q q≠0 ≅ frac r s s≠0
+    q= : {p q r s : ℤ} → {q≠0 : ¬ (q =Z 0ℤ)} {s≠0 : ¬ (s =Z 0ℤ)} {0≤q : 0ℤ ≤Z q} {0≤s : 0ℤ ≤Z s} → p *Z s =Z r *Z q → frac p q q≠0 0≤q ≅ frac r s s≠0 0≤s
 
 infix 4 _≅_
 
@@ -37,20 +38,23 @@ private
     1≠0 : ¬ (1ℤ =Z 0ℤ)
     1≠0 (z= ())
 
+ℤ-to-ℚ : ℤ → ℚ
+ℤ-to-ℚ x = frac x 1ℤ 1≠0 (z≤ 0≤)
+
 0ℚ : ℚ
-0ℚ = frac 0ℤ 1ℤ 1≠0
-1ℚ = frac 1ℤ 1ℤ 1≠0
--1ℚ = frac -1ℤ 1ℤ 1≠0
+0ℚ = ℤ-to-ℚ 0ℤ
+1ℚ = ℤ-to-ℚ 1ℤ
+-1ℚ = ℤ-to-ℚ -1ℤ
 
 private
     ≅-reflexive : Reflexive _≅_
-    ≅-reflexive (frac p q q≠0) = q= (reflexive-on ℤ (p *Z q))
+    ≅-reflexive (frac p q _ _) = q= (reflexive-on ℤ (p *Z q))
 
     ≅-symmetric : Symmetric _≅_
-    ≅-symmetric {frac p q q≠0} {frac r s s≠0} (q= eq) = q= (symmetric-on ℤ eq)
+    ≅-symmetric (q= eq) = q= (symmetric-on ℤ eq)
     
     ≅-transitive : Transitive _≅_
-    ≅-transitive {frac p q q≠0} {frac r s s≠0} {frac t u u≠0} (q= ps=rq) (q= ru=ts) = q= (cancel-left-multiplication-by-nonzero-on _*Z_ _+Z_ 1ℤ 0ℤ negZ s (p *Z u) (t *Z q) s≠0 (begin≅
+    ≅-transitive {frac p q _ _} {frac r s s≠0 _} {frac t u _ _} (q= ps=rq) (q= ru=ts) = q= (cancel-left-multiplication-by-nonzero-on _*Z_ _+Z_ 1ℤ 0ℤ negZ s (p *Z u) (t *Z q) s≠0 (begin≅
         s *Z (p *Z u)       ≅< a<bc>-to-c<ba>-on _*Z_ s p u >
         u *Z (p *Z s)       ≅< left-congruent-on _*Z_ ps=rq >
         u *Z (r *Z q)       ≅< a<bc>-to-c<ba>-on _*Z_ u r q >

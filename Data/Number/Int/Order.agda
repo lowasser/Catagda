@@ -34,12 +34,6 @@ private
     ≤-antisymmetric : Antisymmetric _≤_
     ≤-antisymmetric (z≤ x≤y) (z≤ y≤x) = z= (antisymmetric-order-on _≤N_ x≤y y≤x)
 
-    ≤-left-congruent : {x y z : ℤ} → x ≅ y → x ≤ z → y ≤ z
-    ≤-left-congruent x=y x≤z = ≤-transitive (≤-reflexive-equiv (symmetric-on ℤ x=y)) x≤z
-
-    ≤-right-congruent : {x y z : ℤ} → y ≅ z → x ≤ y → x ≤ z
-    ≤-right-congruent y=z x≤y = ≤-transitive x≤y (≤-reflexive-equiv y=z)
-
     ≤-trichotomy : (x y : ℤ) → Tri _≅_ _≤_ x y
     ≤-trichotomy (int px nx) (int py ny) with trichotomy-on _≤N_ (px ++ ny) (py ++ nx)
     ... | triL is< not= not> = triL (z≤ is<) helpeq helpgt
@@ -72,10 +66,10 @@ instance
     ≤-is-antisymmetric = record {antisymmetric = ≤-antisymmetric}
 
     ≤-partial-order : PartialOrder _≤_
-    ≤-partial-order = record {left-congruent-law = ≤-left-congruent; right-congruent-law = ≤-right-congruent}
+    ≤-partial-order = record {reflexive-equiv = ≤-reflexive-equiv}
 
     ≤-total-order : TotalOrder _≤_
     ≤-total-order = record {trichotomy = ≤-trichotomy}
 
 neg-swaps-order : {x y : ℤ} → x ≤ y → neg y ≤ neg x
-neg-swaps-order {int px nx} {int py ny} (z≤ pxny≤pynx) = z≤ (left-congruent-on-order _≤N_ (commute-on _++_ px ny) (right-congruent-on-order _≤N_ (commute-on _++_ py nx) pxny≤pynx))
+neg-swaps-order {int px nx} {int py ny} (z≤ pxny≤pynx) = z≤ (bi-congruent-order _≤N_ (commute-on _++_ ny px) (commute-on _++_ nx py) pxny≤pynx)

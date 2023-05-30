@@ -337,3 +337,18 @@ left-multiplication-nonnegative {x} {int py ny} {int pz nz} 0≤x (z≤ py+nz≤
                 n *N pz ++ n *N ny                              ≅< symmetric-on ℕ (left-distribute-on _*N_ _++_ n pz ny) >
                 n *N (pz ++ ny)                                 ∎) 
             (multiplication-preserves-≤ (reflexive-order-on _≤N_ n) py+nz≤pz+ny)))
+
+right-multiplication-nonnegative : {x y z : ℤ} → 0ℤ ≤ z → x ≤ y → x * z ≤ y * z
+right-multiplication-nonnegative {x} {y} {z} 0≤z x≤y = bi-congruent-order _≤_ (commute-on _*_ x z) (commute-on _*_ y z) (left-multiplication-nonnegative 0≤z x≤y)
+
+left-multiplication-negative : {x y z : ℤ} → x ≤ 0ℤ → y ≤ z → x * z ≤ x * y
+left-multiplication-negative {x} {y} {z} x≤0 y≤z = bi-congruent-order _≤_ (lemma x z) (lemma x y) 
+        (neg-swaps-order (left-multiplication-nonnegative {neg x} (neg-swaps-order x≤0) y≤z))
+    where   lemma : (a b : ℤ) → (a * b) ≅ neg (neg a * b)
+            lemma a b = symmetric-on ℤ (begin≅
+                neg (neg a * b)     ≅< symmetric-on ℤ (right-times-neg-on _*_ _+_ 1ℤ 0ℤ neg (neg a) b) >
+                neg a * neg b       ≅< neg-times-neg-on _*_ _+_ 1ℤ 0ℤ neg a b >
+                a * b               ∎)
+
+right-multiplication-negative : {x y z : ℤ} → z ≤ 0ℤ → x ≤ y → y * z ≤ x * z
+right-multiplication-negative {x} {y} {z} z≤0 x≤y = bi-congruent-order _≤_ (commute-on _*_ y z) (commute-on _*_ x z) (left-multiplication-negative z≤0 x≤y)

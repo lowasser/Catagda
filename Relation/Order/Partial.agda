@@ -25,11 +25,13 @@ record PartialOrder {A : Set ℓA} {{AS : Setoid ℓ=A A}} (_≤_ : Rel ℓ≤A 
     field
         {{is-preorder}} : PreOrder _≤_
         {{is-antisymmetric}} : IsAntisymmetric _≤_
-        left-congruent-law : {a1 a2 b : A} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
-        right-congruent-law : {a b1 b2 : A} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
-    
-    reflexive-equiv : {a b : A} → a ≅ b → a ≤ b
-    reflexive-equiv {a} a=b = right-congruent-law a=b (IsReflexive.reflexive (PreOrder.is-reflexive is-preorder) a)
+        reflexive-equiv : {a b : A} → a ≅ b → a ≤ b
+
+    left-congruent-law : {a1 a2 b : A} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
+    left-congruent-law a1=a2 a1≤b = IsTransitive.transitive (PreOrder.is-transitive is-preorder) (reflexive-equiv (symmetric-on A a1=a2)) a1≤b
+
+    right-congruent-law : {a b1 b2 : A} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
+    right-congruent-law b1=b2 a≤b1 = IsTransitive.transitive (PreOrder.is-transitive is-preorder) a≤b1 (reflexive-equiv b1=b2)
 
 open IsReflexive {{...}}
 open IsTransitive {{...}}
@@ -48,11 +50,11 @@ transitive-order-on _ = transitive
 antisymmetric-order-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → Antisymmetric _≤_
 antisymmetric-order-on _ = antisymmetric
 
-left-congruent-on-order : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a1 a2 b : A} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
-left-congruent-on-order _ = left-congruent-law
+right-congruent-on-order : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a1 a2 b : A} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
+right-congruent-on-order _ = left-congruent-law
 
-right-congruent-on-order : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a b1 b2 : A} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
-right-congruent-on-order _ = right-congruent-law
+left-congruent-on-order : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a b1 b2 : A} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
+left-congruent-on-order _ = right-congruent-law
 
 bi-congruent-order : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a1 a2 b1 b2 : A} → a1 ≅ a2 → b1 ≅ b2 → a2 ≤ b2 → a1 ≤ b1
-bi-congruent-order {_} {_} {_} {A} _≤_ a1=a2 b1=b2 a2≤b2 = left-congruent-on-order _≤_ (symmetric-on A a1=a2) (right-congruent-on-order _≤_ (symmetric-on A b1=b2) a2≤b2)
+bi-congruent-order {_} {_} {_} {A} _≤_ a1=a2 b1=b2 a2≤b2 = right-congruent-on-order _≤_ (symmetric-on A a1=a2) (left-congruent-on-order _≤_ (symmetric-on A b1=b2) a2≤b2)

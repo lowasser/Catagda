@@ -183,36 +183,31 @@ instance
     *-has-zero = record {left-zero = *-left-zero; right-zero = *-right-zero}
 
 data _≤_ : Rel lzero ℕ where
-    z≤ : { x : ℕ } → 0ℕ ≤ x
+    0≤ : { x : ℕ } → 0ℕ ≤ x
     s≤s : { x y : ℕ } → x ≤ y → suc x ≤ suc y
 
 infixr 6 _≤_
 
 private
     ≤-reflexive : Reflexive _≤_ 
-    ≤-reflexive 0ℕ = z≤
+    ≤-reflexive 0ℕ = 0≤
     ≤-reflexive (suc n) = s≤s (≤-reflexive n)
 
     ≤-transitive : Transitive _≤_
-    ≤-transitive z≤ _ = z≤ 
+    ≤-transitive 0≤ _ = 0≤ 
     ≤-transitive (s≤s x≤y) (s≤s y≤z) = s≤s (≤-transitive x≤y y≤z)
 
     ≤-antisymmetric : Antisymmetric _≤_
-    ≤-antisymmetric z≤ z≤ = 0ℕ=
+    ≤-antisymmetric 0≤ 0≤ = 0ℕ=
     ≤-antisymmetric (s≤s x≤y) (s≤s y≤x) = congruent-on suc (≤-antisymmetric x≤y y≤x)
 
-    ≤-left-congruent : {a1 a2 b : ℕ} → a1 ≅ a2 → a1 ≤ b → a2 ≤ b
-    ≤-left-congruent 0ℕ= z≤ = z≤
-    ≤-left-congruent (suc= a1=a2) (s≤s a1≤b) = s≤s (≤-left-congruent a1=a2 a1≤b)
-
-    ≤-right-congruent : {a b1 b2 : ℕ} → b1 ≅ b2 → a ≤ b1 → a ≤ b2
-    ≤-right-congruent 0ℕ= a≤b1 = a≤b1
-    ≤-right-congruent (suc= _) z≤ = z≤
-    ≤-right-congruent (suc= b1=b2) (s≤s a≤b1) = s≤s (≤-right-congruent b1=b2 a≤b1)
+    ≤-reflexive-equiv : {a b : ℕ} → a ≅ b → a ≤ b
+    ≤-reflexive-equiv 0ℕ= = 0≤
+    ≤-reflexive-equiv (suc= a=b) = s≤s (≤-reflexive-equiv a=b)
 
     ≤-compare : (m n : ℕ) → Either (m ≤ n) (n ≤ m)
-    ≤-compare 0ℕ _ = left z≤
-    ≤-compare _ 0ℕ = right z≤
+    ≤-compare 0ℕ _ = left 0≤
+    ≤-compare _ 0ℕ = right 0≤
     ≤-compare (suc m) (suc n) with ≤-compare m n
     ... | left m≤n      = left (s≤s m≤n)
     ... | right n≤m     = right (s≤s n≤m)
@@ -222,8 +217,8 @@ private
 
     ≤-trichotomy : (m n : ℕ) → Tri _≅_ _≤_ m n
     ≤-trichotomy 0ℕ 0ℕ = triE 0ℕ=
-    ≤-trichotomy 0ℕ (suc n) = triL z≤ (λ ()) (λ ())
-    ≤-trichotomy (suc m) 0ℕ = triG (λ ()) (λ ()) z≤
+    ≤-trichotomy 0ℕ (suc n) = triL 0≤ (λ ()) (λ ())
+    ≤-trichotomy (suc m) 0ℕ = triG (λ ()) (λ ()) 0≤
     ≤-trichotomy (suc m) (suc n) with ≤-trichotomy m n
     ... | triE m=n          = triE (suc= m=n)
     ... | triL m-le-n m≠n n-nle-m
@@ -245,21 +240,21 @@ instance
     ≤-pre-order = record {}
 
     ≤-partial-order : PartialOrder _≤_
-    ≤-partial-order = record { left-congruent-law = ≤-left-congruent ; right-congruent-law = ≤-right-congruent }
+    ≤-partial-order = record { reflexive-equiv = ≤-reflexive-equiv }
 
     ≤-total-order : TotalOrder _≤_
     ≤-total-order = record { trichotomy = ≤-trichotomy }
 
 private
     ≤-suc-rhs : (a b : ℕ) → a ≤ b → a ≤ suc b
-    ≤-suc-rhs 0ℕ _ z≤ = z≤
+    ≤-suc-rhs 0ℕ _ 0≤ = 0≤
     ≤-suc-rhs (suc a) (suc b) (s≤s a≤b) = s≤s (≤-suc-rhs a b a≤b)
 
 addition-preserves-≤ : {a b c d : ℕ} → a ≤ b → c ≤ d → (a + c) ≤ (b + d)
-addition-preserves-≤ {0ℕ} {b} {0ℕ} {d} z≤ _ = z≤
+addition-preserves-≤ {0ℕ} {b} {0ℕ} {d} 0≤ _ = 0≤
 addition-preserves-≤ (s≤s a≤b) c≤d = s≤s (addition-preserves-≤ a≤b c≤d)
-addition-preserves-≤ {0ℕ} {0ℕ} z≤ (s≤s c≤d) = s≤s c≤d
-addition-preserves-≤ {0ℕ} {suc b} {suc c} {suc d} z≤ (s≤s c≤d) = s≤s (addition-preserves-≤ z≤ (≤-suc-rhs c d c≤d))
+addition-preserves-≤ {0ℕ} {0ℕ} 0≤ (s≤s c≤d) = s≤s c≤d
+addition-preserves-≤ {0ℕ} {suc b} {suc c} {suc d} 0≤ (s≤s c≤d) = s≤s (addition-preserves-≤ 0≤ (≤-suc-rhs c d c≤d))
 
 cancel-left-+-≤ : (a b c : ℕ) → (a + b) ≤ (a + c) → b ≤ c
 cancel-left-+-≤ 0ℕ b c ab≤ac = ab≤ac
@@ -297,13 +292,13 @@ product-is-zero {_} {0ℕ} _ = right 0ℕ=
 -- compiler can prove no other cases
 
 ordering-to-subtraction : {a b : ℕ} → a ≤ b → Σ ℕ (λ c → a + c ≅ b)
-ordering-to-subtraction {0ℕ} {b} z≤ = b , reflexive-on ℕ b
+ordering-to-subtraction {0ℕ} {b} 0≤ = b , reflexive-on ℕ b
 ordering-to-subtraction {suc a} {suc b} (s≤s a≤b) with ordering-to-subtraction a≤b
 ... | c , eq    = c , suc= eq
 
 subtraction-to-ordering : {a b c : ℕ} → a + c ≅ b → a ≤ b
 subtraction-to-ordering {suc a} {suc b} {c} (suc= ac=b) = s≤s (subtraction-to-ordering ac=b)
-subtraction-to-ordering {0ℕ} _ = z≤
+subtraction-to-ordering {0ℕ} _ = 0≤
 
 multiplication-preserves-≤ : {a b c d : ℕ} → a ≤ b → c ≤ d → a * c ≤ b * d
 multiplication-preserves-≤ {a} {b} {c} {d} a≤b c≤d with ordering-to-subtraction a≤b | ordering-to-subtraction c≤d
@@ -316,7 +311,7 @@ multiplication-preserves-≤ {a} {b} {c} {d} a≤b c≤d with ordering-to-subtra
 
 cancel-right-multiplication-nonzero-≤ : {x y z : ℕ} → x * suc z ≤ y * suc z → x ≤ y
 cancel-right-multiplication-nonzero-≤ {x} {y} {0ℕ} x1≤y1 = bi-congruent-order _≤_ (symmetric-on ℕ (right-identity-on _*_ x)) (symmetric-on ℕ (right-identity-on _*_ y)) x1≤y1
-cancel-right-multiplication-nonzero-≤ {0ℕ} _ = z≤
+cancel-right-multiplication-nonzero-≤ {0ℕ} _ = 0≤
 cancel-right-multiplication-nonzero-≤ {x} {0ℕ} xsz≤ysz = reflexive-equiv-order-on _≤_ (cancel-right-multiplication-nonzero-≤-lemma xsz≤ysz)
     where   cancel-right-multiplication-nonzero-≤-lemma : {x y : ℕ} → x * suc y ≤ 0ℕ → x ≅ 0ℕ
             cancel-right-multiplication-nonzero-≤-lemma {0ℕ} _ = 0ℕ=
