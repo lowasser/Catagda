@@ -1,4 +1,4 @@
-module Data.Number.Real where
+module Data.Number.Real.Dedekind where
 
 open import Agda.Primitive
 open import Agda.Builtin.Sigma
