@@ -94,7 +94,7 @@ instance
     *-is-commutative = record { commute = *-commute }
 
     *-bicong : BiCongruent _*_
-    *-bicong = bi-congruent-commutative _*_ (λ {a b c} b=c → *-left-congruent {a} {b} {c} b=c)
+    *-bicong = bi-congruent-commute _*_ (λ {a b c} b=c → *-left-congruent {a} {b} {c} b=c)
 
     *-magma : Magma _*_
     *-magma = record {}

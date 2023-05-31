@@ -63,8 +63,8 @@ private
         b ∙ a2      ≅< commute-on _∙_ b a2 >
         a2 ∙ b      ∎
 
-bi-congruent-commutative : {A : Set ℓA} {B : Set ℓB} → {{SA : Setoid ℓ=A A}} → {{SC : Setoid ℓ=B B}} → (_∙_ : A → A → B) → {{IsCommutative _∙_}} → LeftCongruent _∙_ → BiCongruent _∙_
-bi-congruent-commutative _∙_ left-cong = record {left-congruent = left-cong; right-congruent = commute-congruent left-cong}
+bi-congruent-commute : {A : Set ℓA} {B : Set ℓB} → {{SA : Setoid ℓ=A A}} → {{SC : Setoid ℓ=B B}} → (_∙_ : A → A → B) → {{IsCommutative _∙_}} → LeftCongruent _∙_ → BiCongruent _∙_
+bi-congruent-commute _∙_ left-cong = record {left-congruent = left-cong; right-congruent = commute-congruent left-cong}
 
 Associate : { A : Set ℓA } → {{Setoid ℓ=A A}} → BinOp A → Set (ℓA ⊔ ℓ=A)
 Associate _∙_ = ∀ x y z → (x ∙ (y ∙ z)) ≅ ((x ∙ y) ∙ z)

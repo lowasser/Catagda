@@ -171,7 +171,7 @@ instance
     max-is-commutative = record {commute = max-commute}
 
     max-bi-congruent : BiCongruent max
-    max-bi-congruent = bi-congruent-commutative max λ {a} → max-left-congruent {a}
+    max-bi-congruent = bi-congruent-commute max λ {a} → max-left-congruent {a}
 
     max-magma : Magma max
     max-magma = record {}
@@ -253,7 +253,7 @@ instance
     min-is-commutative = record {commute = min-commute}
 
     min-bi-congruent : BiCongruent min
-    min-bi-congruent = bi-congruent-commutative min min-left-congruent
+    min-bi-congruent = bi-congruent-commute min min-left-congruent
 
     min-is-associative : IsAssociative min
     min-is-associative = record {associate = min-assoc}

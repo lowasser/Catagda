@@ -64,7 +64,7 @@ instance
     +-is-commutative = record {commute = +-commute}
 
     +-bi-congruent : BiCongruent _+_
-    +-bi-congruent = bi-congruent-commutative _+_ +-left-congruent
+    +-bi-congruent = bi-congruent-commute _+_ +-left-congruent
 
     +-magma : Magma _+_
     +-magma = record {}
