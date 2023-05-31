@@ -2,8 +2,9 @@ module Data.Number.Int.Addition where
 
 open import Data.Number.Int.Base
 open import Structure.Setoid
-open import Data.Number.Nat.Base renaming (_+_ to _++_; _≅_ to _=N_) hiding (+-bi-congruent; +-has-identity)
-open import Data.Number.Nat renaming (_≤_ to _≤N_) hiding (+-commutative-magma; +-commutative-semigroup; +-commutative-monoid)
+open import Data.Number.Nat.Base renaming (_≅_ to _=N_)
+open import Data.Number.Nat.Addition renaming (_+_ to _++_) hiding (+-bi-congruent; +-has-identity; +-commutative-magma; +-commutative-semigroup; +-commutative-monoid)
+open import Data.Number.Nat.Order renaming (_≤_ to _≤N_)
 open import Data.Number.Int.Order
 open import Function.Binary
 open import Structure.Setoid.Equation

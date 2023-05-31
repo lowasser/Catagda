@@ -1,8 +1,9 @@
 module Data.Number.Int.Order where
 
 open import Agda.Primitive
-open import Data.Number.Nat.Base renaming (_+_ to _++_; _≅_ to _=N_)
-open import Data.Number.Nat hiding (≤-is-reflexive; ≤-is-transitive; ≤-is-antisymmetric; ≤-partial-order; ≤-pre-order; ≤-total-order) 
+open import Data.Number.Nat.Base renaming (_≅_ to _=N_)
+open import Data.Number.Nat.Addition renaming (_+_ to _++_)
+open import Data.Number.Nat.Order hiding (≤-is-reflexive; ≤-is-transitive; ≤-is-antisymmetric; ≤-partial-order; ≤-pre-order; ≤-total-order) 
     renaming (_≤_ to _≤N_; cancel-left-+-≤ to cancel-left-+-≤N; addition-preserves-≤ to addition-preserves-≤N)
 open import Relation
 open import Relation.Properties

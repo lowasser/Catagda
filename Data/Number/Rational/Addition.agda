@@ -30,7 +30,7 @@ open import Structure.Algebraic.Group
 open import Structure.Algebraic.Group.Abelian
 open import Relation.Order.Partial
 open import Data.Number.Rational.Order
-open import Data.Number.Nat using (0≤)
+open import Data.Number.Nat.Order using (0≤)
 
 _+_ : BinOp ℚ
 frac p q q≠0 0≤q + frac r s s≠0 0≤s = frac (p *Z s +Z r *Z q) (q *Z s) qs≠0 

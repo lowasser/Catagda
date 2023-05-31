@@ -18,7 +18,7 @@ open import Structure.Algebraic.IntegralDomain
 open import Structure.Setoid.Equation
 open import Function.Binary.Properties
 open import Structure.Algebraic.Semigroup.Commutative
-open import Data.Number.Nat using (0≤)
+open import Data.Number.Nat.Order using (0≤)
 
 data _≤_ : Rel lzero ℚ where
     q≤ : {p q r s : ℤ} {q≠0 : ¬ (q =Z 0ℤ)} {0≤q : 0ℤ ≤Z q} {s≠0 : ¬ (s =Z 0ℤ)} {0≤s : 0ℤ ≤Z s} → (p *Z s) ≤Z (r *Z q) → frac p q q≠0 0≤q ≤ frac r s s≠0 0≤s

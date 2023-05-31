@@ -33,7 +33,7 @@ open import Structure.Algebraic.Field
 open import Relation.Order.Partial
 open import Relation.Order.Total
 open import Data.Number.Int.Order renaming (_≤_ to _≤Z_)
-open import Data.Number.Nat using (0≤)
+open import Data.Number.Nat.Order using (0≤)
 open import Data.Number.Rational.Order
 
 _*_ : BinOp ℚ

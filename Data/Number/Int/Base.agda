@@ -2,8 +2,9 @@ module Data.Number.Int.Base where
 
 open import Agda.Primitive
 open import Agda.Builtin.Sigma
-open import Data.Number.Nat.Base renaming (_+_ to _++_; _≅_ to _=N_)
-open import Data.Number.Nat
+open import Data.Number.Nat.Base renaming (_≅_ to _=N_)
+open import Data.Number.Nat.Order
+open import Data.Number.Nat.Addition renaming (_+_ to _++_)
 open import Relation
 open import Relation.Properties
 open import Structure.Setoid

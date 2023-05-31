@@ -2,10 +2,12 @@ module Data.Number.Int.Multiplication where
 
 open import Agda.Primitive
 open import Agda.Builtin.Sigma
-open import Data.Number.Nat.Base renaming (_+_ to _++_; _≅_ to _=N_)
-open import Data.Number.Nat
+open import Data.Number.Nat.Base renaming (_≅_ to _=N_)
+open import Data.Number.Nat.Addition renaming (_+_ to _++_)
+open import Data.Number.Nat.Multiplication
     hiding (*-magma; *-is-commutative; *-commutative-magma; *-is-associative; *-semigroup; *-commutative-semigroup; *-has-identity; *-monoid; *-commutative-monoid; *-ringoid; product-is-zero)
-    renaming (_*_ to _*N_; _≤_ to _≤N_)
+    renaming (_*_ to _*N_)
+open import Data.Number.Nat.Order renaming (_≤_ to _≤N_)
 open import Data.Number.Int.Base
 open import Data.Number.Int.Addition
 open import Data.Number.Int.Order

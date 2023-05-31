@@ -5,8 +5,10 @@ open import Agda.Builtin.Sigma
 open import Data.Number.Int.Base renaming (_≅_ to _=Z_; neg to negZ; abs to absZ)
 open import Data.Number.Int.Addition renaming (_+_ to _+Z_)
 open import Data.Number.Int.Multiplication renaming (_*_ to _*Z_)
-open import Data.Number.Nat.Base renaming (_≅_ to _=N_; _+_ to _+N_)
-open import Data.Number.Nat renaming (_*_ to _*N_)
+open import Data.Number.Nat.Base renaming (_≅_ to _=N_)
+open import Data.Number.Nat.Addition renaming (_+_ to _+N_)
+open import Data.Number.Nat.Multiplication renaming (_*_ to _*N_)
+open import Data.Number.Nat.Order using (0≤)
 open import Data.Number.Int.Order renaming (_≤_ to _≤Z_)
 open import Function.Binary
 open import Function.Binary.Properties
