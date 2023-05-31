@@ -46,6 +46,9 @@ private
 1ℚ = ℤ-to-ℚ 1ℤ
 -1ℚ = ℤ-to-ℚ -1ℤ
 
+-1≠0ℚ : ¬ (-1ℚ ≅ 0ℚ)
+-1≠0ℚ (q= eq) = -1≠0ℤ eq
+
 private
     ≅-reflexive : Reflexive _≅_
     ≅-reflexive (frac p q _ _) = q= (reflexive-on ℤ (p *Z q))

@@ -58,3 +58,6 @@ left-congruent-on-order _ = right-congruent-law
 
 bi-congruent-order : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a1 a2 b1 b2 : A} → a1 ≅ a2 → b1 ≅ b2 → a2 ≤ b2 → a1 ≤ b1
 bi-congruent-order {_} {_} {_} {A} _≤_ a1=a2 b1=b2 a2≤b2 = right-congruent-on-order _≤_ (symmetric-on A a1=a2) (left-congruent-on-order _≤_ (symmetric-on A b1=b2) a2≤b2)
+
+between-equal-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (_≤_ : Rel ℓ≤A A) → {{PO : PartialOrder _≤_}} → {a b c : A} → a ≤ b → b ≤ c → a ≅ c → b ≅ c
+between-equal-on _≤_ {a} {b} {c} a≤b b≤c a=c = antisymmetric-order-on _≤_ b≤c (right-congruent-on-order _≤_ a=c a≤b)

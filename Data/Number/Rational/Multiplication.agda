@@ -3,8 +3,8 @@ module Data.Number.Rational.Multiplication where
 open import Agda.Primitive
 open import Agda.Builtin.Sigma
 open import Data.Number.Int.Base renaming (_≅_ to _=Z_; neg to negZ)
-open import Data.Number.Int.Addition renaming (_+_ to _+Z_)
-open import Data.Number.Int.Multiplication renaming (_*_ to _*Z_)
+open import Data.Number.Int.Addition renaming (_+_ to _+Z_; left-+-preserves-≤ to left-+-preserves-≤N)
+open import Data.Number.Int.Multiplication renaming (_*_ to _*Z_; *-nonnegative to *Z-nonnegative)
     hiding (*-bi-congruent; *-is-commutative; *-magma; *-commutative-magma; *-is-associative; *-semigroup; *-commutative-semigroup; *-has-identity; *-monoid; *-commutative-monoid;
             *-+-ringoid; *-+-ring; *-+-commutative-ring)
 open import Function.Binary
@@ -33,6 +33,8 @@ open import Structure.Algebraic.Field
 open import Relation.Order.Partial
 open import Relation.Order.Total
 open import Data.Number.Int.Order renaming (_≤_ to _≤Z_)
+open import Data.Number.Nat using (0≤)
+open import Data.Number.Rational.Order
 
 _*_ : BinOp ℚ
 frac p q q≠0 0≤q * frac r s s≠0 0≤s = frac (p *Z r) (q *Z s) qs≠0 (right-congruent-on-order _≤Z_ (right-zero-on _*Z_ 0ℤ q) (left-multiplication-nonnegative 0≤q 0≤s))
@@ -160,3 +162,111 @@ instance
 
     ℚ-field : Field _*_ _+_ 1ℚ 0ℚ recip neg
     ℚ-field = record {left-multiplicative-inverse = recip-left-inverse}
+
+
+private
+    2ℤ : ℤ
+    2ℤ = 1ℤ +Z 1ℤ
+
+    1/2ℚ : ℚ
+    1/2ℚ = frac 1ℤ 2ℤ 2≠0 (z≤ 0≤) where
+        2≠0 : ¬ (2ℤ =Z 0ℤ)
+        2≠0 (z= ())
+
+right-positive-*-≤ : {p q r : ℚ} → 0ℚ ≤ r → ¬ (r ≅ 0ℚ) → p ≤ q → p * r ≤ q * r
+right-positive-*-≤ {frac a b b≠0 0≤b} {frac c d d≠0 0≤d} {frac e f f≠0 0≤f} (q≤ 0f≤e1) r≠0 (q≤ ad≤cb) = q≤ 
+        (bi-congruent-order _≤Z_ (<ab><cd>-to-<bd><ac>-on _*Z_ a e d f) (<ab><cd>-to-<bd><ac>-on _*Z_ c e b f) (left-multiplication-nonnegative 0≤ef ad≤cb)) where
+    0≤e : 0ℤ ≤Z e
+    0≤e = bi-congruent-order _≤Z_ (symmetric-on ℤ (left-zero-on _*Z_ 0ℤ f)) (symmetric-on ℤ (right-identity-on _*Z_ e)) 0f≤e1
+
+    e≠0 : ¬ (e =Z 0ℤ)
+    e≠0 e=0 = r≠0 (q= (begin≅
+            e *Z 1ℤ     ≅< right-congruent-on _*Z_ e=0 >
+            0ℤ          ≅< symmetric-on ℤ (left-zero-on _*Z_ 0ℤ f) >
+            0ℤ *Z f     ∎))
+
+    0≤ef : 0ℤ ≤Z e *Z f
+    0≤ef = *Z-nonnegative 0≤e 0≤f
+
+    ef≠0 : ¬ (e *Z f =Z 0ℤ)
+    ef≠0 ef=0 = f≠0 (cancel-left-multiplication-by-nonzero-on _*Z_ _+Z_ 1ℤ 0ℤ negZ e f 0ℤ e≠0 (transitive-on ℤ ef=0 (symmetric-on ℤ (right-zero-on _*Z_ 0ℤ e))))
+
+avg : ℚ → ℚ → ℚ
+avg p q = (p + q) * 1/2ℚ
+
+avg-self : (p : ℚ) → p ≅ avg p p
+avg-self (frac p q q≠0 0≤q) = q= (begin≅
+    p *Z ((q *Z q) *Z 2ℤ)       ≅< left-congruent-on _*Z_ (left-distribute-on _*Z_ _+Z_ (q *Z q) 1ℤ 1ℤ) >
+    p *Z ((q *Z q) *Z 1ℤ +Z (q *Z q) *Z 1ℤ)
+                                ≅< left-congruent-on _*Z_ (bi-congruent _+Z_ (right-identity-on _*Z_ (q *Z q)) (right-identity-on _*Z_ (q *Z q))) >
+    p *Z (q *Z q +Z q *Z q)     ≅< left-congruent-on _*Z_ (symmetric-on ℤ (right-distribute-on _*Z_ _+Z_ q q q)) >
+    p *Z ((q +Z q) *Z q)        ≅< left-associate-on _*Z_ p (q +Z q) q >
+    (p *Z (q +Z q)) *Z q        ≅< right-congruent-on _*Z_ (left-distribute-on _*Z_ _+Z_ p q q) >
+    (p *Z q +Z p *Z q) *Z q     ≅< right-congruent-on _*Z_ (symmetric-on ℤ (right-identity-on _*Z_ (p *Z q +Z p *Z q))) >
+    ((p *Z q +Z p *Z q) *Z 1ℤ) *Z q
+                                ∎)
+
+private
+    -1/2≠0ℚ : ¬ (1/2ℚ ≅ 0ℚ)
+    -1/2≠0ℚ (q= (z= ()))
+
+    2ℚ : ℚ
+    2ℚ = ℤ-to-ℚ (1ℤ +Z 1ℤ)
+
+    2≠0ℚ : ¬ (2ℚ ≅ 0ℚ)
+    2≠0ℚ (q= (z= ()))
+
+    avg-≤-right : (p q r : ℚ) → q ≤ r → avg p q ≤ avg p r
+    avg-≤-right p q r q≤r = right-positive-*-≤ {p + q} {p + r} {1/2ℚ} (q≤ (z≤ 0≤)) -1/2≠0ℚ (left-+-preserves-≤ p q≤r)  
+
+avg-commute : (p q : ℚ) → avg p q ≅ avg q p
+avg-commute p q = right-congruent-on _*_ (commute-on _+_ p q)
+
+private
+    avg-≤-left : (p q r : ℚ) → p ≤ q → avg p r ≤ avg q r
+    avg-≤-left p q r p≤q = bi-congruent-order _≤_ (avg-commute p r) (avg-commute q r) (avg-≤-right r p q p≤q)
+
+avg-above-lower : (p q : ℚ) → p ≤ q → p ≤ avg p q
+avg-above-lower p q p≤q = right-congruent-on-order _≤_ (symmetric-on ℚ (avg-self p)) (avg-≤-right p p q p≤q)
+
+avg-below-higher : (p q : ℚ) → p ≤ q → avg p q ≤ q
+avg-below-higher p q p≤q = left-congruent-on-order _≤_ (symmetric-on ℚ (avg-self q)) (avg-≤-left p q q p≤q)
+
+avg-left-injective : (p : ℚ) → Injective (avg p)
+avg-left-injective p {q} {r} avgpq=avgpr = begin≅
+    q                       ≅< symmetric-on ℚ (right-identity-on _*_ q) >
+    q * 1ℚ                  ≅< left-congruent-on _*_ (symmetric-on ℚ (recip-left-inverse 2ℚ 2≠0ℚ)) >
+    q * (x * 2ℚ)            ≅< left-congruent-on _*_ {q} (right-congruent-on _*_ {2ℚ} x=1/2) >
+    q * (1/2ℚ * 2ℚ)         ≅< right-congruent-on _*_ (symmetric-on ℚ (left-identity-on _+_ q)) >
+    (0ℚ + q) * (1/2ℚ * 2ℚ)  ≅< right-congruent-on _*_ (right-congruent-on _+_ (symmetric-on ℚ (left-inverse-on _+_ 0ℚ neg p))) >
+    ((neg p + p) + q) * (1/2ℚ * 2ℚ)
+                            ≅< right-congruent-on _*_ (right-associate-on _+_ (neg p) p q) >
+    (neg p + (p + q)) * (1/2ℚ * 2ℚ)
+                            ≅< right-distribute-on _*_ _+_ (neg p) (p + q) (1/2ℚ * 2ℚ) >
+    neg p * (1/2ℚ * 2ℚ) + (p + q) * (1/2ℚ * 2ℚ)
+                            ≅< left-congruent-on _+_ (left-associate-on _*_ (p + q) 1/2ℚ 2ℚ) >
+    neg p * (1/2ℚ * 2ℚ) + ((p + q) * 1/2ℚ) * 2ℚ
+                            ≅< left-congruent-on _+_ (right-congruent-on _*_ avgpq=avgpr) >
+    neg p * (1/2ℚ * 2ℚ) + ((p + r) * 1/2ℚ) * 2ℚ
+                            ≅< left-congruent-on _+_ (right-associate-on _*_ (p + r) 1/2ℚ 2ℚ) >
+    neg p * (1/2ℚ * 2ℚ) + (p + r) * (1/2ℚ * 2ℚ)
+                            ≅< symmetric-on ℚ (right-distribute-on _*_ _+_ (neg p) (p + r) (1/2ℚ * 2ℚ)) >
+    (neg p + (p + r)) * (1/2ℚ * 2ℚ)
+                            ≅< bi-congruent _*_ (left-associate-on _+_ (neg p) p r) (right-congruent-on _*_ {2ℚ} (symmetric-on ℚ x=1/2)) >
+    ((neg p + p) + r) * (x * 2ℚ)
+                            ≅< bi-congruent _*_ (right-congruent-on _+_ (left-inverse-on _+_ 0ℚ neg p)) (recip-left-inverse 2ℚ 2≠0ℚ) >
+    (0ℚ + r) * 1ℚ           ≅< right-identity-on _*_ (0ℚ + r) >
+    0ℚ + r                  ≅< left-identity-on _+_ r >
+    r                       ∎
+    where   x : ℚ
+            x = recip 2ℚ 2≠0ℚ
+
+            x=1/2 : x ≅ 1/2ℚ
+            x=1/2 = q= (reflexive-on ℤ (1ℤ +Z 1ℤ))
+
+avg-right-injective : (p : ℚ) → Injective (λ q → avg q p)
+avg-right-injective p {q} {r} avgqp=avgrp = avg-left-injective p (begin≅
+    avg p q     ≅< avg-commute p q >
+    avg q p     ≅< avgqp=avgrp >
+    avg r p     ≅< avg-commute r p >
+    avg p r     ∎)

@@ -39,6 +39,12 @@ open Setoid {{...}}
         (d ∙ a) ∙ (b ∙ c)       ≅< right-congruent-on _∙_ (commute-on _∙_ d a) >
         (a ∙ d) ∙ (b ∙ c)       ∎
 
+<ab><cd>-to-<bc><ad>-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c d : S) → ((a ∙ b) ∙ (c ∙ d)) ≅ ((b ∙ c) ∙ (a ∙ d))
+<ab><cd>-to-<bc><ad>-on _∙_ a b c d = begin≅
+        (a ∙ b) ∙ (c ∙ d)       ≅< <ab><cd>-to-<ad><bc>-on _∙_ a b c d >
+        (a ∙ d) ∙ (b ∙ c)       ≅< commute-on _∙_ (a ∙ d) (b ∙ c) >
+        (b ∙ c) ∙ (a ∙ d)       ∎
+
 <ab><cd>-to-<ad><cb>-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c d : S) → ((a ∙ b) ∙ (c ∙ d)) ≅ ((a ∙ d) ∙ (c ∙ b))
 <ab><cd>-to-<ad><cb>-on _∙_ a b c d = begin≅
         (a ∙ b) ∙ (c ∙ d)       ≅< <ab><cd>-to-<ad><bc>-on _∙_ a b c d >
@@ -129,3 +135,9 @@ a<bc>-to-<ac>b-on _∙_ a b c = begin≅
     (b ∙ (c ∙ d)) ∙ a           ≅< right-congruent-on _∙_ (left-associate-on _∙_ b c d) >
     ((b ∙ c) ∙ d) ∙ a           ≅< right-associate-on _∙_ (b ∙ c) d a >
     (b ∙ c) ∙ (d ∙ a)           ∎
+
+<ab><cd>-to-<bd><ac>-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c d : S) → (a ∙ b) ∙ (c ∙ d) ≅ (b ∙ d) ∙ (a ∙ c)
+<ab><cd>-to-<bd><ac>-on _∙_ a b c d = begin≅
+    (a ∙ b) ∙ (c ∙ d)           ≅< <ab><cd>-to-<ac><bd>-on _∙_ a b c d >
+    (a ∙ c) ∙ (b ∙ d)           ≅< commute-on _∙_ (a ∙ c) (b ∙ d) >
+    (b ∙ d) ∙ (a ∙ c)           ∎

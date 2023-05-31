@@ -12,6 +12,7 @@ open import Function.Binary.Properties
 open import Function.Properties
 open import Function.Unary.Properties
 open import Structure.Algebraic.Semigroup.Commutative
+open import Logic
 
 data ℤ : Set where 
     int : ℕ → ℕ → ℤ
@@ -27,6 +28,9 @@ data _≅_ : Rel lzero ℤ where
     z= : { px nx py ny : ℕ } → (px ++ ny) =N (py ++ nx) → int px nx ≅ int py ny
 
 infix 4 _≅_
+
+-1≠0ℤ : ¬ (-1ℤ ≅ 0ℤ)
+-1≠0ℤ (z= ())
 
 private
     reflexive : Reflexive _≅_

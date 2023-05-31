@@ -352,3 +352,6 @@ left-multiplication-negative {x} {y} {z} x≤0 y≤z = bi-congruent-order _≤_ 
 
 right-multiplication-negative : {x y z : ℤ} → z ≤ 0ℤ → x ≤ y → y * z ≤ x * z
 right-multiplication-negative {x} {y} {z} z≤0 x≤y = bi-congruent-order _≤_ (commute-on _*_ y z) (commute-on _*_ x z) (left-multiplication-negative z≤0 x≤y)
+
+*-nonnegative : {x y : ℤ} → 0ℤ ≤ x → 0ℤ ≤ y → 0ℤ ≤ (x * y)
+*-nonnegative {x} 0≤x 0≤y = right-congruent-on-order _≤_ (right-zero-on _*_ 0ℤ x) (left-multiplication-nonnegative 0≤x 0≤y) 

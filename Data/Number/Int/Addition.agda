@@ -4,6 +4,7 @@ open import Data.Number.Int.Base
 open import Structure.Setoid
 open import Data.Number.Nat.Base renaming (_+_ to _++_; _≅_ to _=N_) hiding (+-bi-congruent; +-has-identity)
 open import Data.Number.Nat renaming (_≤_ to _≤N_) hiding (+-commutative-magma; +-commutative-semigroup; +-commutative-monoid)
+open import Data.Number.Int.Order
 open import Function.Binary
 open import Structure.Setoid.Equation
 open import Structure.Algebraic.Semigroup.Commutative
@@ -16,6 +17,7 @@ open import Structure.Algebraic.Monoid
 open import Structure.Algebraic.Monoid.Commutative
 open import Structure.Algebraic.Group
 open import Structure.Algebraic.Group.Abelian
+open import Relation.Order.Partial
 
 _+_ : BinOp ℤ
 int px nx + int py ny = int (px ++ py) (nx ++ ny)
@@ -103,3 +105,10 @@ instance
 
     +-abelian-group : AbelianGroup _+_ 0ℤ neg
     +-abelian-group = record {}
+
+left-+-preserves-≤ : (a : ℤ) → {b c : ℤ} → b ≤ c → a + b ≤ a + c
+left-+-preserves-≤ (int pa na) {int pb nb} {int pc nc} (z≤ pbnc≤pcnb) = z≤ 
+    (bi-congruent-order _≤N_ 
+        (<ab><cd>-to-<ac><bd>-on _++_ pa pb na nc) 
+        (<ab><cd>-to-<ac><bd>-on _++_ pa pc na nb) 
+        (addition-preserves-≤ (reflexive-order-on _≤N_ (pa ++ na)) pbnc≤pcnb))

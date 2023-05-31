@@ -2,10 +2,10 @@
 module Data.Number.Rational.Addition where
 
 open import Data.Number.Int.Base renaming (_≅_ to _=Z_; neg to negZ) hiding (neg-is-congruent)
-open import Data.Number.Int.Addition renaming (_+_ to _+Z_)
+open import Data.Number.Int.Addition renaming (_+_ to _+Z_; left-+-preserves-≤ to left-+-preserves-≤Z)
     hiding (+-is-commutative; +-magma; +-commutative-magma; +-bi-congruent; +-is-associative; +-semigroup; +-commutative-semigroup; +-has-identity; +-monoid; +-commutative-monoid;
             +-has-inverse; +-group; +-abelian-group)
-open import Data.Number.Int.Multiplication renaming (_*_ to _*Z_)
+open import Data.Number.Int.Multiplication renaming (_*_ to _*Z_;  *-nonnegative to *Z-nonnegative)
 open import Data.Number.Int.Order renaming (_≤_ to _≤Z_)
 open import Function.Binary
 open import Function.Binary.Properties
@@ -29,6 +29,8 @@ open import Structure.Algebraic.Ringoid
 open import Structure.Algebraic.Group
 open import Structure.Algebraic.Group.Abelian
 open import Relation.Order.Partial
+open import Data.Number.Rational.Order
+open import Data.Number.Nat using (0≤)
 
 _+_ : BinOp ℚ
 frac p q q≠0 0≤q + frac r s s≠0 0≤s = frac (p *Z s +Z r *Z q) (q *Z s) qs≠0 
@@ -37,6 +39,8 @@ frac p q q≠0 0≤q + frac r s s≠0 0≤s = frac (p *Z s +Z r *Z q) (q *Z s) q
             qs≠0 qs=0 with product-is-zero-one-is-zero-on _*Z_ _+Z_ 1ℤ 0ℤ negZ q s qs=0
             ... | left q=0  = q≠0 q=0
             ... | right s=0 = s≠0 s=0
+
+infixr 9 _+_
 
 neg : ℚ → ℚ
 neg (frac p q q≠0 0≤q) = frac (negZ p) q q≠0 0≤q
@@ -143,3 +147,20 @@ instance
 
     +-abelian-group : AbelianGroup _+_ 0ℚ neg
     +-abelian-group = record {}
+
+left-+-preserves-≤ : (x : ℚ) → {y z : ℚ} → y ≤ z → x + y ≤ x + z
+left-+-preserves-≤ (frac p q q≠0 0≤q) {frac r s s≠0 0≤s} {frac t u u≠0 0≤u} (q≤ ru≤ts) = q≤ 
+    (bi-congruent-order _≤Z_ 
+        (begin≅
+            (p *Z s +Z r *Z q) *Z (q *Z u)      ≅< right-distribute-on _*Z_ _+Z_ (p *Z s) (r *Z q) (q *Z u) >
+            (p *Z s) *Z (q *Z u) +Z (r *Z q) *Z (q *Z u)
+                                                ≅< left-congruent-on _+Z_ (<ab><cd>-to-<bc><ad>-on _*Z_ r q q u) >
+            (p *Z s) *Z (q *Z u) +Z (q *Z q) *Z (r *Z u)
+                                                ∎) 
+        (begin≅
+            (p *Z u +Z t *Z q) *Z (q *Z s)      ≅< right-distribute-on _*Z_ _+Z_ (p *Z u) (t *Z q) (q *Z s) >
+            (p *Z u) *Z (q *Z s) +Z (t *Z q) *Z (q *Z s)
+                                                ≅< bi-congruent _+Z_ (<ab><cd>-to-<ad><cb>-on _*Z_ p u q s) (<ab><cd>-to-<bc><ad>-on _*Z_ t q q s) >
+            (p *Z s) *Z (q *Z u) +Z (q *Z q) *Z (t *Z s)
+                                                ∎) 
+        (left-+-preserves-≤Z ((p *Z s) *Z (q *Z u)) (left-multiplication-nonnegative {q *Z q} (*Z-nonnegative 0≤q 0≤q) ru≤ts)))

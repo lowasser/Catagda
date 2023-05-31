@@ -13,3 +13,6 @@ infix 3 _≡_
 
 ≡-sym : {ℓA : Level} {A : Set ℓA} {x y : A} → x ≡ y → y ≡ x
 ≡-sym refl = refl
+
+≡-trans : {ℓA : Level} {A : Set ℓA} {x y z : A} → x ≡ y → y ≡ z → x ≡ z
+≡-trans refl refl = refl
