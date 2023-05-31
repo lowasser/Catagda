@@ -8,7 +8,7 @@ open import Relation.Properties
 open import Relation.Equivalence.Structural
 open import Data.Number.Rational renaming (_≅_ to _=Q_)
 open import Data.Number.Rational.Addition renaming (_+_ to _+Q_; neg to negQ)
-open import Data.Number.Rational.Order renaming (_≤_ to _≤Q_)
+open import Data.Number.Rational.Order renaming (_≤_ to _≤Q_) hiding (≤-is-reflexive; ≤-pre-order; ≤-is-transitive; ≤-partial-order; ≤-is-antisymmetric)
 open import Data.Number.Rational.Multiplication renaming (_*_ to _*Q)
 open import Logic
 open import Structure.Setoid
@@ -29,21 +29,27 @@ record ℝ : Set where
 
 open ℝ
 
-data _≅_ : Rel lzero ℝ where
-    r= : (x y : ℝ) → ((q : ℚ) → ℝ.is-less x q ≡ ℝ.is-less y q) → x ≅ y
-
 data _≤_ : Rel lzero ℝ where
     r≤ : (x y : ℝ) → ((q : ℚ) → ℝ.is-less x q ≡ true → ℝ.is-less y q ≡ true) → x ≤ y
 
+data _≅_ : Rel lzero ℝ where
+    r= : {x y : ℝ} → x ≤ y → y ≤ x → x ≅ y
+
 private
+    ≤-reflexive : Reflexive _≤_
+    ≤-reflexive x = r≤ x x λ _ eq → eq
+
+    ≤-transitive : Transitive _≤_
+    ≤-transitive (r≤ x y <x→<y) (r≤ y z <y→<z) = r≤ x z λ q eq → <y→<z q (<x→<y q eq)
+
     ≅-reflexive : Reflexive _≅_
-    ≅-reflexive x = r= x x (λ _ → refl)
+    ≅-reflexive x = r= (≤-reflexive x) (≤-reflexive x)
 
     ≅-symmetric : Symmetric _≅_
-    ≅-symmetric (r= x y xq=yq) = r= y x (λ q → ≡-sym (xq=yq q))
+    ≅-symmetric (r= x≤y y≤x) = r= y≤x x≤y
 
     ≅-transitive : Transitive _≅_
-    ≅-transitive (r= x y xq=yq) (r= y z yq=zq) = r= x z (λ q → ≡-trans (xq=yq q) (yq=zq q))
+    ≅-transitive (r= x≤y y≤x) (r= y≤z z≤y) = r= (≤-transitive x≤y y≤z) (≤-transitive z≤y y≤x)
 
 instance
     ℝ-setoid : Setoid lzero ℝ
@@ -115,4 +121,22 @@ instance
             avg p q     ≅< avgpq=q >
             q           ≅< avg-self q >
             avg q q     ∎)))
-    ... | triL p≤q p≠q _ | refl | triG _ q≠avgpq q≤avgpq = contradiction-implies-anything (q≠avgpq (antisymmetric-order-on _≤Q_ (avg-below-higher p q p≤q) q≤avgpq ))
+    ... | triL p≤q p≠q _ | refl | triG _ q≠avgpq q≤avgpq = contradiction-implies-anything (q≠avgpq (antisymmetric-order-on _≤Q_ (avg-below-higher p q p≤q) q≤avgpq))
+
+instance
+    ≤-is-reflexive : IsReflexive _≤_
+    ≤-is-reflexive = record {reflexive = ≤-reflexive}
+
+    ≤-is-transitive : IsTransitive _≤_ 
+    ≤-is-transitive = record {transitive = ≤-transitive}
+
+    ≤-is-antisymmetric : IsAntisymmetric _≤_
+    ≤-is-antisymmetric = record {antisymmetric = r=}
+
+    ≤-pre-order : PreOrder _≤_
+    ≤-pre-order = record {}
+
+    ≤-partial-order : PartialOrder _≤_
+    ≤-partial-order = record {reflexive-equiv = ≤-reflexive-equiv} where
+        ≤-reflexive-equiv : {p q : ℝ} → p ≅ q → p ≤ q
+        ≤-reflexive-equiv (r= p≤q _) = p≤q
