@@ -130,10 +130,13 @@ record HasZero {A : Set ℓA} {{SA : Setoid ℓ=A A}} (_∙_ : BinOp A) (z : A) 
         left-zero : LeftZero _∙_ z
         right-zero : RightZero _∙_ z
 
+has-zero-commute : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → {_∙_ : BinOp A} → {z : A} → {{C : IsCommutative _∙_}} → LeftZero _∙_ z → HasZero _∙_ z
+has-zero-commute {_} {_} {A} {_∙_} {z} lz = record {left-zero = lz; right-zero = λ x → transitive-on A (commute-on _∙_ x z) (lz x)}
+
 left-zero-on :{A : Set ℓA} → {{S : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (z : A) → {{HZ : HasZero _∙_ z}} → LeftZero _∙_ z
 left-zero-on _ _ {{HZ}} = HasZero.left-zero HZ
 
-right-zero-on :{A : Set ℓA} → {{S : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (z : A) → {{HZ : HasZero _∙_ z}} → RightZero _∙_ z
+right-zero-on : {A : Set ℓA} → {{S : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (z : A) → {{HZ : HasZero _∙_ z}} → RightZero _∙_ z
 right-zero-on _ _ {{HZ}} = HasZero.right-zero HZ
 
 LeftInverse : {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (id : A) → {{HasIdentity _∙_ id}} → (A → A) → Set (ℓA ⊔ ℓ=A)
@@ -186,4 +189,4 @@ left-injective-on _ = left-injective
 right-injective-on : {A : Set ℓA} {B : Set ℓB} {C : Set ℓC} →
      {{SA : Setoid ℓ=A A}} → {{SB : Setoid ℓ=B B}} → {{SC : Setoid ℓ=C C}} →
      (_∙_ : A → B → C) → {{BI : BiInjective _∙_}} → (b : B) → Injective (_∙ b)
-right-injective-on _ = right-injective
+right-injective-on _ = right-injective 

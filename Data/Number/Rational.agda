@@ -2,7 +2,7 @@ module Data.Number.Rational where
 
 open import Agda.Primitive
 open import Agda.Builtin.Sigma
-open import Data.Number.Int.Base renaming (_≅_ to _=Z_; neg to negZ)
+open import Data.Number.Int.Base renaming (_≅_ to _=Z_; neg to negZ; abs to absZ)
 open import Data.Number.Int.Addition renaming (_+_ to _+Z_)
 open import Data.Number.Int.Multiplication renaming (_*_ to _*Z_)
 open import Data.Number.Nat.Base renaming (_≅_ to _=N_; _+_ to _+N_)
@@ -68,3 +68,6 @@ private
 instance
     ℚ-setoid : Setoid lzero ℚ
     ℚ-setoid = make-setoid _≅_ ≅-reflexive ≅-transitive ≅-symmetric
+
+abs : ℚ → ℚ
+abs (frac p q q≠0 0≤q) = frac (absZ p) q q≠0 0≤q

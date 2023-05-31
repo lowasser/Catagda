@@ -113,3 +113,29 @@ canonicalize (int n 0ℕ) = nonneg n , reflexive-on ℤ (int n 0ℕ)
 canonicalize (int 0ℕ (suc n)) = negsuc n , reflexive-on ℤ (int 0ℕ (suc n))
 canonicalize (int (suc p) (suc n)) with canonicalize (int p n)
 ... | pnz , eq  = pnz , transitive-on ℤ (sub-both p n) eq
+
+absℕ : ℤ → ℕ
+absℕ (int 0ℕ b) = b
+absℕ (int a 0ℕ) = a
+absℕ (int (suc a) (suc b)) = absℕ (int a b)
+
+abs : ℤ → ℤ
+abs (int a b) = int (max a b) (min a b)
+
+abs=ℕ : (x : ℤ) → ℕ-to-ℤ (absℕ x) ≅ abs x
+abs=ℕ (int 0ℕ b) = z= (begin≅
+    absℕ (int 0ℕ b) ++ min 0ℕ b     ≅<>
+    b ++ 0ℕ                         ≅< right-congruent-on _++_ (symmetric-on ℕ (left-identity-on max b)) >
+    max 0ℕ b ++ 0ℕ                  ∎)
+abs=ℕ (int (suc a) 0ℕ) = z= (begin≅
+    absℕ (ℕ-to-ℤ (suc a)) ++ min (suc a) 0ℕ     ≅<>
+    suc a ++ min (suc a) 0ℕ                     ≅< left-congruent-on _++_ (right-zero-on min 0ℕ (suc a)) >
+    max (suc a) 0ℕ ++ 0ℕ                        ∎)
+abs=ℕ (int (suc a) (suc b)) with abs=ℕ (int a b)
+... | z= absab+minab=maxab+0 = z= (begin≅
+        absℕ (int a b) ++ suc (min a b)     ≅< a<bc>-to-b<ac>-on _++_ (absℕ (int a b)) 1ℕ (min a b) >
+        suc (absℕ (int a b) ++ min a b)     ≅< congruent-on suc absab+minab=maxab+0 >
+        suc (max a b) ++ 0ℕ                 ∎)
+
+abs=neg : (x : ℤ) → abs x ≅ abs (neg x)
+abs=neg (int p q) = z= (bi-congruent _++_ (commute-on max p q) (commute-on min q p))

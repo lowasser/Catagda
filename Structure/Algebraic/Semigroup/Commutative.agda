@@ -92,6 +92,12 @@ a<bc>-to-c<ba>-on _∙_ a b c = begin≅
     c ∙ (a ∙ b)     ≅< left-congruent-on _∙_ (commute-on _∙_ a b) >
     c ∙ (b ∙ a)     ∎  
 
+a<bc>-to-<ba>c-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c : S) → a ∙ (b ∙ c) ≅ (b ∙ a) ∙ c
+a<bc>-to-<ba>c-on _∙_ a b c = begin≅
+    a ∙ (b ∙ c)     ≅< a<bc>-to-c<ba>-on _∙_ a b c >
+    c ∙ (b ∙ a)     ≅< commute-on _∙_ c (b ∙ a) >
+    (b ∙ a) ∙ c     ∎  
+
 <ab>c-to-a<cb>-on : {S : Set ℓS} {{SS : Setoid ℓ=S S}} → (_∙_ : BinOp S) → {{CS : CommutativeSemigroup _∙_}} → (a b c : S) → (a ∙ b) ∙ c ≅ a ∙ (c ∙ b)
 <ab>c-to-a<cb>-on _∙_ a b c = begin≅
     (a ∙ b) ∙ c     ≅< right-associate-on _∙_ a b c >

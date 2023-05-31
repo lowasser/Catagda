@@ -340,3 +340,134 @@ triΔ (suc a) (suc b) with triΔ a b
     c ++ suc b      ≅< symmetric-on ℕ (+-commute-lemma c b) >
     suc c ++ b      ≅< eq >
     a               ∎))  
+
+max : BinOp ℕ
+max 0ℕ n = n
+max m 0ℕ = m
+max (suc m) (suc n) = suc (max m n)
+
+private
+    max-commute-lemma : (a : ℕ) → max a 0ℕ ≅ a
+    max-commute-lemma 0ℕ = 0ℕ=
+    max-commute-lemma (suc a) = suc= (reflexive-on ℕ a)
+
+    max-left-congruent : LeftCongruent max
+    max-left-congruent {a} 0ℕ= = reflexive-on ℕ (max a 0ℕ)
+    max-left-congruent {suc a} {suc b} (suc= a=b) = suc= (max-left-congruent {a} {b} a=b)
+    max-left-congruent {0ℕ} (suc= b=c) = suc= b=c
+
+    max-commute : Commute max
+    max-commute 0ℕ b = symmetric-on ℕ (max-commute-lemma b)
+    max-commute (suc a) 0ℕ = symmetric-on ℕ (max-commute-lemma (suc a))
+    max-commute (suc a) (suc b) = suc= (max-commute a b)
+
+instance
+    max-is-commutative : IsCommutative max
+    max-is-commutative = record {commute = max-commute}
+
+    max-bi-congruent : BiCongruent max
+    max-bi-congruent = bi-congruent-commutative max λ {a} → max-left-congruent {a}
+
+    max-magma : Magma max
+    max-magma = record {}
+
+    max-commutative-magma : CommutativeMagma max
+    max-commutative-magma = record {}
+
+private
+    max-left-identity : LeftIdentity max 0ℕ
+    max-left-identity a = reflexive-on ℕ a
+
+instance
+    max-has-identity : HasIdentity max 0ℕ
+    max-has-identity = has-identity-commute max-left-identity
+
+private
+    max-assoc : Associate max
+    max-assoc 0ℕ b c = reflexive-on ℕ (max b c)
+    max-assoc (suc a) 0ℕ 0ℕ = reflexive-on ℕ (suc a)
+    max-assoc (suc a) 0ℕ (suc c) = begin≅
+        max (suc a) (max 0ℕ (suc c))        ≅<>
+        max (suc a) (suc c)                 ≅< right-congruent-on max {suc c} (symmetric-on ℕ (right-identity-on max (suc a))) >
+        max (max (suc a) 0ℕ) (suc c)        ∎
+    max-assoc (suc a) (suc b) 0ℕ = begin≅
+        max (suc a) (max (suc b) 0ℕ)        ≅< left-congruent-on max {suc a} (right-identity-on max (suc b)) >
+        max (suc a) (suc b)                 ≅< symmetric-on ℕ (right-identity-on max (suc (max a b))) >
+        max (max (suc a) (suc b)) 0ℕ        ∎
+    max-assoc (suc a) (suc b) (suc c) = suc= (max-assoc a b c)
+
+instance
+    max-is-associative : IsAssociative max
+    max-is-associative = record {associate = max-assoc}
+
+    max-semigroup : Semigroup max
+    max-semigroup = record {}
+
+    max-commutative-semigroup : CommutativeSemigroup max
+    max-commutative-semigroup = record {}
+
+    max-monoid : Monoid max 0ℕ
+    max-monoid = record {}
+
+    max-commutative-monoid : CommutativeMonoid max 0ℕ
+    max-commutative-monoid = record {}
+
+max-≤ : (a b : ℕ) → a ≤ b → max a b ≅ b
+max-≤ 0ℕ b _ = reflexive-on ℕ b
+max-≤ (suc m) (suc n) (s≤s m≤n) = suc= (max-≤ m n m≤n)
+
+min : BinOp ℕ
+min 0ℕ _ = 0ℕ
+min _ 0ℕ = 0ℕ
+min (suc a) (suc b) = suc (min a b)
+
+private
+    min-left-congruent : LeftCongruent min
+    min-left-congruent {0ℕ} _ = 0ℕ=
+    min-left-congruent {suc a} 0ℕ= = 0ℕ=
+    min-left-congruent {suc a} (suc= b=c) = suc= (min-left-congruent b=c)
+
+    min-commute : Commute min
+    min-commute 0ℕ 0ℕ = 0ℕ=
+    min-commute 0ℕ (suc _) = 0ℕ=
+    min-commute (suc _) 0ℕ = 0ℕ=
+    min-commute (suc m) (suc n) = suc= (min-commute m n)
+
+    min-assoc : Associate min
+    min-assoc 0ℕ _ _ = 0ℕ=
+    min-assoc (suc _) 0ℕ _ = 0ℕ=
+    min-assoc (suc _) (suc _) 0ℕ = 0ℕ=
+    min-assoc (suc a) (suc b) (suc c) = suc= (min-assoc a b c)
+
+    min-left-zero : LeftZero min 0ℕ
+    min-left-zero 0ℕ = 0ℕ=
+    min-left-zero (suc _) = 0ℕ=
+
+instance
+    min-is-commutative : IsCommutative min
+    min-is-commutative = record {commute = min-commute}
+
+    min-bi-congruent : BiCongruent min
+    min-bi-congruent = bi-congruent-commutative min min-left-congruent
+
+    min-is-associative : IsAssociative min
+    min-is-associative = record {associate = min-assoc}
+
+    min-magma : Magma min
+    min-magma = record {}
+
+    min-commutative-magma : CommutativeMagma min
+    min-commutative-magma = record {}
+
+    min-semigroup : Semigroup min
+    min-semigroup = record {}
+
+    min-commutative-semigroup : CommutativeSemigroup min
+    min-commutative-semigroup = record {}
+
+    min-has-zero : HasZero min 0ℕ
+    min-has-zero = has-zero-commute min-left-zero
+
+≤-min : (a b : ℕ) → a ≤ b → min a b ≅ a
+≤-min 0ℕ _ _ = 0ℕ=
+≤-min (suc a) (suc b) (s≤s a≤b) = suc= (≤-min a b a≤b)
