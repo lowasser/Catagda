@@ -88,38 +88,10 @@ private
         (b + a * b) * c                     ≅<>
         (suc a * b) * c                     ∎
 
-        
+
+open import Structure.Algebraic.Monoid.Commutative.Instance _*_ 1ℕ (λ {a} → *-left-congruent {a}) *-commute *-assoc *-left-id public
+
 instance
-    *-is-commutative : IsCommutative _*_
-    *-is-commutative = record { commute = *-commute }
-
-    *-bicong : BiCongruent _*_
-    *-bicong = bi-congruent-commute _*_ (λ {a b c} b=c → *-left-congruent {a} {b} {c} b=c)
-
-    *-magma : Magma _*_
-    *-magma = record {}
-
-    *-commutative-magma : CommutativeMagma _*_
-    *-commutative-magma = record {}
-
-    *-is-associative : IsAssociative _*_
-    *-is-associative = record { associate = *-assoc }
-
-    *-semigroup : Semigroup _*_
-    *-semigroup = record {}
-
-    *-commutative-semigroup : CommutativeSemigroup _*_
-    *-commutative-semigroup = record {}
-
-    *-has-identity : HasIdentity _*_ 1ℕ
-    *-has-identity = record { left-identity = *-left-id ; right-identity = *-right-id }
-
-    *-monoid : Monoid _*_ 1ℕ
-    *-monoid = record {}
-
-    *-commutative-monoid : CommutativeMonoid _*_ 1ℕ
-    *-commutative-monoid = record {}
-
     *-ringoid : Ringoid _*_ _+_
     *-ringoid = record { left-distribute = *-distributes-over-+ ; right-distribute = *-right-distributes }
 

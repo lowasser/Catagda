@@ -61,3 +61,17 @@ preimage-on f b = fst (surjective-on f b)
 
 preimage-proof-on : {A : Set ℓA} {B : Set ℓB} → (f : A → B) → {{BS : Setoid ℓ=B B}} → {{ISF : IsSurjective f}} → (b : B) → f (preimage-on f b) ≅ b
 preimage-proof-on f b = snd (surjective-on f b)
+
+record Inverses {A : Set ℓA} {{AS : Setoid ℓ=A A}} {B : Set ℓB} {{BS : Setoid ℓ=B B}} (f : A → B) (g : B → A) : Set (ℓA ⊔ ℓB ⊔ ℓ=A ⊔ ℓ=B) where
+    field
+        compose-identity : (b : B) → f (g b) ≅ b
+        reverse-compose-identity : (a : A) → g (f a) ≅ a
+
+SelfInverse : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (A → A) → Set (ℓA ⊔ ℓ=A)
+SelfInverse f = Inverses f f
+
+make-self-inverse : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (f : A → A) → ((a : A) → f (f a) ≅ a) → SelfInverse f
+make-self-inverse f comp-id = record {compose-identity = comp-id; reverse-compose-identity = comp-id}
+
+self-inverse-on : {A : Set ℓA} → {{AS : Setoid ℓ=A A}} → (f : A → A) → {{I : SelfInverse f}} → (a : A) → f (f a) ≅ a
+self-inverse-on _ {{I}} = Inverses.compose-identity I

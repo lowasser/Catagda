@@ -71,6 +71,3 @@ instance
 
     ≤-total-order : TotalOrder _≤_
     ≤-total-order = record {trichotomy = ≤-trichotomy}
-
-neg-swaps-order : {x y : ℤ} → x ≤ y → neg y ≤ neg x
-neg-swaps-order {int px nx} {int py ny} (z≤ pxny≤pynx) = z≤ (bi-congruent-order _≤N_ (commute-on _++_ ny px) (commute-on _++_ nx py) pxny≤pynx)

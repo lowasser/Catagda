@@ -4,9 +4,7 @@ open import Agda.Primitive
 open import Agda.Builtin.Sigma
 open import Data.Number.Nat.Base renaming (_≅_ to _=N_)
 open import Data.Number.Nat.Addition renaming (_+_ to _++_)
-open import Data.Number.Nat.Multiplication
-    hiding (*-magma; *-is-commutative; *-commutative-magma; *-is-associative; *-semigroup; *-commutative-semigroup; *-has-identity; *-monoid; *-commutative-monoid; *-ringoid; product-is-zero)
-    renaming (_*_ to _*N_)
+open import Data.Number.Nat.Multiplication renaming (_*_ to _*N_)
 open import Data.Number.Nat.Order renaming (_≤_ to _≤N_)
 open import Data.Number.Int.Base
 open import Data.Number.Int.Addition
@@ -48,37 +46,12 @@ private
         (px *N pz ++ px *N ny) ++ (nx *N nz ++ nx *N py)    ≅< <ab><cd>-to-<ac><bd>-on _++_ (px *N pz) (px *N ny) (nx *N nz) (nx *N py) >
         (px *N pz ++ nx *N nz) ++ (px *N ny ++ nx *N py)    ∎)
 
-    *-right-congruent : RightCongruent _*_
-    *-right-congruent {int px nx} {int py ny} {int pz nz} (z= py+nz=pz+ny) = z= (begin≅
-        (py *N px ++ ny *N nx) ++ (pz *N nx ++ nz *N px)    ≅< <ab><cd>-to-<ad><cb>-on _++_ (py *N px) (ny *N nx) (pz *N nx) (nz *N px) >
-        (py *N px ++ nz *N px) ++ (pz *N nx ++ ny *N nx)    ≅< bi-congruent _++_ (symmetric-on ℕ (right-distribute-on _*N_ _++_ py nz px)) (symmetric-on ℕ (right-distribute-on _*N_ _++_ pz ny nx)) >
-        (py ++ nz) *N px ++ (pz ++ ny) *N nx                ≅< bi-congruent _++_ (right-congruent-on _*N_ {px} py+nz=pz+ny) (right-congruent-on _*N_ {nx} (symmetric-on ℕ py+nz=pz+ny)) >
-        (pz ++ ny) *N px ++ (py ++ nz) *N nx                ≅< bi-congruent _++_ (right-distribute-on _*N_ _++_ pz ny px) (right-distribute-on _*N_ _++_ py nz nx) >
-        (pz *N px ++ ny *N px) ++ (py *N nx ++ nz *N nx)    ≅< <ab><cd>-to-<ad><cb>-on _++_ (pz *N px) (ny *N px) (py *N nx) (nz *N nx) >
-        (pz *N px ++ nz *N nx) ++ (py *N nx ++ ny *N px)    ∎)
-
-instance
-    *-bi-congruent : BiCongruent _*_
-    *-bi-congruent = record {left-congruent = *-left-congruent; right-congruent = *-right-congruent}
-
-    *-magma : Magma _*_
-    *-magma = record {}
-
-private
     *-commute : Commute _*_
     *-commute (int px nx) (int py ny) = z= (begin≅
         (px *N py ++ nx *N ny) ++ (py *N nx ++ ny *N px)    ≅< bi-congruent _++_ (bi-congruent _++_ (commute-on _*N_ px py) (commute-on _*N_ nx ny)) (commute-on _++_ (py *N nx) (ny *N px)) >
         (py *N px ++ ny *N nx) ++ (ny *N px ++ py *N nx)    ≅< left-congruent-on _++_ {py *N px ++ ny *N nx} (bi-congruent _++_ (commute-on _*N_ ny px) (commute-on _*N_ py nx)) >
         (py *N px ++ ny *N nx) ++ (px *N ny ++ nx *N py)    ∎)
 
-instance
-    *-is-commutative : IsCommutative _*_
-    *-is-commutative = record {commute = *-commute}
-
-    *-commutative-magma : CommutativeMagma _*_
-    *-commutative-magma = record {}
-
-private
     *-assoc : Associate _*_
     *-assoc (int px nx) (int py ny) (int pz nz) = z= (begin≅
         (px *N (py *N pz ++ ny *N nz) ++ nx *N (py *N nz ++ ny *N pz)) ++ ((px *N py ++ nx *N ny) *N nz ++ (px *N ny ++ nx *N py) *N pz)
@@ -133,17 +106,6 @@ private
         ((px *N py ++ nx *N ny) *N pz ++ (px *N ny ++ nx *N py) *N nz) ++ (px *N (py *N nz ++ ny *N pz) ++ nx *N (py *N pz ++ ny *N nz))
                         ∎)
 
-instance
-    *-is-associative : IsAssociative _*_
-    *-is-associative = record {associate = *-assoc}
-
-    *-semigroup : Semigroup _*_
-    *-semigroup = record {}
-
-    *-commutative-semigroup : CommutativeSemigroup _*_
-    *-commutative-semigroup = record {}
-
-private
     *-left-identity : LeftIdentity _*_ 1ℤ
     *-left-identity (int p n) = z= (begin≅
         (1ℕ *N p ++ 0ℕ *N n) ++ n       ≅< right-congruent-on _++_ (right-congruent-on _++_ (left-identity-on _*N_ p)) >
@@ -151,15 +113,7 @@ private
         p ++ (1ℕ *N n)                  ≅< left-congruent-on _++_ {p} (symmetric-on ℕ (right-identity-on _++_ (1ℕ *N n))) >
         p ++ (1ℕ *N n ++ 0ℕ)            ∎)
 
-instance
-    *-has-identity : HasIdentity _*_ 1ℤ
-    *-has-identity = has-identity-commute *-left-identity
-
-    *-monoid : Monoid _*_ 1ℤ
-    *-monoid = record {}
-
-    *-commutative-monoid : CommutativeMonoid _*_ 1ℤ
-    *-commutative-monoid = record {}
+open import Structure.Algebraic.Monoid.Commutative.Instance _*_ 1ℤ *-left-congruent *-commute *-assoc *-left-identity public
 
 private
     *-left-distributes : (x y z : ℤ) → x * (y + z) ≅ (x * y) + (x * z)

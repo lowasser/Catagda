@@ -77,6 +77,9 @@ record Group {ℓA ℓ=A : Level} {A : Set ℓA} {{SA : Setoid ℓ=A A}}  (_∙_
         bi-injective : BiInjective _∙_
         bi-injective = record {left-injective = left-injective; right-injective = right-injective}
 
+        inverse-self-inverse : SelfInverse _⁻¹
+        inverse-self-inverse = make-self-inverse _⁻¹ inverse-inverse
+
 open Group {{...}}
 
 right-inverse-is-unique-on : {ℓA ℓ=A : Level} {A : Set ℓA} → {{SA : Setoid ℓ=A A}} → (_∙_ : BinOp A) → (i : A) → (_⁻¹ : A → A) → {{G : Group _∙_ i _⁻¹}} → (x xi : A) → (x ∙ xi ≅ i) → xi ≅ x ⁻¹

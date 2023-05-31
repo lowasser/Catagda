@@ -34,3 +34,9 @@ instance
 
     ∙-group : Group _∙_ i inv
     ∙-group = record {}
+
+    ∙-bi-injective : BiInjective _∙_
+    ∙-bi-injective = Group.bi-injective ∙-group
+
+    inv-self-inverse : SelfInverse inv
+    inv-self-inverse = Group.inverse-self-inverse ∙-group

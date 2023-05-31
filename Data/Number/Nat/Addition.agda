@@ -43,7 +43,6 @@ instance
     ℕ+-is-associative : IsAssociative _+_
     ℕ+-is-associative = ++-is-associative
 
-
 private
     +-commute-lemma : (x y : ℕ) → (suc x + y) ≅ (x + suc y)
     +-commute-lemma 0ℕ y = begin≅
