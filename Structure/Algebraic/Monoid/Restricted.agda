@@ -16,6 +16,7 @@ module Structure.Algebraic.Monoid.Restricted
     where
 
 open import Structure.Restricted
+open import Structure.Setoid.Restricted A P
 open Monoid {{...}}
 
 open import Function.Binary.Properties

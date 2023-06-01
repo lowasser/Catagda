@@ -16,6 +16,7 @@ module Structure.Algebraic.Monoid.Commutative.Restricted
     where
 
 open import Structure.Restricted
+open import Structure.Setoid.Restricted A P
 open CommutativeMonoid {{...}}
 
 open import Function.Binary.Properties

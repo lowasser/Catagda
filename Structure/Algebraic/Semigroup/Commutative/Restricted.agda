@@ -14,6 +14,7 @@ module Structure.Algebraic.Semigroup.Commutative.Restricted
     where
 
 open import Structure.Restricted
+open import Structure.Setoid.Restricted A P
 open CommutativeSemigroup {{...}}
 
 open import Function.Binary.Properties

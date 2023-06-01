@@ -15,7 +15,7 @@ module Structure.Algebraic.Magma.Restricted
     where
 
 open import Structure.Restricted
-open import Structure.Setoid.Restricted A P public
+open import Structure.Setoid.Restricted A P
 open Magma {{...}}
 
 restricted-op : BinOp (A RestrictedTo P)
@@ -30,4 +30,5 @@ instance
         right-cong : RightCongruent restricted-op
         right-cong {_ constraint _} (eq-restricted a=b) = eq-restricted (right-congruent-on _∙_ a=b)
 
-open import Structure.Algebraic.Magma.Instance restricted-op public
+    restricted-op-magma : Magma restricted-op
+    restricted-op-magma = record {}
